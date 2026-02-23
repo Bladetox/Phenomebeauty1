@@ -1,15 +1,18 @@
 import { google } from "googleapis";
 
-// Read the service account from environment variable
+// 1️⃣ Read the service account JSON from Vercel environment
 const serviceAccountJson = process.env.GOOGLE_SERVICE_KEY;
+
 if (!serviceAccountJson) {
-  throw new Error("GOOGLE_SERVICE_KEY is not set in Vercel environment variables.");
+  throw new Error(
+    "GOOGLE_SERVICE_KEY is not set in Vercel environment variables."
+  );
 }
 
-// Parse JSON to get credentials
+// 2️⃣ Parse it to get the credentials
 const serviceAccount = JSON.parse(serviceAccountJson);
 
-// Setup Google Sheets auth
+// 3️⃣ Setup Google Sheets auth
 const auth = new google.auth.GoogleAuth({
   credentials: serviceAccount,
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
@@ -17,7 +20,7 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: "v4", auth });
 
-// Example function to get sheet data
+// 4️⃣ Function to fetch sheet data
 export async function getSheetData(spreadsheetId, range = "Sheet1!A1:E10") {
   try {
     const client = await auth.getClient();
@@ -33,10 +36,10 @@ export async function getSheetData(spreadsheetId, range = "Sheet1!A1:E10") {
   }
 }
 
-// Example API handler to use in index.js or a separate endpoint
+// 5️⃣ Optional: export a handler if you want a direct API endpoint
 export default async function handler(req, res) {
   try {
-    const data = await getSheetData("1G4pWPXsqCkUlpuEhmRT5sj7GE6NOxcp_OSCs1wqrRfk"); // replace with your ID
+    const data = await getSheetData("1G4pWPXsqCkUlpuEhmRT5sj7GE6NOxcp_OSCs1wqrRfk"); // Replace with your actual ID
     res.status(200).json({ data });
   } catch (error) {
     res.status(500).json({ error: error.message });
