@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PhenomeBeauty Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--a:#ec4899;--a2:#f97316;--bg:#050507;--card:rgba(15,23,42,0.95);--border:rgba(148,163,184,0.14);--border-hi:rgba(148,163,184,0.28);--text:#f8fafc;--muted:rgba(148,163,184,0.75);--green:#10b981;--red:#ef4444;--amber:#f59e0b;--purple:#818cf8;--safe:env(safe-area-inset-bottom,0px);}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;font-family:Inter,system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 20% 0%,#1a0a2e 0,transparent 50%),radial-gradient(circle at 80% 0%,#2d0a1a 0,transparent 50%),#050507;}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{width:100%;max-width:320px;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:32px 24px;backdrop-filter:blur(24px);box-shadow:0 32px 80px rgba(0,0,0,0.8);}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo img{width:60px;height:60px;border-radius:18px;object-fit:cover;box-shadow:0 12px 32px rgba(0,0,0,0.6);}
+.login-logo h2{margin:12px 0 2px;font-size:18px;font-weight:700;}
+.login-logo p{margin:0;font-size:11.5px;color:var(--muted);}
+.flbl{font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;display:block;}
+.finp{width:100%;padding:11px 13px;background:rgba(0,0,0,.5);border:1px solid var(--border);border-radius:11px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .15s;}
+.finp:focus{border-color:var(--a2);}
+.lerr{font-size:11.5px;color:var(--red);margin-top:8px;text-align:center;min-height:16px;}
+.lbtn{width:100%;padding:12px;margin-top:14px;border:none;border-radius:13px;background:linear-gradient(135deg,#f97316,#ec4899);color:#0b1120;font-size:14px;font-weight:700;cursor:pointer;transition:filter .15s;}
+.lbtn:hover{filter:brightness(1.08);}
+.app{display:none;flex-direction:column;min-height:100vh;}
+.app.visible{display:flex;}
+.topbar{background:rgba(5,5,7,.97);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);}
+.topbar-brand{display:flex;align-items:center;gap:9px;}
+.topbar-brand img{width:30px;height:30px;border-radius:9px;object-fit:cover;}
+.topbar-brand span{font-size:14px;font-weight:700;}
+.topbar-right{display:flex;gap:6px;}
+.tbtn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;padding:6px 11px;color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;transition:all .15s;}
+.tbtn:hover{color:var(--text);border-color:var(--border-hi);}
+.layout{flex:1;display:flex;overflow:hidden;}
+.sidebar{width:56px;flex-shrink:0;background:rgba(5,5,7,.8);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;}
+@media(min-width:900px){.sidebar{width:200px;align-items:stretch;padding:12px 8px;}}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:11px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:all .15s;white-space:nowrap;position:relative;justify-content:center;}
+@media(min-width:900px){.nav-item{justify-content:flex-start;}}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.nav-item.active{background:rgba(249,115,22,.13);color:#f97316;}
+.nav-icon{font-size:16px;flex-shrink:0;}
+.nav-lbl{display:none;}
+@media(min-width:900px){.nav-lbl{display:block;}}
+.nav-badge{margin-left:auto;background:var(--a);color:#0b1120;font-size:9px;font-weight:800;padding:1px 5px;border-radius:99px;min-width:18px;text-align:center;flex-shrink:0;}
+.main{flex:1;overflow-y:auto;padding:16px;}
+@media(min-width:768px){.main{padding:20px;}}
+.view{display:none;}
+.view.active{display:block;}
+.stats-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
+@media(min-width:480px){.stats-strip{grid-template-columns:repeat(4,1fr);}}
+@media(min-width:900px){.stats-strip{grid-template-columns:repeat(5,1fr);}}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
+.stat-val{font-size:22px;font-weight:700;line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:10.5px;color:var(--muted);}
+.toolbar{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+@media(min-width:600px){.toolbar{flex-direction:row;align-items:center;}}
+.sw{position:relative;flex:1;}
+.sw svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted);pointer-events:none;}
+.si{width:100%;padding:9px 12px 9px 33px;background:var(--card);border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;}
+.si:focus{border-color:var(--a2);}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:1px;-webkit-overflow-scrolling:touch;flex-shrink:0;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:5px 12px;border-radius:99px;font-size:11.5px;font-weight:500;white-space:nowrap;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;}
+.chip.on{background:rgba(249,115,22,.15);border-color:var(--a2);color:var(--a2);}
+.card-list{display:flex;flex-direction:column;gap:8px;}
+.bcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .18s;}
+.bcard:hover{border-color:rgba(249,115,22,.3);}
+.bcard.sel{border-color:var(--a2);background:rgba(249,115,22,.05);}
+.bcard:active{transform:scale(.99);}
+.bc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px;}
+.bc-name{font-size:14.5px;font-weight:700;}
+.bc-svc{font-size:12px;color:var(--muted);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bc-bot{display:flex;justify-content:space-between;align-items:center;}
+.bc-date{font-size:11.5px;color:var(--muted);}
+.bc-amt{font-size:13.5px;font-weight:700;}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .18s;margin-bottom:8px;}
+.ccard:hover{border-color:rgba(236,72,153,.3);}
+.ccard.sel{border-color:var(--a);background:rgba(236,72,153,.05);}
+.badge{padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap;}
+.b-pending{background:rgba(245,158,11,.14);color:#f59e0b;}
+.b-confirmed{background:rgba(16,185,129,.14);color:#10b981;}
+.b-complete{background:rgba(129,140,248,.14);color:#818cf8;}
+.b-cancelled{background:rgba(148,163,184,.09);color:rgba(148,163,184,.6);}
+.b-refunded{background:rgba(239,68,68,.11);color:#ef4444;}
+.b-new{background:rgba(236,72,153,.12);color:#ec4899;}
+.b-existing{background:rgba(249,115,22,.12);color:#f97316;}
+.empty{text-align:center;color:var(--muted);padding:48px 20px;font-size:13px;}
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);}
+.overlay.open{display:block;}
+.detail{position:fixed;bottom:0;left:0;right:0;z-index:201;background:#0c1422;border-top:1px solid var(--border);border-radius:22px 22px 0 0;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,0,.67,0);padding-bottom:calc(20px + var(--safe));}
+.detail.open{transform:translateY(0);}
+@media(min-width:768px){.detail{left:auto;right:0;top:0;bottom:0;width:400px;border-radius:0;border-left:1px solid var(--border);border-top:none;max-height:none;}}
+.dhandle{width:36px;height:3px;background:rgba(148,163,184,.25);border-radius:99px;margin:12px auto 6px;}
+.dhdr{display:flex;align-items:flex-start;justify-content:space-between;padding:4px 20px 14px;border-bottom:1px solid var(--border);}
+.dname{font-size:17px;font-weight:700;margin:0 0 2px;}
+.dsub{font-size:11px;color:var(--muted);}
+.dclose{background:rgba(255,255,255,.07);border:none;border-radius:50%;width:30px;height:30px;color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.dclose:hover{color:var(--text);}
+.dbody{padding:0 20px;}
+.dsec{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin:18px 0 8px;}
+.drow{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;padding:5px 0;border-bottom:1px solid rgba(148,163,184,.07);}
+.drow:last-child{border-bottom:none;}
+.dlbl{color:var(--muted);flex-shrink:0;margin-right:12px;}
+.dval{text-align:right;word-break:break-word;max-width:58%;font-size:12.5px;}
+.dnote{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.6;margin:4px 0;}
+.acts{padding:0 20px;margin-top:4px;}
+.albl{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.ssel{width:100%;padding:9px 11px;background:rgba(0,0,0,.5);border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:13px;font-family:inherit;outline:none;margin-bottom:10px;-webkit-appearance:none;cursor:pointer;}
+.ssel:focus{border-color:var(--a2);}
+.abtn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit;transition:all .15s;margin-bottom:7px;}
+.abtn:disabled{opacity:.4;cursor:not-allowed;}
+.ab-primary{background:linear-gradient(135deg,#f97316,#ec4899);color:#0b1120;}
+.ab-primary:hover:not(:disabled){filter:brightness(1.08);}
+.ab-success{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25);}
+.ab-success:hover:not(:disabled){background:rgba(16,185,129,.22);}
+.ab-ghost{background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--border);}
+.ab-ghost:hover:not(:disabled){border-color:var(--border-hi);}
+.ab-danger{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.22);}
+.ab-danger:hover:not(:disabled){background:rgba(239,68,68,.2);}
+.link-box{word-break:break-all;font-size:11px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:9px;padding:9px;color:var(--muted);margin-bottom:7px;}
+.cal-note{font-size:11px;text-align:center;padding:8px 0 0;color:var(--muted);}
+.cal-note.ok{color:#10b981;}
+.mrow{display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;}
+.mtotal{font-size:14.5px;font-weight:700;padding:6px 0;}
+.modal-bg{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal{background:#0c1422;border:1px solid var(--border);border-radius:18px;padding:22px;width:100%;max-width:340px;box-shadow:0 32px 80px rgba(0,0,0,.9);}
+.modal h3{margin:0 0 16px;font-size:15px;font-weight:700;}
+.modal label{display:block;font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;}
+.modal input{width:100%;padding:9px 11px;background:rgba(0,0,0,.5);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;margin-bottom:10px;}
+.modal input:focus{border-color:var(--a2);}
+.mnote{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5;}
+.mbtns{display:flex;gap:8px;}
+.mbtns .abtn{flex:1;margin:0;}
+.bnav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:90;background:rgba(5,5,7,.97);border-top:1px solid var(--border);padding-bottom:var(--safe);backdrop-filter:blur(24px);}
+@media(min-width:768px){.bnav{display:none;}}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 2px;cursor:pointer;color:var(--muted);transition:color .15s;position:relative;}
+.bni.on{color:var(--a2);}
+.bni-icon{font-size:17px;line-height:1;}
+.bni-lbl{font-size:9px;font-weight:600;margin-top:3px;letter-spacing:.02em;}
+.bni-dot{position:absolute;top:5px;right:calc(50% - 13px);background:var(--a);color:#0b1120;font-size:8.5px;font-weight:800;min-width:15px;height:15px;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 2px;}
+.toast{position:fixed;bottom:calc(72px + var(--safe));left:50%;transform:translateX(-50%) translateY(12px);opacity:0;background:#1e293b;border:1px solid var(--border);color:var(--text);padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.7);z-index:9999;transition:transform .22s ease,opacity .22s ease;white-space:nowrap;pointer-events:none;}
+@media(min-width:768px){.toast{bottom:24px;}}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.ok{border-color:rgba(16,185,129,.5);color:#10b981;}
+.toast.err{border-color:rgba(239,68,68,.5);color:#ef4444;}
+.main{padding-bottom:calc(72px + var(--safe));}
+@media(min-width:768px){.main{padding-bottom:20px;}}
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty">
+      <h2>PhenomeBeauty</h2><p>Admin Dashboard</p>
+    </div>
+    <label class="flbl" for="lpwd">Password</label>
+    <input class="finp" type="password" id="lpwd" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="lerr" id="lerr"></div>
+    <button class="lbtn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="topbar-brand"><img src="https://iili.io/fpiAjBj.jpg" alt=""><span>Admin</span></div>
+    <div class="topbar-right">
+      <button class="tbtn" onclick="refreshCurrent()">↻ Refresh</button>
+      <button class="tbtn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="nav-item active" data-view="bookings" onclick="switchView('bookings',this)">
+        <span class="nav-icon">📋</span><span class="nav-lbl">Bookings</span>
+        <span class="nav-badge" id="sb-b" style="display:none;"></span>
+      </div>
+      <div class="nav-item" data-view="consultations" onclick="switchView('consultations',this)">
+        <span class="nav-icon">🌸</span><span class="nav-lbl">Consultations</span>
+        <span class="nav-badge" id="sb-c" style="background:#ec4899;display:none;"></span>
+      </div>
+    </nav>
+
+    <div class="main" id="main">
+
+      <!-- BOOKINGS -->
+      <div class="view active" id="view-bookings">
+        <div class="stats-strip" id="stats"></div>
+        <div class="toolbar">
+          <div class="sw">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input class="si" id="si" placeholder="Name, phone, service…" oninput="renderBookings()">
+          </div>
+          <div class="chips" id="fc">
+            <div class="chip on" data-f="all" onclick="sf(this)">All</div>
+            <div class="chip" data-f="Pending Payment" onclick="sf(this)">Pending</div>
+            <div class="chip" data-f="Confirmed" onclick="sf(this)">Confirmed</div>
+            <div class="chip" data-f="Service Complete" onclick="sf(this)">Complete</div>
+            <div class="chip" data-f="balance" onclick="sf(this)">Balance Due</div>
+            <div class="chip" data-f="Cancelled" onclick="sf(this)">Cancelled</div>
+          </div>
+        </div>
+        <div class="card-list" id="blist"><div class="empty">Loading…</div></div>
+      </div>
+
+      <!-- CONSULTATIONS -->
+      <div class="view" id="view-consultations">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+          <div>
+            <div style="font-size:16px;font-weight:700;margin-bottom:2px;">Consultations</div>
+            <div style="font-size:12px;color:var(--muted);">New client safety &amp; source data</div>
+          </div>
+          <div class="chips">
+            <div class="chip on" data-cf="all" onclick="scf(this)">All</div>
+            <div class="chip" data-cf="New" onclick="scf(this)">New Divas</div>
+            <div class="chip" data-cf="Existing" onclick="scf(this)">Existing</div>
+          </div>
+        </div>
+        <div id="src-summary" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;"></div>
+        <div id="clist"><div class="empty">Loading…</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="bnav">
+    <div class="bni on" data-v="bookings" onclick="mbn(this)">
+      <div class="bni-icon">📋</div><div class="bni-lbl">Bookings</div>
+      <div class="bni-dot" id="bn-p">0</div>
+    </div>
+    <div class="bni" data-v="consultations" onclick="mbn(this)">
+      <div class="bni-icon">🌸</div><div class="bni-lbl">Consults</div>
+      <div class="bni-dot" id="bn-c" style="background:#ec4899;">0</div>
+    </div>
+  </nav>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeDetail()"></div>
+<div class="detail" id="detail">
+  <div class="dhandle"></div>
+  <div class="dhdr">
+    <div><div class="dname" id="dname"></div><div class="dsub" id="dsub"></div></div>
+    <button class="dclose" onclick="closeDetail()">✕</button>
+  </div>
+  <div class="dbody" id="dbody"></div>
+</div>
+
+<div class="modal-bg" id="modal-rs">
+  <div class="modal">
+    <h3>📅 Reschedule</h3>
+    <label>New Date</label><input type="date" id="rs-date">
+    <label>New Time</label><input type="text" id="rs-time" placeholder="10:00-12:00">
+    <div class="mnote" id="rs-note"></div>
+    <div class="mbtns">
+      <button class="abtn ab-ghost" onclick="cm('modal-rs')">Cancel</button>
+      <button class="abtn ab-primary" onclick="doReschedule()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let token='',allB=[],allC=[],bFilter='all',cFilter='all',curView='bookings',rsId='',selId='';
+
+async function doLogin(){
+  const pwd=document.getElementById('lpwd').value.trim();if(!pwd)return;
+  try{
+    const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+    const d=await r.json();
+    if(!r.ok){document.getElementById('lerr').textContent=d.error||'Invalid password';return;}
+    token=d.token;sessionStorage.setItem('pbAdminToken',token);showApp();
+  }catch(e){document.getElementById('lerr').textContent='Connection error';}
+}
+function doLogout(){sessionStorage.removeItem('pbAdminToken');token='';location.reload();}
+function api(u,o={}){o.headers={...(o.headers||{}),'x-admin-token':token};return fetch(u,o);}
+window.addEventListener('load',()=>{const t=sessionStorage.getItem('pbAdminToken');if(t){token=t;showApp();}});
+function showApp(){document.getElementById('login-wrap').style.display='none';document.getElementById('app').classList.add('visible');loadAll();}
+
+async function loadAll(){await Promise.all([loadBookings(),loadConsults()]);}
+async function refreshCurrent(){curView==='bookings'?await loadBookings():await loadConsults();}
+
+async function loadBookings(){
+  document.getElementById('blist').innerHTML='<div class="empty">Loading…</div>';
+  try{
+    const r=await api('/api/admin/bookings');
+    if(r.status===401){doLogout();return;}
+    allB=await r.json();updateStats();renderBookings();
+  }catch(e){document.getElementById('blist').innerHTML=`<div class="empty">Error: ${esc(e.message)}</div>`;}
+}
+
+async function loadConsults(){
+  document.getElementById('clist').innerHTML='<div class="empty">Loading…</div>';
+  try{
+    const r=await api('/api/admin/consultations');
+    if(r.status===401)return;
+    allC=await r.json();renderConsults();
+  }catch(e){document.getElementById('clist').innerHTML=`<div class="empty">Error: ${esc(e.message)}</div>`;}
+}
+
+function updateStats(){
+  const pend=allB.filter(b=>b.status==='Pending Payment').length;
+  const conf=allB.filter(b=>b.status==='Confirmed').length;
+  const comp=allB.filter(b=>b.status==='Service Complete').length;
+  const rev=allB.filter(b=>b.status==='Confirmed'||b.status==='Service Complete').reduce((a,b)=>a+parseFloat(b.deposit||0),0);
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat-val">${allB.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat" style="border-color:rgba(245,158,11,.25);"><div class="stat-val" style="color:#f59e0b;">${pend}</div><div class="stat-lbl">Pending</div></div>
+    <div class="stat" style="border-color:rgba(16,185,129,.25);"><div class="stat-val" style="color:#10b981;">${conf}</div><div class="stat-lbl">Confirmed</div></div>
+    <div class="stat" style="border-color:rgba(129,140,248,.25);"><div class="stat-val" style="color:#818cf8;">${comp}</div><div class="stat-lbl">Complete</div></div>
+    <div class="stat" style="border-color:rgba(16,185,129,.2);"><div class="stat-val" style="color:#10b981;font-size:18px;">R${rev.toFixed(0)}</div><div class="stat-lbl">Deposits In</div></div>`;
+  document.getElementById('bn-p').textContent=pend;
+  document.getElementById('bn-c').textContent=allC.filter(c=>c.clientType==='New').length;
+  const sbb=document.getElementById('sb-b');if(pend>0){sbb.textContent=pend;sbb.style.display='flex';}else sbb.style.display='none';
+}
+
+function switchView(name,el){
+  curView=name;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+}
+function mbn(el){
+  const v=el.dataset.v;
+  document.querySelectorAll('.bni').forEach(i=>i.classList.remove('on'));el.classList.add('on');
+  curView=v;
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===v));
+  closeDetail();
+}
+
+function sf(chip){document.querySelectorAll('#fc .chip').forEach(c=>c.classList.remove('on'));chip.classList.add('on');bFilter=chip.dataset.f;renderBookings();}
+function scf(chip){document.querySelectorAll('[data-cf]').forEach(c=>c.classList.remove('on'));chip.classList.add('on');cFilter=chip.dataset.cf;renderConsults();}
+
+function renderBookings(){
+  const q=(document.getElementById('si').value||'').toLowerCase().trim();
+  let list=allB.filter(b=>{
+    if(bFilter==='balance')return b.balanceStatus==='Requested';
+    if(bFilter!=='all')return b.status===bFilter;
+    return true;
+  });
+  if(q)list=list.filter(b=>(b.name||'').toLowerCase().includes(q)||(b.phone||'').includes(q)||(b.services||'').toLowerCase().includes(q)||(b.email||'').toLowerCase().includes(q));
+  const el=document.getElementById('blist');
+  if(!list.length){el.innerHTML='<div class="empty">No bookings found</div>';return;}
+  el.innerHTML=list.map(b=>`
+    <div class="bcard${b.bookingId===selId?' sel':''}" onclick="selB('${esc(b.bookingId)}')">
+      <div class="bc-top"><div class="bc-name">${esc(b.name||'—')}</div><span class="badge ${bc(b.status)}">${esc(b.status||'')}</span></div>
+      <div class="bc-svc">${esc(b.services||'—')}</div>
+      <div class="bc-bot"><div class="bc-date">📅 ${fmtD(b.date)} · ${esc(b.time||'')}</div><div class="bc-amt">R${esc(b.total||'0')}</div></div>
+      ${b.balanceStatus==='Requested'?'<div style="margin-top:7px;font-size:11px;color:#f97316;background:rgba(249,115,22,.08);border-radius:7px;padding:4px 9px;display:inline-block;">💰 Balance awaiting payment</div>':''}
+    </div>`).join('');
+}
+
+function selB(id){selId=id;renderBookings();const b=allB.find(x=>x.bookingId===id);if(b)openDetail(b);}
+
+function openDetail(b){
+  document.getElementById('dname').textContent=b.name||'—';
+  document.getElementById('dsub').textContent=`${fmtD(b.date)} · ${b.time||''} · Ref: ${b.bookingId}`;
+  const canBal=(b.status==='Confirmed'||b.status==='Service Complete')&&b.balanceStatus!=='Paid'&&b.balanceStatus!=='Requested';
+  const canRef=b.status==='Confirmed'||b.status==='Service Complete';
+  const canCan=b.status!=='Cancelled'&&b.status!=='Refunded';
+  const c=allC.find(x=>x.bookingId===b.bookingId);
+  document.getElementById('dbody').innerHTML=`
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding:14px 0 0;">
+      <span class="badge ${bc(b.status)}">${esc(b.status)}</span>
+      ${b.balanceStatus&&b.balanceStatus!=='Pending'?`<span class="badge ${b.balanceStatus==='Paid'?'b-confirmed':'b-pending'}">Balance: ${esc(b.balanceStatus)}</span>`:''}
+    </div>
+    <div class="dsec">Appointment</div>
+    <div class="drow"><span class="dlbl">Date</span><span class="dval" style="font-weight:600;">${fmtD(b.date)}</span></div>
+    <div class="drow"><span class="dlbl">Time</span><span class="dval">${esc(b.time||'—')}</span></div>
+    <div class="drow"><span class="dlbl">Services</span><span class="dval">${esc(b.services||'—')}</span></div>
+    <div class="dsec">Client</div>
+    <div class="drow"><span class="dlbl">Name</span><span class="dval">${esc(b.name||'—')}</span></div>
+    <div class="drow"><span class="dlbl">Phone</span><span class="dval"><a href="tel:${esc(b.phone)}" style="color:#f97316;">${esc(b.phone||'—')}</a></span></div>
+    <div class="drow"><span class="dlbl">Email</span><span class="dval" style="font-size:11.5px;"><a href="mailto:${esc(b.email)}" style="color:#f97316;">${esc(b.email||'—')}</a></span></div>
+    <div class="drow"><span class="dlbl">Address</span><span class="dval" style="font-size:11.5px;">${esc(b.address||'—')}</span></div>
+    ${c?`<div class="drow"><span class="dlbl">Client Type</span><span class="dval"><span class="badge ${c.clientType==='New'?'b-new':'b-existing'}">${esc(c.clientType)}</span></span></div>
+    <div class="drow"><span class="dlbl">Source</span><span class="dval">${esc(c.leadSource||'—')}</span></div>`:''}
+    <div class="dsec">Financials</div>
+    <div class="mrow"><span style="color:var(--muted);">Total</span><span class="mtotal">R${esc(b.total||'0')}</span></div>
+    <div class="mrow" style="color:#10b981;"><span>Deposit Paid</span><span>R${esc(b.deposit||'0')}</span></div>
+    <div class="mrow" style="color:#f97316;"><span>Balance Due</span><span>R${esc(b.balanceDue||'0')}</span></div>
+    ${b.calEventId?'<div class="cal-note ok">📅 Google Calendar synced</div>':'<div class="cal-note">⚠ Not synced to Calendar</div>'}
+    ${c&&(c.skinConditions||c.medications||c.allergies||c.healthConditions||c.pregnancy==='Yes')?`
+    <div class="dsec">Health Notes</div>
+    ${c.skinConditions?`<div class="dnote">🩹 <strong>Skin:</strong> ${esc(c.skinConditions)}</div>`:''}
+    ${c.medications?`<div class="dnote">💊 <strong>Medications:</strong> ${esc(c.medications)}</div>`:''}
+    ${c.allergies?`<div class="dnote" style="border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.06);">⚠️ <strong style="color:#f59e0b;">Allergies:</strong> ${esc(c.allergies)}</div>`:''}
+    ${c.healthConditions?`<div class="dnote">🏥 <strong>Health:</strong> ${esc(c.healthConditions)}</div>`:''}
+    ${c.pregnancy==='Yes'?'<div class="dnote" style="border-color:rgba(236,72,153,.25);background:rgba(236,72,153,.07);">🤰 <strong style="color:#ec4899;">Client is pregnant</strong></div>':''}`:''}`;
+  const acts=document.createElement('div');acts.className='acts';
+  acts.innerHTML=`
+    <div class="dsec" style="margin-top:18px;">Actions</div>
+    <div class="albl">Change Status</div>
+    <select class="ssel" onchange="updStatus('${esc(b.bookingId)}',this.value)">
+      ${['Pending Payment','Confirmed','Service Complete','Cancelled','Refunded'].map(s=>`<option value="${s}"${s===b.status?' selected':''}>${s}</option>`).join('')}
+    </select>
+    <button class="abtn ab-ghost" onclick="openRS('${esc(b.bookingId)}','${esc(b.date)}','${esc(b.time||'')}')">📅 Reschedule</button>
+    ${canBal?`<button class="abtn ab-success" onclick="doReqBal('${esc(b.bookingId)}')">💰 Request Balance — R${esc(b.balanceDue||'0')}</button>`:''}
+    ${b.balanceStatus==='Requested'&&b.yocoLink?`<div class="albl" style="margin-top:8px;">Balance Payment Link</div><div class="link-box">${esc(b.yocoLink)}</div><button class="abtn ab-ghost" onclick="cp('${esc(b.yocoLink)}')">📋 Copy Link</button>`:''}
+    ${canRef?`<button class="abtn ab-danger" onclick="doRefund('${esc(b.bookingId)}')">↩ Process Refund</button>`:''}
+    ${canCan?`<button class="abtn ab-ghost" style="color:rgba(148,163,184,.5);" onclick="updStatus('${esc(b.bookingId)}','Cancelled')">Cancel Booking</button>`:''}`;
+  document.getElementById('dbody').appendChild(acts);
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('detail').classList.add('open');
+}
+
+function closeDetail(){selId='';document.getElementById('overlay').classList.remove('open');document.getElementById('detail').classList.remove('open');renderBookings();}
+
+function renderConsults(){
+  let list=allC;
+  if(cFilter!=='all')list=list.filter(c=>c.clientType===cFilter);
+  const src={};allC.forEach(c=>{const s=c.leadSource||'Unknown';src[s]=(src[s]||0)+1;});
+  const tops=Object.entries(src).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  document.getElementById('src-summary').innerHTML=tops.map(([s,n])=>`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+      <div style="font-size:18px;font-weight:700;margin-bottom:2px;">${n}</div>
+      <div style="font-size:11px;color:var(--muted);">${esc(s)}</div>
+    </div>`).join('');
+  const newN=allC.filter(c=>c.clientType==='New').length;
+  const sbc=document.getElementById('sb-c');if(newN>0){sbc.textContent=newN;sbc.style.display='flex';}
+  document.getElementById('bn-c').textContent=newN;
+  const el=document.getElementById('clist');
+  if(!list.length){el.innerHTML='<div class="empty">No consultations yet</div>';return;}
+  el.innerHTML=list.map(c=>`
+    <div class="ccard" onclick="selC('${esc(c.bookingId)}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">
+        <div style="font-size:14px;font-weight:700;">${esc(c.name||'—')}</div>
+        <span class="badge ${c.clientType==='New'?'b-new':'b-existing'}">${esc(c.clientType||'—')}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:12px;color:var(--muted);">${c.leadSource?'📣 '+esc(c.leadSource):''}</div>
+        <div style="font-size:11.5px;color:var(--muted);">${fmtD(c.date)}</div>
+      </div>
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+        ${c.pregnancy==='Yes'?'<span style="font-size:10.5px;color:#ec4899;background:rgba(236,72,153,.08);border-radius:6px;padding:3px 8px;">🤰 Pregnant</span>':''}
+        ${c.allergies?'<span style="font-size:10.5px;color:#f59e0b;background:rgba(245,158,11,.08);border-radius:6px;padding:3px 8px;">⚠️ Allergies</span>':''}
+        ${c.medications?'<span style="font-size:10.5px;color:#818cf8;background:rgba(129,140,248,.08);border-radius:6px;padding:3px 8px;">💊 Medications</span>':''}
+      </div>
+    </div>`).join('');
+}
+
+function selC(id){
+  const c=allC.find(x=>x.bookingId===id);if(!c)return;
+  document.getElementById('dname').textContent=c.name||'—';
+  document.getElementById('dsub').textContent=`${fmtD(c.date)} · Ref: ${c.bookingId}`;
+  const has=c.skinConditions||c.medications||c.allergies||c.healthConditions;
+  document.getElementById('dbody').innerHTML=`
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding:14px 0 0;">
+      <span class="badge ${c.clientType==='New'?'b-new':'b-existing'}">${esc(c.clientType||'')}</span>
+      ${c.status?`<span class="badge ${bc(c.status)}">${esc(c.status)}</span>`:''}
+    </div>
+    <div class="dsec">Client</div>
+    <div class="drow"><span class="dlbl">Name</span><span class="dval">${esc(c.name||'—')}</span></div>
+    <div class="drow"><span class="dlbl">Phone</span><span class="dval"><a href="tel:${esc(c.phone)}" style="color:#f97316;">${esc(c.phone||'—')}</a></span></div>
+    <div class="drow"><span class="dlbl">Email</span><span class="dval" style="font-size:11.5px;"><a href="mailto:${esc(c.email)}" style="color:#f97316;">${esc(c.email||'—')}</a></span></div>
+    <div class="drow"><span class="dlbl">Appointment</span><span class="dval">${fmtD(c.date)} · ${esc(c.time||'')}</span></div>
+    <div class="drow"><span class="dlbl">Services</span><span class="dval">${esc(c.services||'—')}</span></div>
+    <div class="dsec">Consultation Data</div>
+    <div class="drow"><span class="dlbl">Client Type</span><span class="dval"><span class="badge ${c.clientType==='New'?'b-new':'b-existing'}">${esc(c.clientType||'—')}</span></span></div>
+    <div class="drow"><span class="dlbl">Lead Source</span><span class="dval">${esc(c.leadSource||'—')}</span></div>
+    <div class="drow"><span class="dlbl">Pregnancy</span><span class="dval" style="${c.pregnancy==='Yes'?'color:#ec4899;font-weight:700;':''}">${esc(c.pregnancy||'No')}</span></div>
+    ${has?`<div class="dsec">Health Notes</div>
+    ${c.skinConditions?`<div class="dnote">🩹 <strong>Skin Conditions:</strong><br>${esc(c.skinConditions)}</div>`:''}
+    ${c.medications?`<div class="dnote">💊 <strong>Medications:</strong><br>${esc(c.medications)}</div>`:''}
+    ${c.allergies?`<div class="dnote" style="border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.06);">⚠️ <strong style="color:#f59e0b;">Allergies:</strong><br>${esc(c.allergies)}</div>`:''}
+    ${c.healthConditions?`<div class="dnote">🏥 <strong>Health Conditions:</strong><br>${esc(c.healthConditions)}</div>`:''}
+    `:'<div class="dnote">No health concerns noted</div>'}`;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('detail').classList.add('open');
+}
+
+async function updStatus(id,status){
+  try{
+    const r=await api('/api/admin/update-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id,status})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    showToast('Status updated ✓','ok');await loadBookings();const b=allB.find(x=>x.bookingId===id);if(b)selB(b.bookingId);
+  }catch(e){showToast(e.message,'err');}
+}
+function openRS(id,date,time){rsId=id;document.getElementById('rs-date').value=date||'';document.getElementById('rs-time').value=time||'';document.getElementById('rs-note').textContent=`Current: ${fmtD(date)} at ${time}`;document.getElementById('modal-rs').classList.add('open');}
+function cm(id){document.getElementById(id).classList.remove('open');}
+async function doReschedule(){
+  const nd=document.getElementById('rs-date').value,nt=document.getElementById('rs-time').value.trim();
+  if(!nd||!nt){showToast('Enter date and time','err');return;}
+  try{
+    const r=await api('/api/admin/reschedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:rsId,newDate:nd,newTime:nt})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    cm('modal-rs');showToast('Rescheduled ✓','ok');await loadBookings();const b=allB.find(x=>x.bookingId===rsId);if(b)selB(b.bookingId);
+  }catch(e){showToast(e.message,'err');}
+}
+async function doReqBal(id){
+  if(!confirm('Send balance payment link to client?'))return;
+  try{
+    const r=await api('/api/admin/request-balance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    showToast(`Balance link sent — R${d.balanceDue.toFixed(2)}`,'ok');await loadBookings();const b=allB.find(x=>x.bookingId===id);if(b)selB(b.bookingId);
+  }catch(e){showToast(e.message,'err');}
+}
+async function doRefund(id){
+  const reason=prompt('Refund reason (optional):')||'requested_by_customer';if(reason===null)return;
+  try{
+    const r=await api('/api/admin/refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id,reason})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    showToast('Refund processed ✓','ok');await loadBookings();closeDetail();
+  }catch(e){showToast(e.message,'err');}
+}
+function cp(t){navigator.clipboard.writeText(t).then(()=>showToast('Copied ✓','ok')).catch(()=>showToast('Copy failed','err'));}
+function bc(s){return s==='Pending Payment'?'b-pending':s==='Confirmed'?'b-confirmed':s==='Service Complete'?'b-complete':s==='Cancelled'?'b-cancelled':s==='Refunded'?'b-refunded':'b-pending';}
+function fmtD(ds){if(!ds)return '—';const[y,m,d]=ds.split('-').map(Number);const dt=new Date(y,m-1,d);const D=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return`${D[dt.getDay()]} ${d} ${M[m-1]}`;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${type}`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>

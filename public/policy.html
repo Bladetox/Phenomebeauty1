@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenomeBeauty — Consultation & Policy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#ec4899;--accent2:#f97316;--card:rgba(15,23,42,0.92);--border:rgba(148,163,184,0.18);--text:#f8fafc;--muted:rgba(148,163,184,0.8);}
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;font-family:Inter,system-ui,sans-serif;color:var(--text);
+  background:radial-gradient(circle at 0% 0%,#2f1445 0,transparent 55%),
+             radial-gradient(circle at 100% 0%,#ff4f8b 0,transparent 55%),
+             radial-gradient(circle at 0% 100%,#111827 0,transparent 55%),#000;
+  min-height:100vh;}
+.page{max-width:680px;margin:0 auto;padding:24px 14px 60px;}
+.hdr{text-align:center;padding:32px 20px 24px;}
+.hdr-logo{width:64px;height:64px;border-radius:20px;overflow:hidden;margin:0 auto 14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);}
+.hdr-logo img{width:100%;height:100%;object-fit:cover;}
+.hdr h1{margin:5px 0 2px;font-size:19px;font-weight:600;letter-spacing:-0.02em;color:#ffffff;}
+.hdr p{margin:0;font-size:13px;color:var(--muted);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;margin-bottom:12px;backdrop-filter:blur(20px);}
+.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:var(--accent2);margin:0 0 16px;display:flex;align-items:center;gap:8px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.check-group{margin-bottom:14px;}
+.check-group:last-child{margin-bottom:0;}
+.check-lbl{font-size:13px;font-weight:600;color:var(--text);margin:0 0 8px;display:block;}
+.check-opts{display:flex;flex-wrap:wrap;gap:8px;}
+.check-opt{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--muted);cursor:pointer;}
+.check-opt input[type=checkbox]{accent-color:var(--accent2);width:15px;height:15px;}
+.s-row{border-bottom:1px solid var(--border);padding:13px 0;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;}
+.s-row:last-of-type{border-bottom:none;padding-bottom:0;}
+.s-q{font-size:13px;color:var(--text);line-height:1.5;}
+.s-q small{color:var(--muted);font-size:11.5px;display:block;margin-top:2px;}
+.s-yn{display:flex;gap:10px;flex-shrink:0;}
+.s-yn-opt{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;color:var(--muted);}
+.s-yn-opt input[type=checkbox]{accent-color:var(--accent2);width:16px;height:16px;}
+.s-detail{grid-column:1/-1;margin-top:6px;}
+.s-detail input{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none;}
+.s-detail input::placeholder{color:rgba(148,163,184,0.35);}
+.disc{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.15);border-radius:12px;padding:14px 16px;margin-top:12px;}
+.disc h4{margin:0 0 8px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent2);}
+.disc ul{margin:0;padding-left:16px;}
+.disc li{font-size:12.5px;color:var(--muted);margin-bottom:4px;line-height:1.5;}
+.p-row{padding:12px 0;border-bottom:1px solid var(--border);}
+.p-row:last-child{border-bottom:none;padding-bottom:0;}
+.p-name{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent2);margin-bottom:6px;}
+.p-text{font-size:12.5px;color:var(--muted);line-height:1.7;}
+.p-text strong{color:var(--text);}
+.badge-eff{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10.5px;font-weight:600;background:rgba(148,163,184,0.1);color:var(--muted);margin-bottom:14px;}
+.note{border-radius:12px;padding:12px 16px;font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:8px;}
+.note:last-child{margin-bottom:0;}
+.note-green{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);}
+.note-green strong{color:#10b981;}
+.note-pink{background:rgba(236,72,153,0.07);border:1px solid rgba(236,72,153,0.2);}
+.note-pink strong{color:#ec4899;}
+.note-orange{background:rgba(249,115,22,0.07);border:1px solid rgba(249,115,22,0.2);}
+.note-orange strong{color:#f97316;}
+.contact{background:linear-gradient(135deg,rgba(249,115,22,0.1),rgba(236,72,153,0.1));border:1px solid rgba(249,115,22,0.25);border-radius:14px;padding:16px;text-align:center;}
+.contact a{color:var(--accent2);text-decoration:none;font-weight:600;}
+.contact a:hover{text-decoration:underline;}
+ul.plain{margin:8px 0 0;padding-left:16px;}
+ul.plain li{font-size:12.5px;color:var(--muted);margin-bottom:5px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hdr">
+    <div class="hdr-logo"><img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty"></div>
+    <h1>PhenomeBeauty</h1>
+    <p id="hdr-sub">Client Consultation & Policy Agreement</p>
+  </div>
+
+  <!-- CONSULTATION SECTIONS — hidden when ?terms is set -->
+  <div id="consultation-sections">
+
+    <div class="card">
+      <div class="card-title">Treatment History</div>
+      <div class="check-group">
+        <span class="check-lbl">Have you had this type of waxing before?</span>
+        <div class="check-opts">
+          <div class="check-opt"><input type="checkbox"> Yes</div>
+          <div class="check-opt"><input type="checkbox"> No</div>
+        </div>
+      </div>
+      <div class="check-group">
+        <span class="check-lbl">How long since your last waxing session?</span>
+        <div class="check-opts">
+          <div class="check-opt"><input type="checkbox"> Less than 4 weeks</div>
+          <div class="check-opt"><input type="checkbox"> 4-6 weeks</div>
+          <div class="check-opt"><input type="checkbox"> More than 6 weeks</div>
+          <div class="check-opt"><input type="checkbox"> Never (first time)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Safety Assessment</div>
+      <p style="font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6;">Please answer all questions honestly. All information is strictly confidential and used solely to ensure your safety during treatment.</p>
+
+      <div class="s-row">
+        <div class="s-q"><strong>1. Skin conditions</strong> in treatment area?<small>Rashes, cuts, sunburn, eczema, acne, etc.</small></div>
+        <div class="s-yn"><div class="s-yn-opt"><input type="checkbox">Yes</div><div class="s-yn-opt"><input type="checkbox">No</div></div>
+        <div class="s-detail"><input type="text" placeholder="If yes, please specify…"></div>
+      </div>
+      <div class="s-row">
+        <div class="s-q"><strong>2. Medications or recent skin treatments?</strong><small>See disclosure list below</small></div>
+        <div class="s-yn"><div class="s-yn-opt"><input type="checkbox">Yes</div><div class="s-yn-opt"><input type="checkbox">No</div></div>
+        <div class="s-detail"><input type="text" placeholder="If yes, please list…"></div>
+      </div>
+      <div class="s-row">
+        <div class="s-q"><strong>3. Allergies</strong> to wax or beauty products?<small>See disclosure list below</small></div>
+        <div class="s-yn"><div class="s-yn-opt"><input type="checkbox">Yes</div><div class="s-yn-opt"><input type="checkbox">No</div></div>
+        <div class="s-detail"><input type="text" placeholder="If yes, please describe…"></div>
+      </div>
+      <div class="s-row">
+        <div class="s-q"><strong>4. Currently pregnant?</strong></div>
+        <div class="s-yn"><div class="s-yn-opt"><input type="checkbox">Yes</div><div class="s-yn-opt"><input type="checkbox">No</div></div>
+      </div>
+      <div class="s-row">
+        <div class="s-q"><strong>5. Health conditions</strong> affecting skin, healing, or safety?<small>Diabetes, varicose veins, immune conditions, recent surgery</small></div>
+        <div class="s-yn"><div class="s-yn-opt"><input type="checkbox">Yes</div><div class="s-yn-opt"><input type="checkbox">No</div></div>
+        <div class="s-detail"><input type="text" placeholder="If yes, please explain…"></div>
+      </div>
+      <div class="s-row">
+        <div class="s-q"><strong>6. Environmental exposure?</strong><small>Sun, heat, chemicals, frequent water or sweat contact</small></div>
+        <div class="s-yn"><div class="s-yn-opt"><input type="checkbox">Yes</div><div class="s-yn-opt"><input type="checkbox">No</div></div>
+        <div class="s-detail"><input type="text" placeholder="If yes, please describe…"></div>
+      </div>
+      <div class="s-row">
+        <div class="s-q"><strong>7. Physical factors?</strong><small>Frequent pressure or friction on areas to be waxed</small></div>
+        <div class="s-yn"><div class="s-yn-opt"><input type="checkbox">Yes</div><div class="s-yn-opt"><input type="checkbox">No</div></div>
+        <div class="s-detail"><input type="text" placeholder="If yes, please describe…"></div>
+      </div>
+      <div class="s-row">
+        <div class="s-q"><strong>8. Hair length suitable for waxing?</strong><small>Minimum 2 weeks of uninterrupted growth required</small></div>
+        <div class="s-yn"><div class="s-yn-opt"><input type="checkbox">Yes</div><div class="s-yn-opt"><input type="checkbox">No</div></div>
+      </div>
+
+      <div class="disc">
+        <h4>Medications / Treatments to Disclose (Q2)</h4>
+        <ul><li>Blood thinners — Warfarin, Aspirin, Heparin</li><li>Retinoids / Acne medications — Accutane, Retinol, Tretinoin</li><li>Steroids — Prednisone, Hydrocortisone</li><li>Chemotherapy medications</li><li>Recent skin treatments — chemical peels, laser resurfacing, micro-needling, strong exfoliants</li></ul>
+      </div>
+      <div class="disc">
+        <h4>Allergies to Disclose (Q3)</h4>
+        <ul><li>Wax ingredients — resins, rosins, paraffin, beeswax, synthetic additives, fragrances</li><li>Pre/post-wax products — oils, lotions, aloe, gels, creams</li><li>Latex (gloves / applicators)</li><li>Previous skin reactions — contact dermatitis, irritation, redness</li></ul>
+      </div>
+      <div class="disc">
+        <h4>Health Conditions to Disclose (Q5)</h4>
+        <ul><li>Diabetes</li><li>Varicose veins</li><li>Circulatory / vascular issues</li><li>Skin infections — fungal, herpes simplex, warts, eczema, psoriasis</li><li>Immune system conditions</li><li>Recent surgeries or scars in treatment area</li></ul>
+      </div>
+
+      <div style="margin-top:14px;">
+        <p style="font-size:12px;font-weight:600;color:var(--muted);margin:0 0 6px;">Additional information:</p>
+        <textarea rows="3" placeholder="Anything else we should know…" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:12.5px;font-family:inherit;outline:none;resize:vertical;"></textarea>
+      </div>
+    </div>
+
+  </div><!-- /consultation-sections -->
+
+  <!-- POLICY SECTIONS — always visible -->
+  <div class="card">
+    <div class="card-title">Refund & Cancellation Policy</div>
+    <span class="badge-eff">Effective January 2026</span>
+
+    <div class="p-row">
+      <div class="p-name">1. Cancellation — Before Service</div>
+      <div class="p-text"><strong>7+ days before:</strong> Full refund<br><strong>3-6 days before:</strong> 50% refund<br><strong>Within 48 hours:</strong> 25% refund<br><strong>Within 24 hours:</strong> No refund — full amount retained</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">2. Cancellation — After Service</div>
+      <div class="p-text">Not applicable once service has been rendered. For unsatisfactory service, see Section 3.</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">3. Service Not As Described</div>
+      <div class="p-text">Notify within 48 hours. Remedies: redo at no charge, partial refund (20-50%), or full refund if unusable. Processing: 5 business days.</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">4. Unsatisfactory Service</div>
+      <div class="p-text">Contact within 7 days with documented examples. Review may result in redo or partial refund (25-50%).</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">5. Partial Services</div>
+      <div class="p-text">Completed sessions non-refundable. Remaining sessions refunded within 7 business days.</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">6. Payment Terms</div>
+      <div class="p-text"><strong>Deposit:</strong> Non-refundable once service has begun. Constitutes booking confirmation.<br><strong>Rescheduling by PhenomeBeauty:</strong> We'll give at least 24 hours notice and offer the next available slot.<br><strong>Balance:</strong> Due on completion of service.<br><strong>Refunds:</strong> Issued to original payment method only.</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">7. Rescheduling</div>
+      <div class="p-text">Available at any time. Refunds follow cancellation terms above.</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">8. Transaction Fees</div>
+      <div class="p-text">Refunds issued as original amount minus processing fees charged at purchase.</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">9. Disputes & Escalation</div>
+      <div class="p-text">Email <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="89f9e1ece7e6e4ecebece8fcfdf0c9eee4e8e0e5a7eae6a7f3e8">[email&#160;protected]</a></strong>. Reviewed within 5 business days. Unresolved disputes may be escalated to your bank or card provider.</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">10. Consumer Protection Act</div>
+      <div class="p-text">This policy does not limit your statutory rights under South African consumer protection law.</div>
+    </div>
+    <div class="p-row">
+      <div class="p-name">11. Contact</div>
+      <div class="contact">
+        <div style="font-size:13px;margin-bottom:8px;color:#f97316;">Questions or concerns?</div>
+        <a href="mailto:phenomebeauty@gmail.co.za" style="color:#ffffff;">phenomebeauty@gmail.co.za</a><br>
+        <a href="tel:+27745115725" style="display:inline-block;margin-top:4px;color:#ec4899;">+27 74 511 5725</a>
+        <div style="font-size:11px;color:#ffffff;margin-top:6px;">We respond within 24 hours</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Client Responsibilities</div>
+    <div class="note note-green"><strong>By proceeding with payment, I confirm I will provide:</strong></div>
+    <ul class="plain"><li>A clean, safe, well-lit space with accessible power</li><li>Secured pets and a calm environment</li><li>Sufficient space for the treatment bed and equipment</li><li>A smoke-free environment during treatment</li></ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Consent & Liability</div>
+    <div class="note note-pink">
+      <strong>By completing payment</strong> I confirm I am over 18 years of age (or under 18 with parent/guardian consent), understand the nature of the treatment, accept full responsibility for results and outcomes, and release Phenome Beauty from liability for adverse reactions due to undisclosed information or failure to follow aftercare instructions.
+    </div>
+    <div class="note note-green">
+      <strong>Medical Disclosure:</strong> All medical conditions, allergies, medications, and pregnancy status have been honestly disclosed. I understand that providing false information increases risk and may affect eligibility.
+    </div>
+    <div class="note note-orange">
+      <strong>Treatment Expectations:</strong> I understand results vary between individuals, temporary redness or sensitivity may occur, and I will follow all aftercare instructions provided.
+    </div>
+  </div>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // When op
