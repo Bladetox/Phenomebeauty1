@@ -36,7 +36,7 @@ export async function getSheetData(spreadsheetId, range = "Sheet1!A1:E10") {
 // Example API handler to use in index.js or a separate endpoint
 export default async function handler(req, res) {
   try {
-    const data = await getSheetData("YOUR_SPREADSHEET_ID"); // replace with your ID
+    const data = await getSheetData("1G4pWPXsqCkUlpuEhmRT5sj7GE6NOxcp_OSCs1wqrRfk"); // replace with your ID
     res.status(200).json({ data });
   } catch (error) {
     res.status(500).json({ error: error.message });
