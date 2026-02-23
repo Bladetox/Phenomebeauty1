@@ -4,7 +4,7 @@ import { getSheetData } from "./sheet.js";
 export default async function handler(req, res) {
   try {
     // Replace with your actual Google Sheet ID
-    const SPREADSHEET_ID = "YOUR_SPREADSHEET_ID";
+    const SPREADSHEET_ID = "1G4pWPXsqCkUlpuEhmRT5sj7GE6NOxcp_OSCs1wqrRfk";
 
     // Optional: pick a range if you want something specific
     const RANGE = "Sheet1!A1:E10";
