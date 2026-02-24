@@ -1,7 +1,6 @@
 // api/lib/sheet.js — PhenomeBeauty · Sheet & Cache helpers
 'use strict';
 
-const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT }               = require('google-auth-library');
 
 const SPREADSHEET_ID = '1G4pWPXsqCkUlpuEhmRT5sj7GE6NOxcp_OSCs1wqrRfk';
@@ -38,6 +37,7 @@ function getJwt() {
 let _docCache = null, _docExpiry = 0;
 async function getDoc() {
     if (_docCache && Date.now() < _docExpiry) return _docCache;
+    const { GoogleSpreadsheet } = await import('google-spreadsheet');
     const doc = new GoogleSpreadsheet(SPREADSHEET_ID, getJwt());
     await doc.loadInfo();
     _docCache  = doc;
