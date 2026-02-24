@@ -61,9 +61,22 @@ html,body{margin:0;padding:0;font-family:Inter,system-ui,sans-serif;color:var(--
 .contact a:hover{text-decoration:underline;}
 ul.plain{margin:8px 0 0;padding-left:16px;}
 ul.plain li{font-size:12.5px;color:var(--muted);margin-bottom:5px;line-height:1.6;}
+      /* FIX-P4: close bar */
+      .close-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(5,5,7,0.92);border-bottom:1px solid rgba(148,163,184,0.14);backdrop-filter:blur(16px);}
+      .close-bar-lbl{font-size:12px;color:rgba(148,163,184,0.7);}
+      .close-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(148,163,184,0.25);border-radius:99px;color:rgba(248,250,252,0.85);font-size:12px;font-weight:600;padding:6px 14px;cursor:pointer;font-family:inherit;transition:background 0.15s;}
+      .close-btn:hover{background:rgba(249,115,22,0.15);border-color:#f97316;}
+      /* FIX-P3: read-only notice */
+      .readonly-notice{background:rgba(129,140,248,0.07);border:1px solid rgba(129,140,248,0.2);border-radius:12px;padding:11px 14px;font-size:12px;color:rgba(148,163,184,0.85);line-height:1.6;margin-bottom:14px;}
+      .readonly-notice strong{color:#818cf8;}
 </style>
 </head>
 <body>
+<!-- FIX-P4: sticky close / return to booking bar -->
+<div class="close-bar" id="close-bar">
+  <span class="close-bar-lbl" id="close-bar-lbl">PhenomeBeauty Policy</span>
+  <button class="close-btn" onclick="window.close();history.back();">&#x2715; Close</button>
+</div>
 <div class="page">
 
   <div class="hdr">
@@ -74,6 +87,10 @@ ul.plain li{font-size:12.5px;color:var(--muted);margin-bottom:5px;line-height:1.
 
   <!-- CONSULTATION SECTIONS — hidden when ?terms is set -->
   <div id="consultation-sections">
+    <!-- FIX-P3: read-only reference notice -->
+    <div class="readonly-notice" id="readonly-notice">
+      <strong>For reference only.</strong> Safety questions are completed during the booking process. This section is provided so you can review what to expect before your appointment.
+    </div>
 
     <div class="card">
       <div class="card-title">Treatment History</div>
@@ -194,11 +211,11 @@ ul.plain li{font-size:12.5px;color:var(--muted);margin-bottom:5px;line-height:1.
     </div>
     <div class="p-row">
       <div class="p-name">8. Transaction Fees</div>
-      <div class="p-text">Refunds issued as original amount minus processing fees charged at purchase.</div>
+      <div class="p-text">Refunds issued as original at purchase.</div>
     </div>
     <div class="p-row">
       <div class="p-name">9. Disputes & Escalation</div>
-      <div class="p-text">Email <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="89f9e1ece7e6e4ecebece8fcfdf0c9eee4e8e0e5a7eae6a7f3e8">[email&#160;protected]</a></strong>. Reviewed within 5 business days. Unresolved disputes may be escalated to your bank or card provider.</div>
+      <div class="p-text">Reviewed within 5 business days.</div>
     </div>
     <div class="p-row">
       <div class="p-name">10. Consumer Protection Act</div>
@@ -211,6 +228,8 @@ ul.plain li{font-size:12.5px;color:var(--muted);margin-bottom:5px;line-height:1.
         <a href="mailto:phenomebeauty@gmail.co.za" style="color:#ffffff;">phenomebeauty@gmail.co.za</a><br>
         <a href="tel:+27745115725" style="display:inline-block;margin-top:4px;color:#ec4899;">+27 74 511 5725</a>
         <div style="font-size:11px;color:#ffffff;margin-top:6px;">We respond within 24 hours</div>
+        <!-- FIX-P2: plain text fallback when CF decode script unavailable -->
+        <noscript><div style="font-size:12px;color:rgba(148,163,184,0.7);margin-top:6px;">phenomebeauty&#64;gmail&#46;co&#46;za</div></noscript>
       </div>
     </div>
   </div>
@@ -236,5 +255,38 @@ ul.plain li{font-size:12.5px;color:var(--muted);margin-bottom:5px;line-height:1.
 
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // When op
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+  // FIX-P1: Handle ?terms query param — hide consultation section,
+  //          update header subtitle, scroll to policy (FIX-P5)
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var isTerms = params.has('terms');
+
+    if (isTerms) {
+      // Hide consultation sections — not relevant when reading T&Cs
+      var consult = document.getElementById('consultation-sections');
+      if (consult) consult.style.display = 'none';
+
+      // Update header subtitle
+      var sub = document.getElementById('hdr-sub');
+      if (sub) sub.textContent = 'Terms & Conditions';
+
+      // Update close bar label
+      var lbl = document.getElementById('close-bar-lbl');
+      if (lbl) lbl.textContent = 'Terms & Conditions';
+
+      // FIX-P5: scroll to first policy card (Refund & Cancellation)
+      var firstPolicy = document.querySelector('.card');
+      if (firstPolicy) {
+        // Small delay to allow layout to settle after hiding sections
+        setTimeout(function() {
+          firstPolicy.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 120);
+      }
+    }
+  })();
+</script>
+</body>
+</html>
