@@ -54,7 +54,7 @@ app.use((req, res, next) => {
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
         "font-src 'self' https://fonts.gstatic.com; " +
         "img-src 'self' data: https://iili.io; " +
-        "connect-src 'self' https://maps.googleapis.com; " +
+        "connect-src 'self' https://maps.googleapis.com https://places.googleapis.com; " +
         "frame-ancestors 'none';"
     );
     next();
