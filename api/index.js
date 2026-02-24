@@ -1,4 +1,4 @@
-// api/index.js — PhenomeBeauty Booking Server v5.1
+// api/index.js — PhenomeBeauty Booking Server v5.2
 // Vercel serverless entry point — exports Express app, never calls app.listen()
 'use strict';
 
@@ -343,7 +343,7 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         const svcIds    = services.map(x => (typeof x === 'object' ? x.id : '') || '').filter(Boolean).join(', ');
         const svcMins   = services.reduce((a, x) => a + parseInt((typeof x === 'object' ? x.duration : 0) || 0), 0);
 
-        // ── Server-side amount recalculation (Fix 6) ─────────────────────────
+        // ── Server-side amount recalculation ─────────────────────────────────
         const serverServicesTotal = services.reduce((sum, x) => {
             const p = typeof x === 'object' ? parseFloat(x.price || 0) : 0;
             return sum + (isFinite(p) && p >= 0 ? p : 0);
@@ -501,36 +501,39 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         res.status(500).json({ error: 'Failed to save booking — please try again' });
     }
 });
+
 // =============================================================================
 // POST /api/webhook/yoco
 // =============================================================================
 app.post('/api/webhook/yoco', async (req, res) => {
-    // Verify Yoco HMAC-SHA256 signature
+    // ── Verify Yoco HMAC-SHA256 signature ────────────────────────────────────
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
     if (webhookSecret) {
-        // Support both the new documented header and the old one
         const sigRaw = (req.headers['webhook-signature'] || req.headers['x-yoco-signature'] || '').toString();
         const rawBody = JSON.stringify(req.body);
-
         const hex = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
-        const candidates = [
-            hex,                // plain hex
-            'sha256=' + hex,    // prefixed form used in your old code
-        ];
+
+        // Yoco may send the signature as plain hex or prefixed with "sha256="
+        const candidates = [hex, 'sha256=' + hex];
 
         let valid = false;
         for (const exp of candidates) {
-            const sigBuf = Buffer.from(sigRaw.padEnd(exp.length, '\0'));
-            const expBuf = Buffer.from(exp.padEnd(sigRaw.length, '\0'));
-            if (sigBuf.length > 0 && expBuf.length > 0) {
-                try {
-                    if (crypto.timingSafeEqual(sigBuf, expBuf)) {
-                        valid = true;
-                        break;
-                    }
-                } catch {
-                    // fall through and try next candidate
+            try {
+                // timingSafeEqual REQUIRES equal-length buffers — allocate to the
+                // same length and copy each string in so no throw can occur.
+                const maxLen = Math.max(sigRaw.length, exp.length);
+                if (maxLen === 0) continue;
+                const sigBuf = Buffer.alloc(maxLen);
+                const expBuf = Buffer.alloc(maxLen);
+                Buffer.from(sigRaw).copy(sigBuf);
+                Buffer.from(exp).copy(expBuf);
+                if (crypto.timingSafeEqual(sigBuf, expBuf)) {
+                    valid = true;
+                    break;
                 }
+            } catch (err) {
+                // Defensive fallback — should never reach here after the alloc fix
+                console.warn('Webhook sig compare error:', err.message);
             }
         }
 
@@ -542,16 +545,15 @@ app.post('/api/webhook/yoco', async (req, res) => {
         console.warn('YOCO_WEBHOOK_SECRET not set — webhook signature not verified');
     }
 
-    // Acknowledge immediately so Yoco doesn't retry because of slow downstream work
-    res.status(200).json({ received: true });
-
+    // ── Process event synchronously so Yoco gets a meaningful status code ────
+    // Returning 500 on failure signals Yoco to retry; 200 means we handled it.
     try {
         const event   = req.body || {};
         const payment = event.payload || event;
         const meta    = payment.metadata || {};
 
         // Yoco docs: success type is "payment.succeeded".
-        // Keep your old types for backwards compatibility.
+        // Keep legacy types for backwards compatibility.
         const successTypes = [
             'payment.succeeded',
             'payment.approved',
@@ -560,23 +562,37 @@ app.post('/api/webhook/yoco', async (req, res) => {
             'payment_captured',
         ];
 
-        if (!successTypes.includes(event.type)) return;
-        if (payment.status && payment.status !== 'succeeded') return;
+        if (!successTypes.includes(event.type)) {
+            console.log(`Webhook: ignoring event type "${event.type}"`);
+            return res.status(200).json({ received: true });
+        }
+
+        if (payment.status && payment.status !== 'succeeded') {
+            console.log(`Webhook: ignoring payment status "${payment.status}"`);
+            return res.status(200).json({ received: true });
+        }
 
         const bookingId = meta.bookingId || '';
-        if (!bookingId) return;
+        if (!bookingId) {
+            console.warn('Webhook: no bookingId in metadata — ignoring');
+            return res.status(200).json({ received: true });
+        }
 
         const type = meta.type || 'deposit';
 
-        const doc      = await getDoc();
-        const { row }  = await findRow(doc, bookingId);
-        if (!row) return;
+        const doc     = await getDoc();
+        const { row } = await findRow(doc, bookingId);
+        if (!row) {
+            console.warn(`Webhook: booking ${bookingId} not found in sheet`);
+            return res.status(200).json({ received: true });
+        }
 
-        // ─────────────────────────────────────────────────────────────────────
-        // Balance payment branch (Step 7, 8, 9)
-        // ─────────────────────────────────────────────────────────────────────
+        // ── Balance payment branch ────────────────────────────────────────────
         if (type === 'balance') {
-            if (row.get('Balance Status') === 'Paid') return;   // idempotent
+            if (row.get('Balance Status') === 'Paid') {
+                console.log(`Webhook: balance already paid for ${bookingId} — idempotent skip`);
+                return res.status(200).json({ received: true });
+            }
 
             row.set('Balance Status', 'Paid');
             await row.save();
@@ -584,7 +600,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
 
             const settings = await getSettings(doc);
 
-            // Step 8: customer thank-you / rebook email
+            // Customer thank-you / rebook email
             sendRebookEmail(settings, {
                 bookingId,
                 name:     row.get('Client Name'),
@@ -595,7 +611,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
                 console.error('Rebook email error:', e.message);
             });
 
-            // Step 9: admin notification that remaining amount has been paid
+            // Admin notification that remaining balance has been paid
             sendAdminDepositNotification(settings, {
                 bookingId,
                 name:        row.get('Client Name'),
@@ -607,18 +623,19 @@ app.post('/api/webhook/yoco', async (req, res) => {
                 time:        row.get('Time'),
                 totalAmount: row.get('Total Amount (R)'),
                 deposit:     row.get('Deposit Amount (R)'),
-                balance:     row.get('Balance Due (R)'),   // still original value, but matches your existing email shape
+                balance:     row.get('Balance Due (R)'),
             }).catch((e) => {
                 console.error('Admin balance-paid email error:', e.message);
             });
 
-            return;
+            return res.status(200).json({ received: true });
         }
 
-        // ─────────────────────────────────────────────────────────────────────
-        // Deposit payment branch (Step 3–5)
-        // ─────────────────────────────────────────────────────────────────────
-        if (row.get('Deposit Status') === 'Confirmed') return;  // idempotent
+        // ── Deposit payment branch ────────────────────────────────────────────
+        if (row.get('Deposit Status') === 'Confirmed') {
+            console.log(`Webhook: deposit already confirmed for ${bookingId} — idempotent skip`);
+            return res.status(200).json({ received: true });
+        }
 
         row.set('Deposit Status',   'Confirmed');
         row.set('Yoco Checkout ID', payment.id || row.get('Yoco Checkout ID') || '');
@@ -627,7 +644,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
 
         const settings = await getSettings(doc);
 
-        // Create calendar event (Step 5)
+        // Create Google Calendar event
         const calId = await calCreate(settings, {
             bookingId,
             name:        row.get('Client Name'),
@@ -646,7 +663,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
             await row.save();
         }
 
-        // Step 3: notify admin of new booking with full details
+        // Notify admin of new confirmed booking
         sendAdminDepositNotification(settings, {
             bookingId,
             name:        row.get('Client Name'),
@@ -663,26 +680,29 @@ app.post('/api/webhook/yoco', async (req, res) => {
             console.error('Admin deposit email error:', e.message);
         });
 
-        // Step 4: confirm to customer
+        // Confirm booking to customer
         sendCustomerConfirmationEmail(settings, {
             bookingId,
-            name:    row.get('Client Name'),
-            email:   row.get('Client Email'),
-            address: row.get('Client Address'),
-            services:row.get('Service Names'),
-            date:    row.get('Date'),
-            time:    row.get('Time'),
-            deposit: row.get('Deposit Amount (R)'),
-            balance: row.get('Balance Due (R)'),
+            name:     row.get('Client Name'),
+            email:    row.get('Client Email'),
+            address:  row.get('Client Address'),
+            services: row.get('Service Names'),
+            date:     row.get('Date'),
+            time:     row.get('Time'),
+            deposit:  row.get('Deposit Amount (R)'),
+            balance:  row.get('Balance Due (R)'),
         }).catch((e) => {
             console.error('Customer confirmation email error:', e.message);
         });
 
+        return res.status(200).json({ received: true });
+
     } catch (e) {
-        console.error('Webhook error:', e.message);
+        // Returning 500 here tells Yoco to retry the webhook
+        console.error('Webhook processing error:', e.message);
+        return res.status(500).json({ error: 'Internal error — will retry' });
     }
 });
-
 
 // =============================================================================
 // GET /api/check-payment
@@ -861,14 +881,14 @@ app.post('/api/admin/update-status', adminOnly, async (req, res) => {
                 }).catch(() => {});
                 sendCustomerConfirmationEmail(req.settings, {
                     bookingId,
-                    name:    row.get('Client Name'),
-                    email:   row.get('Client Email'),
-                    address: row.get('Client Address'),
-                    services:row.get('Service Names'),
-                    date:    row.get('Date'),
-                    time:    row.get('Time'),
-                    deposit: row.get('Deposit Amount (R)'),
-                    balance: row.get('Balance Due (R)'),
+                    name:     row.get('Client Name'),
+                    email:    row.get('Client Email'),
+                    address:  row.get('Client Address'),
+                    services: row.get('Service Names'),
+                    date:     row.get('Date'),
+                    time:     row.get('Time'),
+                    deposit:  row.get('Deposit Amount (R)'),
+                    balance:  row.get('Balance Due (R)'),
                 }).catch(() => {});
             }
         }
@@ -1070,4 +1090,3 @@ app.post('/api/admin/refund', adminOnly, async (req, res) => {
 // Vercel serverless export — never call app.listen()
 // =============================================================================
 module.exports = app;
-
