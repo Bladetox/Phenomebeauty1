@@ -1,20 +1,30 @@
 {
-  "name": "my-vercel-app",
+  "name": "phenomebeauty-api",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
+  "description": "PhenomeBeauty booking & admin API",
+  "author": "PhenomeBeauty",
   "license": "ISC",
-  "description": "",
+  "main": "api/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "node --watch api/index.js"
+  },
   "dependencies": {
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "express-rate-limit": "^7.5.0",
     "google-auth-library": "^10.5.0",
-    "google-spreadsheet": "^4.1.4",
+    "google-spreadsheet": "^5.2.0",
     "googleapis": "^171.4.0",
+    "helmet": "^8.0.0",
     "nodemailer": "^8.0.1"
-  }
+  },
+  "keywords": [
+    "phenomebeauty",
+    "booking",
+    "api"
+  ]
 }
