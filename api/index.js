@@ -159,6 +159,13 @@ function createTransporter(s) {
         auth: { user, pass },
     });
 }
+const transporter = createTransporter(s);
+console.log('Transporter check:', { 
+    hasSMTP: !!transporter, 
+    smtpUser: s.smtp_user, 
+    hasPass: !!s.smtp_pass,
+    adminEmail: s.admin_email 
+});
 
 function fmtDateEmail(ds) {
     if (!ds) return ds;
