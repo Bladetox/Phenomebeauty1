@@ -219,54 +219,47 @@ async function sendCustomerConfirmationEmail(s, b) {
     const firstName = (b.name || '').split(/\s+/)[0] || '';
 
     try {
-        const reviewHtml = emailReviewBlock(
-            s,
-            'After your appointment, if you enjoyed your experience, a short Google review helps other women discover PhenomeBeauty. It is completely optional, but means a lot to a small business like ours.'
-        );
-
         await transporter.sendMail({
             from:    `"PhenomeBeauty" <${(s.smtp_user || s.smtpuser || adminEmail)}>`,
             to:      b.email,
-            subject: `✨ You're booked, ${firstName}! — ${fmtDateEmail(b.date)}`,
+            subject: `✨ Your booking is confirmed, ${firstName} — ${fmtDateEmail(b.date)}`,
             html: emailWrap(
                 emailHeader(
-                    '✨',
-                    `You're all set, ${firstName}!`,
-                    "Your deposit is in — we can't wait to pamper you."
+                    '🤍',
+                    `You're all set, ${firstName}`,
+                    "We have successfully received your deposit and your appointment slot is secured.",
+                    'linear-gradient(135deg,#c5a880,#a68864)' // Premium champagne gold gradient
                 ),
                 `
                 <p style="font-size:14px;line-height:1.7;color:rgba(248,250,252,0.9);margin:0 0 20px;">
-                  Hi <strong>${firstName}</strong> 💕<br><br>
-                  Your booking is confirmed and your stylist will arrive at your door ready to make you look and feel amazing.
-                  Here's everything you need to know:
+                  Hi <strong>${firstName}</strong>,<br><br>
+                  Thank you for booking with PhenomeBeauty. Your beauty therapist will arrive at your location fully equipped to provide a relaxing and premium experience.
+                  Here are your appointment details:
                 </p>
 
-                <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.25);border-radius:14px;padding:18px 20px;margin-bottom:18px;">
+                <div style="background:rgba(197,168,128,0.08);border:1px solid rgba(197,168,128,0.25);border-radius:14px;padding:18px 20px;margin-bottom:18px;">
                   <table style="width:100%;border-collapse:collapse;">
-                    ${emailRow('📅 Date', `<strong style="color:#f97316;">${fmtDateEmail(b.date)}</strong>`)}
-                    ${emailRow('🕐 Time', `<strong style="color:#f97316;">${b.time}</strong>`)}
-                    ${emailRow('💅 Services', `<strong>${b.services}</strong>`)}
+                    ${emailRow('📅 Date', `<strong style="color:#c5a880;">${fmtDateEmail(b.date)}</strong>`)}
+                    ${emailRow('🕐 Time', `<strong style="color:#c5a880;">${b.time}</strong>`)}
+                    ${emailRow('✨ Services', `<strong>${b.services}</strong>`)}
                     ${emailRow('📍 Address', b.address)}
                   </table>
                 </div>
 
-                <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:14px;padding:16px 20px;margin-bottom:18px;">
+                <div style="background:rgba(123,158,135,0.08);border:1px solid rgba(123,158,135,0.25);border-radius:14px;padding:16px 20px;margin-bottom:18px;">
                   <table style="width:100%;border-collapse:collapse;">
-                    ${emailRow('Deposit Paid ✅', `<strong style="color:#10b981;">R${Number(b.deposit || 0).toFixed(2)}</strong>`)}
-                    ${emailRow('Balance (after service)', `<span style="color:#f97316;">R${Number(b.balance || 0).toFixed(2)}</span>`)}
+                    ${emailRow('Deposit Paid ✅', `<strong style="color:#7b9e87;">R${Number(b.deposit || 0).toFixed(2)}</strong>`)}
+                    ${emailRow('Balance (after service)', `<span style="color:#c5a880;">R${Number(b.balance || 0).toFixed(2)}</span>`)}
                   </table>
                 </div>
 
                 <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px 16px;margin-bottom:18px;font-size:12.5px;color:rgba(148,163,184,0.8);line-height:1.7;">
-                  💡 <strong style="color:#f8fafc;">Good to know:</strong>
-                  Please give us at least 24 hours notice if you need to cancel or reschedule so we can offer your slot to someone else.
-                  Late cancellations may forfeit the deposit.
+                  <strong style="color:#f8fafc;">Arrival Information:</strong><br>
+                  Please allow a brief 10-minute window around your scheduled time for your therapist to arrive and set up their equipment. We look forward to treating you.
                 </div>
 
-                ${reviewHtml}
-
                 <p style="font-size:12px;color:rgba(148,163,184,0.4);text-align:center;margin:0;">
-                  Ref: ${b.bookingId}
+                  Booking Ref: ${b.bookingId}
                 </p>
                 `
             ),
@@ -292,45 +285,40 @@ async function sendBalanceRequestEmail(s, b) {
     const firstName = (b.name || '').split(/\s+/)[0] || '';
 
     try {
-        const reviewHtml = emailReviewBlock(
-            s,
-            'Once your treatment is complete, we would love to hear how it went. If you have a moment, a short Google review really helps other clients choose the right mobile studio.'
-        );
+        // No review request here
+        const reviewHtml = '';
 
         await transporter.sendMail({
             from:    `"PhenomeBeauty" <${(s.smtp_user || s.smtpuser || adminEmail)}>`,
             to:      b.email,
-            subject: `💳 Your balance payment — R${Number(b.balance || 0).toFixed(2)}`,
+            subject: `🤍 Balance Payment : R${Number(b.balance || 0).toFixed(2)}`,
             html: emailWrap(
                 emailHeader(
-                    '💅',
-                    `Thank you, ${firstName}!`,
-                    "Hope you loved your treatment — here's your balance link.",
-                    'linear-gradient(135deg,#7c3aed,#ec4899)'
+                    '✨',
+                    `Thank you, ${firstName}`,
+                    "Your treatment is complete. Please find your balance link below.",
+                    'linear-gradient(135deg,#d4b5b0,#bfa19c)' // Soft Rose Gold/Blush
                 ),
                 `
                 <p style="font-size:14px;line-height:1.7;color:rgba(248,250,252,0.9);margin:0 0 20px;">
-                  Hi <strong>${firstName}</strong> 💕<br><br>
-                  We hope you're feeling absolutely fabulous! Your service is complete and the remaining balance is now due.
+                  Hi <strong>${firstName}</strong>,<br><br>
+                  We hope you enjoyed your mobile beauty experience. Your service is now complete, and the remaining balance for your appointment is due.
                 </p>
 
-                <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.25);border-radius:14px;padding:18px 20px;margin-bottom:20px;">
+                <div style="background:rgba(212,181,176,0.08);border:1px solid rgba(212,181,176,0.25);border-radius:14px;padding:18px 20px;margin-bottom:20px;">
                   <table style="width:100%;border-collapse:collapse;">
                     ${emailRow('Services', b.services)}
-                    ${emailRow('Deposit Already Paid', `<span style="color:#10b981;">R${Number(b.deposit || 0).toFixed(2)}</span>`)}
-                    ${emailRow('Balance Due', `<strong style="color:#f97316;font-size:15px;">R${Number(b.balance || 0).toFixed(2)}</strong>`)}
+                    ${emailRow('Deposit Already Paid', `<span style="color:#7b9e87;">R${Number(b.deposit || 0).toFixed(2)}</span>`)}
+                    ${emailRow('Balance Due', `<strong style="color:#d4b5b0;font-size:15px;">R${Number(b.balance || 0).toFixed(2)}</strong>`)}
                   </table>
                 </div>
 
-                <a href="${b.paymentUrl}" style="display:block;background:linear-gradient(135deg,#f97316,#ec4899);color:#0b1120;text-align:center;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:18px;">
-                  Pay Balance — R${Number(b.balance || 0).toFixed(2)} →
+                <a href="${b.paymentUrl}" style="display:block;background:linear-gradient(135deg,#d4b5b0,#bfa19c);color:#0b1120;text-align:center;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:18px;">
+                  Complete Payment : R${Number(b.balance || 0).toFixed(2)} →
                 </a>
 
-                ${reviewHtml}
-
                 <p style="font-size:12px;color:rgba(148,163,184,0.5);text-align:center;margin:0;">
-                  If you have any questions, please don't hesitate to reach out 💕<br>
-                  Ref: ${b.bookingId}
+                  Booking Ref: ${b.bookingId}
                 </p>
                 `
             ),
@@ -362,44 +350,44 @@ async function sendRebookEmail(s, b) {
     try {
         const reviewHtml = emailReviewBlock(
             s,
-            'If you loved your time with us, a short, honest Google review helps other women feel confident booking mobile beauty. No pressure at all — only if it feels right for you.'
+            'If you enjoyed your treatment, a short Google review helps other clients discover PhenomeBeauty. It is completely optional, but greatly appreciated.'
         );
 
         await transporter.sendMail({
             from:    `"PhenomeBeauty" <${(s.smtp_user || s.smtpuser || adminEmail)}>`,
             to:      b.email,
-            subject: `🌸 Thank you ${firstName} — see you next time!`,
+            subject: `🤍 Thank you, ${firstName} : Payment Complete`,
             html: emailWrap(
                 emailHeader(
-                    '🌸',
-                    'All done — you look amazing!',
-                    'Your full payment is in. Thank you so much!',
-                    'linear-gradient(135deg,#ec4899,#8b5cf6)'
+                    '🤍',
+                    'Payment Successful',
+                    'Thank you for trusting PhenomeBeauty.',
+                    'linear-gradient(135deg,#7b9e87,#5f826b)' // Elegant Sage Green
                 ),
                 `
                 <p style="font-size:14px;line-height:1.7;color:rgba(248,250,252,0.9);margin:0 0 20px;">
-                  Hi <strong>${firstName}</strong> 💕<br><br>
-                  Your payment is complete — thank you so much for trusting PhenomeBeauty!
-                  It was an absolute pleasure treating you and we hope you feel as beautiful on the outside as you are on the inside. 🌸
+                  Hi <strong>${firstName}</strong>,<br><br>
+                  We have received your full payment. Thank you so much for choosing PhenomeBeauty.
+                  It was a pleasure treating you, and I hope you feel relaxed and renewed.
                 </p>
 
-                <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:14px;padding:16px 20px;margin-bottom:20px;text-align:center;">
+                <div style="background:rgba(123,158,135,0.08);border:1px solid rgba(123,158,135,0.25);border-radius:14px;padding:16px 20px;margin-bottom:20px;text-align:center;">
                   <div style="font-size:13px;color:rgba(148,163,184,0.8);margin-bottom:4px;">Total Paid</div>
-                  <div style="font-size:24px;font-weight:700;color:#10b981;">R${Number(b.total || 0).toFixed(2)} ✅</div>
+                  <div style="font-size:24px;font-weight:700;color:#7b9e87;">R${Number(b.total || 0).toFixed(2)} ✨</div>
                 </div>
 
                 <p style="font-size:13px;color:rgba(148,163,184,0.8);line-height:1.7;margin:0 0 20px;">
-                  Beauty isn't a once-in-a-while thing — it's a lifestyle. When you're ready to treat yourself again, we're just a click away:
+                  I look forward to treating you again in the future. Whenever you are ready to book your next appointment, simply click below:
                 </p>
 
-                <a href="${appBase}" style="display:block;background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff;text-align:center;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:18px;">
+                <a href="${appBase}" style="display:block;background:linear-gradient(135deg,#7b9e87,#5f826b);color:#fff;text-align:center;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:18px;">
                   Book Your Next Appointment →
                 </a>
 
                 ${reviewHtml}
 
                 <p style="font-size:12px;color:rgba(148,163,184,0.4);text-align:center;margin:0;">
-                  Ref: ${b.bookingId}
+                  Booking Ref: ${b.bookingId}
                 </p>
                 `
             ),
