@@ -518,6 +518,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
 
     if (webhookSecret) {
+        console.log("Webhook headers:", JSON.stringify(req.headers));
         const sigRaw = (
             req.headers['webhook-signature'] ||
             req.headers['x-yoco-signature'] ||
