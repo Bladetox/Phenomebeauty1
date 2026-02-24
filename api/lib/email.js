@@ -278,7 +278,7 @@ async function sendCustomerConfirmationEmail(s, b) {
 }
 
 // =============================================================================
-– 3. Balance request email
+// 3. Balance request email
 // =============================================================================
 
 async function sendBalanceRequestEmail(s, b) {
