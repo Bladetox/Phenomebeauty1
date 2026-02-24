@@ -529,10 +529,15 @@ app.post('/api/webhook/yoco', async (req, res) => {
             ? req.rawBody.toString('utf8')
             : JSON.stringify(req.body);
 
-        const hex = crypto
-            .createHmac('sha256', webhookSecret)
-            .update(rawBody)
-            .digest('hex');
+        const secretKey = webhookSecret.startsWith('whsec_')
+    ? Buffer.from(webhookSecret.slice(6), 'base64')
+    : Buffer.from(webhookSecret);
+
+const hex = crypto
+    .createHmac('sha256', secretKey)
+    .update(rawBody)
+    .digest('hex');
+
 
         // Yoco may send plain hex or prefixed with "sha256="
         const candidates = [hex, 'sha256=' + hex];
