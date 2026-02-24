@@ -47,8 +47,14 @@ app.use((req, res, next) => {
     next();
 });
 
-// Body size limit — prevents large-payload attacks
-app.use(express.json({ limit: '50kb' }));
+// Body size limit — prevent large payload attacks
+// verify captures raw bytes before JSON.parse so webhook HMAC works correctly
+app.use(express.json({
+    limit: '50kb',
+    verify: (req, res, buf) => {
+        req.rawBody = buf;
+    }
+}));
 
 // =============================================================================
 // RATE LIMITER (in-memory, per IP+path)
