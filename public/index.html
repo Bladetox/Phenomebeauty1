@@ -580,6 +580,7 @@
         color: var(--text-muted);
       }
       .success-total-row.highlight { color: var(--accent); font-weight: 700; font-size: 14px; }
+      @keyframes shimmer { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
     </style>
   </head>
   <body>
@@ -607,7 +608,11 @@
               <div class="section-label">Select your treatments</div>
               <div class="scroll-area" id="services-scroll">
                 <div class="chip-row" id="category-chips"></div>
-                <div id="services-list"></div>
+                <div id="services-list">
+                  <div style="border-radius:16px;padding:14px;margin-bottom:7px;background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.15);animation:shimmer 1.4s ease-in-out infinite;"><div style="height:12px;border-radius:6px;background:rgba(148,163,184,0.12);margin-bottom:8px;width:65%;"></div><div style="height:10px;border-radius:6px;background:rgba(148,163,184,0.08);width:40%;"></div></div>
+                  <div style="border-radius:16px;padding:14px;margin-bottom:7px;background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.15);animation:shimmer 1.4s ease-in-out infinite;animation-delay:0.2s;"><div style="height:12px;border-radius:6px;background:rgba(148,163,184,0.12);margin-bottom:8px;width:55%;"></div><div style="height:10px;border-radius:6px;background:rgba(148,163,184,0.08);width:35%;"></div></div>
+                  <div style="border-radius:16px;padding:14px;margin-bottom:7px;background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.15);animation:shimmer 1.4s ease-in-out infinite;animation-delay:0.4s;"><div style="height:12px;border-radius:6px;background:rgba(148,163,184,0.12);margin-bottom:8px;width:70%;"></div><div style="height:10px;border-radius:6px;background:rgba(148,163,184,0.08);width:45%;"></div></div>
+                </div>
               </div>
               <!-- Cart bar sits below scroll, inside view -->
               <div class="cart-bar" id="cart-bar">
@@ -1318,7 +1323,7 @@
 
       // ── NAVIGATION ─────────────────────────────────────────────────────────
       function nextStep() {
-        if (currentStep === 3 && !validateDetails()) return;
+        if (currentStep === 3 && (!validateDetails() || !safetyComplete())) return; // FIX #1
         if (currentStep === 4) { submitBooking(); return; }
         currentStep++;
         updateStepUI();
@@ -1350,12 +1355,25 @@
           document.getElementById('step-bar-' + i).style.width = i <= currentStep ? '100%' : '0';
 
         if (currentStep === 2) {
+          calDrawDays(); // FIX #5: restore selected date highlight on back navigation
+          if (selectedDate) {
+            const _k = calKey();
+            if (monthCache[_k] && monthCache[_k].slots && monthCache[_k].slots[selectedDate]) {
+              renderTimeSlots(monthCache[_k].slots[selectedDate]);
+            }
+          }
           const k = calKey();
           if (!monthCache[k] || !monthCache[k].loaded) calRender();
         }
         if (currentStep === 3) initPlacesAutocomplete();
         if (currentStep === 4) renderSummary();
         updateNextBtn();
+      }
+
+      const SAFETY_KEYS = ['skin','meds','allergies','pregnant','health','enviro','physical','hair'];
+      function safetyComplete() {
+        if (divaType !== 'new') return true;
+        return SAFETY_KEYS.every(k => safetyAnswers[k] === 'yes' || safetyAnswers[k] === 'no');
       }
 
       function updateNextBtn() {
@@ -1368,7 +1386,7 @@
           const email = document.getElementById('client-email').value.trim();
           const addr  = document.getElementById('client-address').value.trim();
           btn.disabled = name.length < 2 || !/^0\d{9}$/.test(phone) ||
-                         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || addr.length < 5;
+                         !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || addr.length < 5 || !safetyComplete(); // FIX #1c + #6b
         } else if (currentStep === 4) {
           btn.disabled = false;
         } else {
@@ -1471,7 +1489,7 @@
         const addr  = document.getElementById('client-address').value.trim();
         if (name.length < 2)                       { showToast('Please enter your full name', true);        return false; }
         if (!/^0\d{9}$/.test(phone))               { showToast('Enter a valid 10-digit SA phone number', true); return false; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Enter a valid email address', true); return false; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showToast('Enter a valid email address', true); return false; } // FIX #6
         if (addr.length < 5)                       { showToast('Please enter your full address', true);     return false; }
         return true;
       }
@@ -1564,6 +1582,7 @@
           detail.style.display = val === 'yes' ? 'block' : 'none';
           if (val === 'no') detail.value = '';
         }
+        updateNextBtn(); // FIX #2
       }
       let divaType = 'existing'; // default
 
@@ -1593,6 +1612,7 @@
           btnNew.style.color           = 'var(--text-muted)';
           btnNew.style.borderColor     = 'var(--border)';
         }
+        updateNextBtn(); // FIX #3
       }
 
       function submitBooking() {
@@ -1655,7 +1675,16 @@
             } else {
               btn.style.display = 'none';
               document.getElementById('btn-back').style.display = 'none';
-              showToast(result.paymentError || 'Booking saved — we will send you a payment link shortly', false);
+              // FIX #4: no paymentUrl returned — show proper confirmation screen
+              showDepositThankYou({
+                bookingId: result.bookingId || '',
+                name:      document.getElementById('client-name').value.trim(),
+                date:      selectedDate,
+                time:      selectedTime,
+                services:  selectedServices.map(s => s.name).join(', '),
+                deposit:   String(result.depositAmount || '0'),
+                balance:   String(result.balanceDue    || '0'),
+              });
             }
           })
           .catch(() => {
