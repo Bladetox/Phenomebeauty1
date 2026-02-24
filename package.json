@@ -20,7 +20,8 @@
     "google-spreadsheet": "^5.2.0",
     "googleapis": "^171.4.0",
     "helmet": "^8.0.0",
-    "nodemailer": "^8.0.1"
+    "nodemailer": "^8.0.1",
+    "svix": "^1.86.0"
   },
   "keywords": [
     "phenomebeauty",

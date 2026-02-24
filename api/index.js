@@ -514,64 +514,24 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
 // =============================================================================
 app.post('/api/webhook/yoco', async (req, res) => {
 
-    // ── Verify Yoco HMAC-SHA256 signature ────────────────────────────────────
+    // ── Verify Yoco webhook signature via Svix ──────────────────────────
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
 
     if (webhookSecret) {
-        console.log("Webhook headers:", JSON.stringify(req.headers));
-        const sigRaw = (
-            req.headers['webhook-signature'] ||
-            req.headers['x-yoco-signature'] ||
-            ''
-        ).toString();
-
-        // Use raw bytes captured before JSON.parse — NOT re-serialized JSON
-        const rawBody = req.rawBody
-            ? req.rawBody.toString('utf8')
-            : JSON.stringify(req.body);
-
-        const secretKey = webhookSecret.startsWith('whsec_')
-    ? Buffer.from(webhookSecret.slice(6), 'base64')
-    : Buffer.from(webhookSecret);
-
-const hex = crypto
-    .createHmac('sha256', secretKey)
-    .update(rawBody)
-    .digest('hex');
-
-
-        // Yoco may send plain hex or prefixed with "sha256="
-        const candidates = [hex, 'sha256=' + hex];
-
-        let valid = false;
-        for (const exp of candidates) {
-            try {
-                const maxLen = Math.max(sigRaw.length, exp.length);
-                if (maxLen === 0) continue;
-                const sigBuf = Buffer.alloc(maxLen);
-                const expBuf = Buffer.alloc(maxLen);
-                Buffer.from(sigRaw).copy(sigBuf);
-                Buffer.from(exp).copy(expBuf);
-                if (crypto.timingSafeEqual(sigBuf, expBuf)) {
-                    valid = true;
-                    break;
-                }
-            } catch (err) {
-                console.warn('Webhook sig compare error:', err.message);
-            }
-        }
-
-        if (!valid) {
-            console.warn('Webhook: invalid signature — rejected');
-            console.warn('  sigRaw  :', sigRaw.slice(0, 20) + '...');
-            console.warn('  expected:', hex.slice(0, 20) + '...');
+        const { Webhook } = require('svix');
+        const wh = new Webhook(webhookSecret);
+        try {
+            const rawBody = req.rawBody
+                ? req.rawBody.toString('utf8')
+                : JSON.stringify(req.body);
+            wh.verify(rawBody, req.headers);
+            console.log('Webhook: signature verified ✓');
+        } catch (err) {
+            console.error('Webhook signature verification failed:', err.message);
             return res.status(401).json({ error: 'Invalid signature' });
         }
-
-        console.log('Webhook: signature verified ✓');
-
     } else {
-        console.warn('YOCO_WEBHOOK_SECRET not set — webhook signature not verified');
+        console.warn('YOCO_WEBHOOK_SECRET not set — skipping verification');
     }
 
     // ── Process event ─────────────────────────────────────────────────────────
