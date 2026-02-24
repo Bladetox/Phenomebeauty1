@@ -260,6 +260,30 @@ html,body{margin:0;padding:0;min-height:100%;font-family:Inter,system-ui,sans-se
   </div>
 </div>
 
+<!-- FIX-A1: Confirmation modal -->
+<div class="modal-bg" id="modal-confirm">
+  <div class="modal">
+    <h3 id="mc-title">Confirm</h3>
+    <p class="mnote" id="mc-body"></p>
+    <div class="mbtns">
+      <button class="abtn ab-ghost" onclick="cm('modal-confirm')">Cancel</button>
+      <button class="abtn ab-primary" id="mc-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+<!-- FIX-A2: Refund modal -->
+<div class="modal-bg" id="modal-refund">
+  <div class="modal">
+    <h3>Process Refund</h3>
+    <label>Reason</label>
+    <input id="refund-reason" placeholder="requested_by_customer" maxlength="120">
+    <p class="mnote">Leave blank to use default reason.</p>
+    <div class="mbtns">
+      <button class="abtn ab-ghost" onclick="cm('modal-refund')">Cancel</button>
+      <button class="abtn ab-danger" onclick="doRefundConfirm()">Process Refund</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -275,9 +299,11 @@ async function doLogin(){
   }catch(e){document.getElementById('lerr').textContent='Connection error';}
 }
 function doLogout(){sessionStorage.removeItem('pbAdminToken');token='';location.reload();}
-function api(u,o={}){o.headers={...(o.headers||{}),'x-admin-token':token};return fetch(u,o);}
+function api(u,o={}){o.headers={...(o.headers||{}),'x-admin-token':token};return fetch(u,o).then(r=>{if(r.status===401){doLogout();}return r;}); // FIX-A4
+}
 window.addEventListener('load',()=>{const t=sessionStorage.getItem('pbAdminToken');if(t){token=t;showApp();}});
-function showApp(){document.getElementById('login-wrap').style.display='none';document.getElementById('app').classList.add('visible');loadAll();}
+function showApp(){document.getElementById('login-wrap').style.display='none';document.getElementById('app').classList.add('visible');loadAll();setInterval(()=>{if(!document.hidden)refreshCurrent();},60000); // FIX-A6
+}
 
 async function loadAll(){await Promise.all([loadBookings(),loadConsults()]);}
 async function refreshCurrent(){curView==='bookings'?await loadBookings():await loadConsults();}
@@ -304,7 +330,7 @@ function updateStats(){
   const pend=allB.filter(b=>b.status==='Pending Payment').length;
   const conf=allB.filter(b=>b.status==='Confirmed').length;
   const comp=allB.filter(b=>b.status==='Service Complete').length;
-  const rev=allB.filter(b=>b.status==='Confirmed'||b.status==='Service Complete').reduce((a,b)=>a+parseFloat(b.deposit||0),0);
+  const rev=allB.filter(b=>b.status==='Confirmed'||b.status==='Service Complete').reduce((a,b)=>a+parseFloat(b.deposit||0)+parseFloat(b.balanceStatus==='Paid'?b.balanceDue||0:0),0); // FIX-A5
   document.getElementById('stats').innerHTML=`
     <div class="stat"><div class="stat-val">${allB.length}</div><div class="stat-lbl">Total</div></div>
     <div class="stat" style="border-color:rgba(245,158,11,.25);"><div class="stat-val" style="color:#f59e0b;">${pend}</div><div class="stat-lbl">Pending</div></div>
@@ -409,7 +435,7 @@ function openDetail(b){
   document.getElementById('detail').classList.add('open');
 }
 
-function closeDetail(){selId='';document.getElementById('overlay').classList.remove('open');document.getElementById('detail').classList.remove('open');renderBookings();}
+function closeDetail(){selId='';document.getElementById('overlay').classList.remove('open');document.getElementById('detail').classList.remove('open');if(curView==='bookings')renderBookings();} // FIX-A3
 
 function renderConsults(){
   let list=allC;
@@ -486,24 +512,38 @@ function cm(id){document.getElementById(id).classList.remove('open');}
 async function doReschedule(){
   const nd=document.getElementById('rs-date').value,nt=document.getElementById('rs-time').value.trim();
   if(!nd||!nt){showToast('Enter date and time','err');return;}
+  if(!/^\d{2}:\d{2}(\s*[-–]\s*\d{2}:\d{2})?$/.test(nt)){showToast('Use HH:MM or HH:MM–00:00','err');return;} // FIX-A7
   try{
     const r=await api('/api/admin/reschedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:rsId,newDate:nd,newTime:nt})});
     const d=await r.json();if(!r.ok)throw new Error(d.error);
     cm('modal-rs');showToast('Rescheduled ✓','ok');await loadBookings();const b=allB.find(x=>x.bookingId===rsId);if(b)selB(b.bookingId);
   }catch(e){showToast(e.message,'err');}
 }
-async function doReqBal(id){
-  if(!confirm('Send balance payment link to client?'))return;
-  try{
-    const r=await api('/api/admin/request-balance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id})});
-    const d=await r.json();if(!r.ok)throw new Error(d.error);
-    showToast(`Balance link sent — R${d.balanceDue.toFixed(2)}`,'ok');await loadBookings();const b=allB.find(x=>x.bookingId===id);if(b)selB(b.bookingId);
-  }catch(e){showToast(e.message,'err');}
+async function doReqBal(id){ // FIX-A1: replaced confirm() with modal
+  document.getElementById('mc-title').textContent='Send Balance Link?';
+  document.getElementById('mc-body').textContent='This will send the balance payment link to the client.';
+  const mcOk=document.getElementById('mc-ok');
+  mcOk.onclick=async()=>{
+    cm('modal-confirm');
+    try{
+      const r=await api('/api/admin/request-balance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id})});
+      const d=await r.json();if(!r.ok)throw new Error(d.error);
+      showToast(`Balance link sent — R${d.balanceDue.toFixed(2)}`,'ok');await loadBookings();const b=allB.find(x=>x.bookingId===id);if(b)selB(b.bookingId);
+    }catch(e){showToast(e.message,'err');}
+  };
+  document.getElementById('modal-confirm').classList.add('open');
 }
-async function doRefund(id){
-  const reason=prompt('Refund reason (optional):')||'requested_by_customer';if(reason===null)return;
+let _refundId='';
+function doRefund(id){ // FIX-A2: replaced prompt() with modal
+  _refundId=id;
+  document.getElementById('refund-reason').value='';
+  document.getElementById('modal-refund').classList.add('open');
+}
+async function doRefundConfirm(){
+  const reason=document.getElementById('refund-reason').value.trim()||'requested_by_customer';
+  cm('modal-refund');
   try{
-    const r=await api('/api/admin/refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id,reason})});
+    const r=await api('/api/admin/refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:_refundId,reason})});
     const d=await r.json();if(!r.ok)throw new Error(d.error);
     showToast('Refund processed ✓','ok');await loadBookings();closeDetail();
   }catch(e){showToast(e.message,'err');}
