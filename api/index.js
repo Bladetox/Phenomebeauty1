@@ -507,21 +507,33 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
 // POST /api/webhook/yoco
 // =============================================================================
 app.post('/api/webhook/yoco', async (req, res) => {
+
     // ── Verify Yoco HMAC-SHA256 signature ────────────────────────────────────
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
-    if (webhookSecret) {
-        const sigRaw = (req.headers['webhook-signature'] || req.headers['x-yoco-signature'] || '').toString();
-        const rawBody = JSON.stringify(req.body);
-        const hex = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
 
-        // Yoco may send the signature as plain hex or prefixed with "sha256="
+    if (webhookSecret) {
+        const sigRaw = (
+            req.headers['webhook-signature'] ||
+            req.headers['x-yoco-signature'] ||
+            ''
+        ).toString();
+
+        // Use raw bytes captured before JSON.parse — NOT re-serialized JSON
+        const rawBody = req.rawBody
+            ? req.rawBody.toString('utf8')
+            : JSON.stringify(req.body);
+
+        const hex = crypto
+            .createHmac('sha256', webhookSecret)
+            .update(rawBody)
+            .digest('hex');
+
+        // Yoco may send plain hex or prefixed with "sha256="
         const candidates = [hex, 'sha256=' + hex];
 
         let valid = false;
         for (const exp of candidates) {
             try {
-                // timingSafeEqual REQUIRES equal-length buffers — allocate to the
-                // same length and copy each string in so no throw can occur.
                 const maxLen = Math.max(sigRaw.length, exp.length);
                 if (maxLen === 0) continue;
                 const sigBuf = Buffer.alloc(maxLen);
@@ -533,28 +545,30 @@ app.post('/api/webhook/yoco', async (req, res) => {
                     break;
                 }
             } catch (err) {
-                // Defensive fallback — should never reach here after the alloc fix
                 console.warn('Webhook sig compare error:', err.message);
             }
         }
 
         if (!valid) {
             console.warn('Webhook: invalid signature — rejected');
+            console.warn('  sigRaw  :', sigRaw.slice(0, 20) + '...');
+            console.warn('  expected:', hex.slice(0, 20) + '...');
             return res.status(401).json({ error: 'Invalid signature' });
         }
+
+        console.log('Webhook: signature verified ✓');
+
     } else {
         console.warn('YOCO_WEBHOOK_SECRET not set — webhook signature not verified');
     }
 
-    // ── Process event synchronously so Yoco gets a meaningful status code ────
-    // Returning 500 on failure signals Yoco to retry; 200 means we handled it.
+    // ── Process event ─────────────────────────────────────────────────────────
+    // Return 500 on failure so Yoco retries; 200 means we handled it.
     try {
         const event   = req.body || {};
         const payment = event.payload || event;
         const meta    = payment.metadata || {};
 
-        // Yoco docs: success type is "payment.succeeded".
-        // Keep legacy types for backwards compatibility.
         const successTypes = [
             'payment.succeeded',
             'payment.approved',
@@ -601,18 +615,14 @@ app.post('/api/webhook/yoco', async (req, res) => {
 
             const settings = await getSettings(doc);
 
-            // Customer thank-you / rebook email
             sendRebookEmail(settings, {
                 bookingId,
                 name:     row.get('Client Name'),
                 email:    row.get('Client Email'),
                 total:    row.get('Total Amount (R)'),
                 services: row.get('Service Names'),
-            }).catch((e) => {
-                console.error('Rebook email error:', e.message);
-            });
+            }).catch((e) => console.error('Rebook email error:', e.message));
 
-            // Admin notification that remaining balance has been paid
             sendAdminDepositNotification(settings, {
                 bookingId,
                 name:        row.get('Client Name'),
@@ -625,9 +635,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
                 totalAmount: row.get('Total Amount (R)'),
                 deposit:     row.get('Deposit Amount (R)'),
                 balance:     row.get('Balance Due (R)'),
-            }).catch((e) => {
-                console.error('Admin balance-paid email error:', e.message);
-            });
+            }).catch((e) => console.error('Admin balance-paid email error:', e.message));
 
             return res.status(200).json({ received: true });
         }
@@ -677,9 +685,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
             totalAmount: row.get('Total Amount (R)'),
             deposit:     row.get('Deposit Amount (R)'),
             balance:     row.get('Balance Due (R)'),
-        }).catch((e) => {
-            console.error('Admin deposit email error:', e.message);
-        });
+        }).catch((e) => console.error('Admin deposit email error:', e.message));
 
         // Confirm booking to customer
         sendCustomerConfirmationEmail(settings, {
@@ -692,18 +698,17 @@ app.post('/api/webhook/yoco', async (req, res) => {
             time:     row.get('Time'),
             deposit:  row.get('Deposit Amount (R)'),
             balance:  row.get('Balance Due (R)'),
-        }).catch((e) => {
-            console.error('Customer confirmation email error:', e.message);
-        });
+        }).catch((e) => console.error('Customer confirmation email error:', e.message));
 
         return res.status(200).json({ received: true });
 
     } catch (e) {
-        // Returning 500 here tells Yoco to retry the webhook
+        // 500 tells Yoco to retry
         console.error('Webhook processing error:', e.message);
         return res.status(500).json({ error: 'Internal error — will retry' });
     }
 });
+
 
 // =============================================================================
 // GET /api/check-payment
