@@ -415,10 +415,9 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
                     'Skin Conditions':   skinNotes,
                     'Medications':       medsNotes,
                     'Allergies':         allergyNotes,
-                    'Health Conditions': healthNotes,vercel --prod
+                    'Health Conditions': healthNotes,
                     'Pregnancy':         pregnantNote,
                 };
-                await consultSheet.loadHeaderRow();
                 await consultSheet.loadHeaderRow();
                 const headers = consultSheet.headerValues || [];
                 if (headers.includes('Additional Notes'))       consultRow['Additional Notes']       = addlNotes;
