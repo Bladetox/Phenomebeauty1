@@ -501,7 +501,6 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         res.status(500).json({ error: 'Failed to save booking — please try again' });
     }
 });
-
 // =============================================================================
 // POST /api/webhook/yoco
 // =============================================================================
@@ -509,12 +508,32 @@ app.post('/api/webhook/yoco', async (req, res) => {
     // Verify Yoco HMAC-SHA256 signature
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
     if (webhookSecret) {
-        const sig      = req.headers['x-yoco-signature'] || '';
-        const rawBody  = JSON.stringify(req.body);
-        const expected = 'sha256=' + crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
-        const sigBuf   = Buffer.from(sig.padEnd(expected.length,     '\0'));
-        const expBuf   = Buffer.from(expected.padEnd(sig.length,     '\0'));
-        const valid    = sigBuf.length > 0 && expBuf.length > 0 && crypto.timingSafeEqual(sigBuf, expBuf);
+        // Support both the new documented header and the old one
+        const sigRaw = (req.headers['webhook-signature'] || req.headers['x-yoco-signature'] || '').toString();
+        const rawBody = JSON.stringify(req.body);
+
+        const hex = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
+        const candidates = [
+            hex,                // plain hex
+            'sha256=' + hex,    // prefixed form used in your old code
+        ];
+
+        let valid = false;
+        for (const exp of candidates) {
+            const sigBuf = Buffer.from(sigRaw.padEnd(exp.length, '\0'));
+            const expBuf = Buffer.from(exp.padEnd(sigRaw.length, '\0'));
+            if (sigBuf.length > 0 && expBuf.length > 0) {
+                try {
+                    if (crypto.timingSafeEqual(sigBuf, expBuf)) {
+                        valid = true;
+                        break;
+                    }
+                } catch {
+                    // fall through and try next candidate
+                }
+            }
+        }
+
         if (!valid) {
             console.warn('Webhook: invalid signature — rejected');
             return res.status(401).json({ error: 'Invalid signature' });
@@ -523,43 +542,84 @@ app.post('/api/webhook/yoco', async (req, res) => {
         console.warn('YOCO_WEBHOOK_SECRET not set — webhook signature not verified');
     }
 
-    // Acknowledge immediately
+    // Acknowledge immediately so Yoco doesn't retry because of slow downstream work
     res.status(200).json({ received: true });
 
     try {
-        const event    = req.body;
-        const payment  = event.payload || event;
-        const meta     = payment.metadata || {};
-        const approved = ['payment.approved', 'payment_approved', 'payment.captured', 'payment_captured'].includes(event.type);
-        if (!approved) return;
+        const event   = req.body || {};
+        const payment = event.payload || event;
+        const meta    = payment.metadata || {};
+
+        // Yoco docs: success type is "payment.succeeded".
+        // Keep your old types for backwards compatibility.
+        const successTypes = [
+            'payment.succeeded',
+            'payment.approved',
+            'payment_approved',
+            'payment.captured',
+            'payment_captured',
+        ];
+
+        if (!successTypes.includes(event.type)) return;
+        if (payment.status && payment.status !== 'succeeded') return;
 
         const bookingId = meta.bookingId || '';
         if (!bookingId) return;
 
         const type = meta.type || 'deposit';
-        const doc  = await getDoc();
-        const { row } = await findRow(doc, bookingId);
+
+        const doc      = await getDoc();
+        const { row }  = await findRow(doc, bookingId);
         if (!row) return;
 
-        // ── Balance payment ──────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────────
+        // Balance payment branch (Step 7, 8, 9)
+        // ─────────────────────────────────────────────────────────────────────
         if (type === 'balance') {
             if (row.get('Balance Status') === 'Paid') return;   // idempotent
+
             row.set('Balance Status', 'Paid');
             await row.save();
             console.log(`Webhook: balance paid for ${bookingId}`);
+
             const settings = await getSettings(doc);
+
+            // Step 8: customer thank-you / rebook email
             sendRebookEmail(settings, {
                 bookingId,
                 name:     row.get('Client Name'),
                 email:    row.get('Client Email'),
                 total:    row.get('Total Amount (R)'),
                 services: row.get('Service Names'),
-            }).catch(() => {});
+            }).catch((e) => {
+                console.error('Rebook email error:', e.message);
+            });
+
+            // Step 9: admin notification that remaining amount has been paid
+            sendAdminDepositNotification(settings, {
+                bookingId,
+                name:        row.get('Client Name'),
+                email:       row.get('Client Email'),
+                phone:       row.get('Client Phone'),
+                address:     row.get('Client Address'),
+                services:    row.get('Service Names'),
+                date:        row.get('Date'),
+                time:        row.get('Time'),
+                totalAmount: row.get('Total Amount (R)'),
+                deposit:     row.get('Deposit Amount (R)'),
+                balance:     row.get('Balance Due (R)'),   // still original value, but matches your existing email shape
+            }).catch((e) => {
+                console.error('Admin balance-paid email error:', e.message);
+            });
+
             return;
         }
 
-        // ── Deposit payment ──────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────────
+        // Deposit payment branch (Step 3–5)
+        // ─────────────────────────────────────────────────────────────────────
         if (row.get('Deposit Status') === 'Confirmed') return;  // idempotent
+
         row.set('Deposit Status',   'Confirmed');
         row.set('Yoco Checkout ID', payment.id || row.get('Yoco Checkout ID') || '');
         await row.save();
@@ -567,7 +627,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
 
         const settings = await getSettings(doc);
 
-        // Create calendar event
+        // Create calendar event (Step 5)
         const calId = await calCreate(settings, {
             bookingId,
             name:        row.get('Client Name'),
@@ -581,9 +641,12 @@ app.post('/api/webhook/yoco', async (req, res) => {
             deposit:     row.get('Deposit Amount (R)'),
             balance:     row.get('Balance Due (R)'),
         });
-        if (calId) { row.set('Calendar Event ID', calId); await row.save(); }
+        if (calId) {
+            row.set('Calendar Event ID', calId);
+            await row.save();
+        }
 
-        // Notify admin
+        // Step 3: notify admin of new booking with full details
         sendAdminDepositNotification(settings, {
             bookingId,
             name:        row.get('Client Name'),
@@ -596,9 +659,11 @@ app.post('/api/webhook/yoco', async (req, res) => {
             totalAmount: row.get('Total Amount (R)'),
             deposit:     row.get('Deposit Amount (R)'),
             balance:     row.get('Balance Due (R)'),
-        }).catch(() => {});
+        }).catch((e) => {
+            console.error('Admin deposit email error:', e.message);
+        });
 
-        // Confirm to customer
+        // Step 4: confirm to customer
         sendCustomerConfirmationEmail(settings, {
             bookingId,
             name:    row.get('Client Name'),
@@ -609,10 +674,15 @@ app.post('/api/webhook/yoco', async (req, res) => {
             time:    row.get('Time'),
             deposit: row.get('Deposit Amount (R)'),
             balance: row.get('Balance Due (R)'),
-        }).catch(() => {});
+        }).catch((e) => {
+            console.error('Customer confirmation email error:', e.message);
+        });
 
-    } catch (e) { console.error('Webhook error:', e.message); }
+    } catch (e) {
+        console.error('Webhook error:', e.message);
+    }
 });
+
 
 // =============================================================================
 // GET /api/check-payment
