@@ -415,9 +415,11 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
                     'Skin Conditions':   skinNotes,
                     'Medications':       medsNotes,
                     'Allergies':         allergyNotes,
-                    'Health Conditions': healthNotes,
+                    'Health Conditions': healthNotes,vercel --prod
                     'Pregnancy':         pregnantNote,
                 };
+                await consultSheet.loadHeaderRow();
+                await consultSheet.loadHeaderRow();
                 const headers = consultSheet.headerValues || [];
                 if (headers.includes('Additional Notes'))       consultRow['Additional Notes']       = addlNotes;
                 if (headers.includes('Environmental Exposure')) consultRow['Environmental Exposure'] = environNotes;
