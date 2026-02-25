@@ -118,7 +118,8 @@
       }
       .step-pill-inner {
         width: 0; height: 100%; border-radius: inherit;
-        background: #000000;
+        background: rgba(0,0,0,0.75);
+        box-shadow: 0 0 6px rgba(0,0,0,0.3);
         transition: width 0.3s ease;
       }
       .step-label { font-size: 10.5px; color: var(--text-muted); margin-top: 4px; }
@@ -127,7 +128,8 @@
       .surface {
         flex: 1; margin-top: 10px; padding: 14px;
         border-radius: var(--r-lg);
-        background: rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.14);
+        border: 0.5px solid rgba(255,255,255,0.45);
         backdrop-filter: blur(32px) saturate(240%);
         -webkit-backdrop-filter: blur(32px) saturate(240%);
         box-shadow:
@@ -239,6 +241,7 @@
         -webkit-backdrop-filter: blur(20px) saturate(200%);
         border: 0.5px solid rgba(255,255,255,0.92);
         box-shadow:
+          0 1px 0 rgba(255,255,255,0.92) inset,
           0 0 0 0.5px rgba(0,0,0,0.04),
           0 2px 6px rgba(0,0,0,0.05),
           0 6px 20px rgba(0,0,0,0.04);
@@ -279,8 +282,9 @@
       .check-circle {
         width: 26px; height: 26px; flex-shrink: 0;
         border-radius: 50%;
-        border: 1.5px solid rgba(0,0,0,0.16);
-        background: rgba(255,255,255,0.70);
+        border: 0.5px solid rgba(255,255,255,0.90);
+        background: rgba(255,255,255,0.45);
+        box-shadow: 0 0 0 0.5px rgba(0,0,0,0.06);
         display: flex; align-items: center; justify-content: center;
         transition: all 0.2s ease;
       }
