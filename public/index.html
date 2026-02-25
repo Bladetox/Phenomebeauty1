@@ -188,7 +188,7 @@
         content: '';
         position: absolute; left: 0; top: 50%; transform: translateY(-50%);
         width: 3px; height: 16px; border-radius: var(--r-pill);
-        background: linear-gradient(180deg, #E8CBA9, #000000);
+        background: #000000;
       }
       .service-card {
         border-radius: 18px; padding: 18px 16px;
@@ -207,16 +207,16 @@
         border-color: rgba(0,0,0,0.08);
       }
       .service-card.selected {
-        background: linear-gradient(135deg, #000000, #F7ECD8);
+        background: #000000;
         border-color: #000000;
         border-width: 1.5px;
-        box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.18);
       }
       .service-main { flex: 1; margin-right: 12px; }
       .service-header {
         display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
       }
-      .service-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: #1C1008; }
+      .service-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: #1d1d1f; }
       .service-price { font-size: 15px; font-weight: 600; white-space: nowrap; color: #000000; }
       .service-meta { margin-top: 5px; font-size: 12px; color: rgba(0,0,0,0.55); line-height: 1.4; }
       /* Check circle */
@@ -231,7 +231,7 @@
       .service-card.selected .service-meta { color: rgba(255,255,255,0.55); }
       .service-card.selected .service-price { color: #ffffff; }
       .service-card.selected .check-circle {
-        background: linear-gradient(135deg, #000000, #a8744e);
+        background: #000000;
         border-color: transparent;
         box-shadow: 0 2px 8px rgba(0,0,0,0.25);
       }
@@ -242,8 +242,8 @@
         margin-top: 10px; flex-shrink: 0;
         border-radius: var(--r-md);
         padding: 10px 12px;
-        background: linear-gradient(135deg, #000000, #F5E8D8);
-        border: 1.5px solid rgba(0,0,0,0.2);
+        background: rgba(0,0,0,0.04);
+        border: 1px solid rgba(0,0,0,0.08);
         display: none; /* shown via JS when items selected */
       }
       .cart-bar.visible { display: block; }
@@ -572,7 +572,7 @@
         padding: 9px 16px; border-radius: var(--r-pill);
         font-size: 12px; font-weight: 500;
         color: var(--text);
-        background: linear-gradient(135deg, #f9fafb, #e5e7eb);
+        background: rgba(255,255,255,0.96);
         box-shadow: 0 16px 36px rgba(0,0,0,0.7);
         opacity: 0; z-index: 9999; text-align: center;
         transition: transform 0.28s cubic-bezier(0.18,0.89,0.32,1.28), opacity 0.28s ease;
@@ -1156,7 +1156,7 @@
           'max-width:92vw;padding:13px 18px;border-radius:14px;font-size:13px;font-weight:600;' +
           'text-align:center;box-shadow:0 16px 40px rgba(0,0,0,.7);cursor:pointer;' +
           (success ? 'background:linear-gradient(135deg,#000000,#000000);color:#ffffff;'
-                   : 'background:linear-gradient(135deg,#b45309,#92400e);color:#fef3c7;');
+                   : 'background:rgba(0,0,0,0.88);color:#ffffff;');
         b.textContent = msg;
         document.body.appendChild(b);
         setTimeout(() => b.remove(), 7000);
