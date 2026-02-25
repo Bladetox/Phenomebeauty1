@@ -67,9 +67,7 @@ function emailRow(label, value, valueStyle = '') {
 // Optional Google review block — only shows if google_review_url exists in Settings
 function emailReviewBlock(s, contextLine) {
     const url =
-        s.google_review_url ||
-        s.googleReviewUrl ||
-        '';
+        s.googlereviewurl || '';
     if (!url) return '';
 
     return `
