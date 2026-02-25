@@ -19,6 +19,7 @@ const {
 
 const {
     sendAdminDepositNotification,
+    sendAdminBalancePaidNotification,
     sendCustomerConfirmationEmail,
     sendBalanceRequestEmail,
     sendRebookEmail,
@@ -595,7 +596,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
                 services: row.get('Service Names'),
             }).catch((e) => console.error('Rebook email error:', e.message));
 
-            sendAdminDepositNotification(settings, {
+            sendAdminBalancePaidNotification(settings, {
                 bookingId,
                 name:        row.get('Client Name'),
                 email:       row.get('Client Email'),
