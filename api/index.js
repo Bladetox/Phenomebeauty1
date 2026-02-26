@@ -926,6 +926,16 @@ app.post('/api/admin/update-status', adminOnly, async (req, res) => {
                     row.set('Balance Status', 'Requested');
                     row.set('Yoco Link',      paymentUrl);
                     await row.save();
+
+        sendBalanceRequestEmail(s, {
+            bookingId,
+            name:       row.get('Client Name'),
+            email:      row.get('Client Email'),
+            services:   row.get('Service Names'),
+            deposit:    row.get('Deposit Amount (R)'),
+            balance:    bal.toFixed(2),
+            paymentUrl: paymentUrl,
+        }).catch((e) => console.error('Balance request email error:', e.message));
                     sendBalanceRequestEmail(req.settings, {
                         bookingId,
                         name:       row.get('Client Name'),
@@ -1040,6 +1050,16 @@ app.post('/api/admin/request-balance', adminOnly, async (req, res) => {
         row.set('Yoco Link',       paymentUrl);
         row.set('Deposit Status',  'Service Complete');
         await row.save();
+
+        sendBalanceRequestEmail(s, {
+            bookingId,
+            name:       row.get('Client Name'),
+            email:      row.get('Client Email'),
+            services:   row.get('Service Names'),
+            deposit:    row.get('Deposit Amount (R)'),
+            balance:    bal.toFixed(2),
+            paymentUrl: paymentUrl,
+        }).catch((e) => console.error('Balance request email error:', e.message));
 
         res.json({ success: true, paymentUrl, balanceDue: bal });
     } catch (e) { res.status(500).json({ error: e.message }); }
