@@ -6,24 +6,50 @@
     <title>PhenomeBeauty Booking</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       /* ═══════════════════════════════════════════════════════════
-         PHENOMEBEAUTY — LUXURY MONOCHROME LIQUID GLASS SYSTEM
-         v5.0 — Black & White. No compromise. Do not patch.
+         PHENOMEBEAUTY — OBSIDIAN ATELIER
+         v6.0 — Deep dark canvas. Liquid glass over obsidian.
+         Cormorant Garamond (display) + Jost (UI)
          ═══════════════════════════════════════════════════════════ */
 
       :root {
-        --ink:        #0a0a0a;
-        --ink-2:      #1c1c1e;
-        --ink-soft:   #3a3a3c;
-        --text:       #1d1d1f;
-        --text-muted: rgba(0,0,0,0.40);
-        --text-faint: rgba(0,0,0,0.25);
+        /* Core obsidian palette */
+        --obsidian:   #04040a;
+        --void:       #070710;
+        --onyx:       #0d0d1a;
+        --graphite:   #181828;
+
+        /* Glass surfaces — luminous layers over dark */
+        --glass-1:    rgba(255,255,255,0.09);
+        --glass-2:    rgba(255,255,255,0.06);
+        --glass-3:    rgba(255,255,255,0.03);
+        --glass-inv:  rgba(255,255,255,0.96);
+
+        /* Text — clear luminous hierarchy */
+        --text-pri:   rgba(255,255,255,0.96);
+        --text-sec:   rgba(255,255,255,0.65);
+        --text-ter:   rgba(255,255,255,0.38);
+        --text-quat:  rgba(255,255,255,0.20);
+
+        /* Borders */
+        --border-hi:  rgba(255,255,255,0.18);
+        --border-mid: rgba(255,255,255,0.10);
+        --border-lo:  rgba(255,255,255,0.05);
+
+        /* Legacy compat aliases */
+        --ink:        #04040a;
+        --ink-2:      #0d0d1a;
+        --ink-soft:   rgba(255,255,255,0.38);
+        --text:       rgba(255,255,255,0.96);
+        --text-muted: rgba(255,255,255,0.38);
+        --text-faint: rgba(255,255,255,0.22);
         --glass-hi:   rgba(255,255,255,0.96);
-        --glass-mid:  rgba(255,255,255,0.60);
-        --glass-low:  rgba(255,255,255,0.28);
-        --glass-ink:  rgba(10,10,10,0.88);
+        --glass-mid:  rgba(255,255,255,0.12);
+        --glass-low:  rgba(255,255,255,0.07);
+        --glass-ink:  rgba(255,255,255,0.92);
+
         --r-xl:   28px;
         --r-lg:   22px;
         --r-md:   16px;
@@ -36,20 +62,21 @@
         -webkit-tap-highlight-color: transparent;
       }
 
-      /* ── BODY — Apple.com pearl canvas ── */
+      /* ── BODY — deep obsidian with chromatic depth ── */
       html, body {
         margin: 0; padding: 0;
-        font-family: Inter, system-ui, -apple-system, sans-serif;
-        color: var(--text);
+        font-family: 'Jost', system-ui, sans-serif;
+        color: var(--text-pri);
         min-height: 100vh;
-        /* Signature Apple light — cool pearl with luminous spheres */
         background:
-          radial-gradient(ellipse at 18% 8%,  rgba(210,210,218,0.90) 0%, transparent 48%),
-          radial-gradient(ellipse at 82% 6%,  rgba(225,225,232,0.75) 0%, transparent 44%),
-          radial-gradient(ellipse at 50% 48%, rgba(218,218,226,0.55) 0%, transparent 52%),
-          radial-gradient(ellipse at 10% 90%, rgba(200,200,210,0.65) 0%, transparent 44%),
-          radial-gradient(ellipse at 88% 88%, rgba(215,215,224,0.60) 0%, transparent 44%),
-          #ececf1;
+          radial-gradient(ellipse at 15% 5%,  rgba(100, 60,220,0.80) 0%, transparent 36%),
+          radial-gradient(ellipse at 85% 4%,  rgba(65,  35,165,0.70) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 52%, rgba(50,  25,130,0.60) 0%, transparent 42%),
+          radial-gradient(ellipse at 8%  94%, rgba(80,  45,175,0.65) 0%, transparent 34%),
+          radial-gradient(ellipse at 92% 92%, rgba(58,  28,130,0.60) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 50%, rgba(18,  10, 55,0.92) 0%, transparent 66%),
+          var(--obsidian);
+        background-attachment: fixed;
       }
 
       /* ── LAYOUT ── */
@@ -59,22 +86,35 @@
         display: flex; align-items: stretch; justify-content: center;
       }
 
-      /* ── SHELL — outermost frosted glass card ── */
+      /* ── SHELL — dark glass master card ── */
       .shell {
         width: 100%; max-width: 520px;
         min-height: calc(100vh - 32px);
         border-radius: var(--r-xl);
         padding: 20px 16px;
-        background: rgba(255,255,255,0.52);
-        backdrop-filter: blur(48px) saturate(200%) brightness(1.04);
-        -webkit-backdrop-filter: blur(48px) saturate(200%) brightness(1.04);
+        background: rgba(255,255,255,0.10);
+        backdrop-filter: blur(72px) saturate(200%);
+        -webkit-backdrop-filter: blur(72px) saturate(200%);
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.98) inset,
-          0 1px 0 rgba(255,255,255,0.80) inset,
-          0 0 0 0.5px rgba(0,0,0,0.06),
-          0 24px 72px rgba(0,0,0,0.12),
-          0 4px 12px rgba(0,0,0,0.05);
+          0 0 0 0.5px rgba(255,255,255,0.20) inset,
+          0 1px 0 rgba(255,255,255,0.14) inset,
+          0 0 0 0.5px rgba(255,255,255,0.06),
+          0 28px 80px rgba(0,0,0,0.70),
+          0 4px 16px rgba(0,0,0,0.50);
         display: flex; flex-direction: column;
+        position: relative; overflow: hidden;
+      }
+      /* Prismatic top-edge highlight */
+      .shell::before {
+        content: '';
+        position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+        background: linear-gradient(90deg,
+          transparent,
+          rgba(255,255,255,0.45) 30%,
+          rgba(255,255,255,0.80) 50%,
+          rgba(255,255,255,0.45) 70%,
+          transparent);
+        border-radius: var(--r-pill);
       }
       @media(min-width:768px){
         .app-frame { padding: 32px 16px; }
@@ -87,23 +127,25 @@
         margin-bottom: 18px;
       }
 
-      /* Logo — clean luxury black ring */
+      /* Logo — dark glass ring with inner glow */
       .logo-wrap {
         width: 82px; height: 82px;
         border-radius: 27px; padding: 2.5px;
-        background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
+        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.20) inset,
-          0 10px 36px rgba(0,0,0,0.32),
-          0 2px 8px rgba(0,0,0,0.18);
+          0 0 0 0.5px rgba(255,255,255,0.18) inset,
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 12px 44px rgba(0,0,0,0.75),
+          0 2px 10px rgba(0,0,0,0.50),
+          0 0 40px rgba(120,90,220,0.10);
         position: relative;
       }
-      /* Inner shine ring */
+      /* Inner glass shine */
       .logo-wrap::before {
         content: '';
         position: absolute; inset: 0;
         border-radius: inherit;
-        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
         pointer-events: none;
       }
       .logo {
@@ -112,62 +154,137 @@
         border: none; display: block;
       }
 
+      /* ── BRAND TYPOGRAPHY — luxury hierarchy ── */
       .brand-tag {
-        margin-top: 14px; font-size: 9.5px;
-        letter-spacing: 0.22em; text-transform: uppercase;
-        color: var(--text-faint); font-weight: 500;
+        margin-top: 14px;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; letter-spacing: 0.36em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.70); font-weight: 800;
       }
       h1 {
-        margin: 6px 0 2px; font-size: 21px; font-weight: 400;
-        letter-spacing: -0.02em;
-        font-family: 'Playfair Display', Georgia, serif;
-        color: var(--ink-2);
+        margin: 6px 0 2px;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 30px; font-weight: 400;
+        letter-spacing: 0.03em; line-height: 1.1;
+        color: rgba(255,255,255,0.97);
       }
       .sub-heading {
-        font-size: 11px; color: var(--text-muted);
-        margin-bottom: 14px; letter-spacing: 0.01em;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; font-weight: 700;
+        letter-spacing: 0.24em; text-transform: uppercase;
+        color: rgba(255,255,255,0.38);
+        margin-bottom: 16px;
       }
 
-      /* ── STEP INDICATOR ── */
+      /* ══ STEP PROGRESS — animated fill system ══════════════════════════════
+         Each segment fills left-to-right. Completed = solid white.
+         Current step = 60% fill with trailing shimmer pulse.
+         Future = empty track.
+         ═══════════════════════════════════════════════════════════════════ */
       .step-indicator {
-        display: flex; align-items: center; gap: 7px;
-        padding: 7px 12px; border-radius: var(--r-pill);
-        background: rgba(255,255,255,0.55);
-        backdrop-filter: blur(20px) saturate(200%);
-        -webkit-backdrop-filter: blur(20px) saturate(200%);
-        border: 0.5px solid rgba(255,255,255,0.92);
-        box-shadow:
-          0 0 0 0.5px rgba(0,0,0,0.05),
-          0 2px 10px rgba(0,0,0,0.05);
+        width: 100%;
+        display: flex; flex-direction: column;
+        align-items: center; gap: 10px;
       }
+      .step-track-row {
+        display: flex; align-items: center; gap: 5px;
+        width: 100%; padding: 0 2px;
+      }
+      /* Individual segment tracks */
       .step-pill {
         flex: 1; height: 3px; border-radius: var(--r-pill);
-        background: rgba(0,0,0,0.08); overflow: hidden;
+        background: rgba(255,255,255,0.10);
+        overflow: visible; position: relative;
       }
       .step-pill-inner {
         width: 0; height: 100%; border-radius: inherit;
-        background: linear-gradient(90deg, #1a1a1a, #0a0a0a);
-        box-shadow: 0 0 8px rgba(0,0,0,0.25);
-        transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
+        background: linear-gradient(90deg,
+          rgba(200,180,255,0.70) 0%,
+          rgba(255,255,255,0.98) 100%);
+        box-shadow: 0 0 10px rgba(200,180,255,0.50), 0 0 3px rgba(255,255,255,0.60);
+        transition: width 0.60s cubic-bezier(0.4,0,0.2,1);
+        position: relative;
       }
-      .step-label {
-        font-size: 10px; color: var(--text-faint);
-        margin-top: 5px; letter-spacing: 0.02em;
+      /* Active shimmer — only on current step's bar */
+      .step-pill-inner.pb-active::after {
+        content: '';
+        position: absolute; top: -2px; right: -20px;
+        width: 28px; height: calc(100% + 4px);
+        background: linear-gradient(90deg, transparent, rgba(220,200,255,0.90));
+        border-radius: var(--r-pill);
+        filter: blur(3px);
+        animation: pbShimmer 1.8s ease-in-out infinite;
+      }
+      @keyframes pbShimmer {
+        0%, 100% { opacity: 0; transform: translateX(-12px); }
+        50%       { opacity: 1; transform: translateX(0); }
       }
 
-      /* ── SURFACE — inner glass pane ── */
+      /* Step dot row — labels under each segment */
+      .step-dots-row {
+        display: flex; width: 100%;
+        justify-content: space-between;
+        padding: 0 2px;
+      }
+      .step-dot {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 3px; flex: 1;
+        transition: opacity 0.3s ease;
+      }
+      .step-dot-num {
+        width: 20px; height: 20px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Jost', sans-serif;
+        font-size: 8px; font-weight: 800;
+        transition: all 0.35s ease;
+        border: 0.5px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.30);
+      }
+      .step-dot.sd-done .step-dot-num {
+        background: rgba(255,255,255,0.97);
+        color: var(--obsidian);
+        border-color: transparent;
+        box-shadow: 0 0 12px rgba(200,180,255,0.35), 0 2px 8px rgba(255,255,255,0.20);
+      }
+      .step-dot.sd-active .step-dot-num {
+        background: rgba(255,255,255,0.18);
+        color: rgba(255,255,255,0.96);
+        border-color: rgba(255,255,255,0.35);
+        box-shadow: 0 0 14px rgba(200,180,255,0.30), 0 0 0 1px rgba(255,255,255,0.10);
+      }
+      .step-dot-lbl {
+        font-family: 'Jost', sans-serif;
+        font-size: 7.5px; font-weight: 700;
+        letter-spacing: 0.10em; text-transform: uppercase;
+        color: rgba(255,255,255,0.22);
+        text-align: center; white-space: nowrap;
+        transition: color 0.3s ease;
+      }
+      .step-dot.sd-active .step-dot-lbl { color: rgba(255,255,255,0.65); }
+      .step-dot.sd-done  .step-dot-lbl  { color: rgba(255,255,255,0.35); }
+
+      /* Legacy: small text label below whole bar */
+      .step-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.25);
+        margin-top: 2px; letter-spacing: 0.04em;
+        display: none; /* replaced by dot labels */
+      }
+
+      /* ── SURFACE — inner dark glass pane ── */
       .surface {
         flex: 1; margin-top: 12px; padding: 15px;
         border-radius: var(--r-lg);
-        background: rgba(255,255,255,0.18);
-        backdrop-filter: blur(36px) saturate(220%) brightness(1.02);
-        -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.02);
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(36px) saturate(180%);
+        -webkit-backdrop-filter: blur(36px) saturate(180%);
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.90) inset,
-          0 1px 0 rgba(255,255,255,0.60) inset,
-          0 0 0 0.5px rgba(0,0,0,0.04),
-          0 8px 28px rgba(0,0,0,0.05);
-        border: 0.5px solid rgba(255,255,255,0.55);
+          0 0 0 0.5px rgba(255,255,255,0.12) inset,
+          0 1px 0 rgba(255,255,255,0.07) inset,
+          0 0 0 0.5px rgba(255,255,255,0.04);
+        border: none;
         display: flex; flex-direction: column;
         overflow: visible;
       }
@@ -193,15 +310,18 @@
       @keyframes shimmer { 0%,100% { opacity:0.55; } 50% { opacity:0.85; } }
 
       .section-label {
-        font-size: 9.5px; letter-spacing: 0.24em;
-        text-transform: uppercase; color: var(--text-faint);
-        margin-bottom: 14px; flex-shrink: 0; font-weight: 600;
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; letter-spacing: 0.30em;
+        text-transform: uppercase; color: rgba(255,255,255,0.50);
+        margin-bottom: 14px; flex-shrink: 0; font-weight: 800;
       }
 
       .scroll-area {
         overflow-y: auto; overflow-x: visible;
         padding-right: 2px; flex: 1; min-height: 0;
         -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.08) transparent;
       }
 
       /* ── CATEGORY CHIPS ── */
@@ -218,86 +338,79 @@
         border-radius: var(--r-pill);
         height: 33px; padding: 0 17px;
         display: inline-flex; align-items: center; justify-content: center;
-        font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; font-weight: 600; letter-spacing: 0.10em;
         text-transform: uppercase;
         white-space: nowrap; flex-shrink: 0;
-        background: rgba(255,255,255,0.72);
-        backdrop-filter: blur(18px) saturate(180%);
-        -webkit-backdrop-filter: blur(18px) saturate(180%);
-        border: 0.5px solid rgba(255,255,255,0.95);
-        box-shadow:
-          0 0 0 0.5px rgba(0,0,0,0.05),
-          0 1px 4px rgba(0,0,0,0.06);
-        color: rgba(0,0,0,0.50);
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.40);
         cursor: pointer; transition: all 0.2s ease;
       }
       .chip:hover {
-        background: rgba(255,255,255,0.92);
-        color: var(--ink-2);
-        box-shadow: 0 0 0 0.5px rgba(0,0,0,0.08), 0 3px 12px rgba(0,0,0,0.09);
+        background: rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.70);
+        border-color: rgba(255,255,255,0.22);
         transform: translateY(-1px);
       }
       .chip.active {
-        background: var(--glass-ink);
-        backdrop-filter: blur(18px) saturate(200%);
-        -webkit-backdrop-filter: blur(18px) saturate(200%);
-        border: 0.5px solid rgba(255,255,255,0.12);
-        color: #ffffff;
+        background: rgba(255,255,255,0.94);
+        border: 0.5px solid transparent;
+        color: var(--obsidian);
+        font-weight: 700; letter-spacing: 0.09em;
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.10) inset,
-          0 1px 0 rgba(255,255,255,0.08) inset,
-          0 5px 18px rgba(0,0,0,0.28);
-        letter-spacing: 0.09em;
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 4px 18px rgba(255,255,255,0.12);
       }
 
       /* ── SERVICE CARDS ── */
       .category-title {
-        font-size: 10px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 0.16em;
-        color: var(--text-faint);
-        margin: 16px 0 9px; padding-left: 12px;
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.20em;
+        color: rgba(255,255,255,0.40);
+        margin: 18px 0 10px; padding-left: 12px;
         position: relative;
       }
       .category-title::before {
         content: '';
         position: absolute; left: 0; top: 50%; transform: translateY(-50%);
         width: 3px; height: 14px; border-radius: var(--r-pill);
-        background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
+        background: linear-gradient(180deg, rgba(255,255,255,0.60), rgba(255,255,255,0.25));
       }
       .service-card {
-        border-radius: 18px; padding: 15px 14px;
-        margin-bottom: 8px;
+        border-radius: 18px; padding: 16px 15px;
+        margin-bottom: 9px;
         display: flex; align-items: center; justify-content: space-between;
-        background: rgba(255,255,255,0.52);
-        backdrop-filter: blur(22px) saturate(200%);
-        -webkit-backdrop-filter: blur(22px) saturate(200%);
-        border: 0.5px solid rgba(255,255,255,0.95);
+        background: rgba(255,255,255,0.09);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 0.5px solid rgba(255,255,255,0.13);
         box-shadow:
-          0 1px 0 rgba(255,255,255,0.95) inset,
-          0 0 0 0.5px rgba(0,0,0,0.04),
-          0 2px 6px rgba(0,0,0,0.04),
-          0 6px 20px rgba(0,0,0,0.03);
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 0 0 0.5px rgba(255,255,255,0.04),
+          0 4px 20px rgba(0,0,0,0.25);
         cursor: pointer;
         transition: all 0.22s ease;
       }
       .service-card:hover {
-        background: rgba(255,255,255,0.82);
-        border-color: rgba(255,255,255,0.99);
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.18);
         box-shadow:
-          0 0 0 0.5px rgba(0,0,0,0.05),
-          0 6px 22px rgba(0,0,0,0.08);
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 8px 26px rgba(0,0,0,0.30);
         transform: translateY(-1px);
       }
       .service-card.selected {
-        background: var(--glass-ink);
-        backdrop-filter: blur(22px) saturate(200%);
-        -webkit-backdrop-filter: blur(22px) saturate(200%);
-        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.94);
+        border: 0.5px solid transparent;
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.08) inset,
-          0 1px 0 rgba(255,255,255,0.06) inset,
-          0 10px 32px rgba(0,0,0,0.26),
-          0 2px 8px rgba(0,0,0,0.14);
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 1px 0 rgba(255,255,255,0.60) inset,
+          0 12px 40px rgba(0,0,0,0.50),
+          0 0 30px rgba(255,255,255,0.05);
         transform: none;
       }
       .service-main { flex: 1; margin-right: 12px; }
@@ -305,27 +418,43 @@
         display: flex; justify-content: space-between;
         align-items: baseline; gap: 8px;
       }
-      .service-name  { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-2); }
-      .service-price { font-size: 14.5px; font-weight: 700; white-space: nowrap; color: var(--ink); }
-      .service-meta  { margin-top: 4px; font-size: 11.5px; color: rgba(0,0,0,0.42); line-height: 1.4; }
-      .service-card.selected .service-name  { color: rgba(255,255,255,0.95); }
-      .service-card.selected .service-price { color: rgba(255,255,255,0.80); }
-      .service-card.selected .service-meta  { color: rgba(255,255,255,0.42); }
+      /* Service name — Cormorant for elegance, legible size */
+      .service-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px; font-weight: 500;
+        letter-spacing: 0.01em; color: rgba(255,255,255,0.95);
+        line-height: 1.2;
+      }
+      .service-price {
+        font-family: 'Jost', sans-serif;
+        font-size: 14px; font-weight: 700;
+        white-space: nowrap; color: rgba(255,255,255,0.80);
+      }
+      /* Meta — boosted contrast for legibility */
+      .service-meta {
+        margin-top: 5px;
+        font-family: 'Jost', sans-serif;
+        font-size: 12.5px; color: rgba(255,255,255,0.55);
+        line-height: 1.50; letter-spacing: 0.01em;
+      }
+      /* Selected state — dark text on white card */
+      .service-card.selected .service-name  { color: rgba(4,4,10,0.92); }
+      .service-card.selected .service-price { color: rgba(4,4,10,0.65); }
+      .service-card.selected .service-meta  { color: rgba(4,4,10,0.45); }
 
       /* ── CHECK CIRCLE ── */
       .check-circle {
         width: 26px; height: 26px; flex-shrink: 0;
         border-radius: 50%;
-        border: 0.5px solid rgba(0,0,0,0.10);
-        background: rgba(255,255,255,0.60);
-        box-shadow: 0 0 0 0.5px rgba(0,0,0,0.05);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
         display: flex; align-items: center; justify-content: center;
         transition: all 0.22s ease;
       }
       .service-card.selected .check-circle {
-        background: rgba(255,255,255,0.14);
-        border-color: rgba(255,255,255,0.22);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+        background: rgba(4,4,10,0.88);
+        border-color: rgba(4,4,10,0.30);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.40);
       }
       .check-circle svg { display: none; }
       .service-card.selected .check-circle svg { display: block; }
@@ -334,89 +463,92 @@
       .cart-bar {
         margin-top: 10px; flex-shrink: 0;
         border-radius: var(--r-md); padding: 11px 13px;
-        background: rgba(255,255,255,0.52);
-        backdrop-filter: blur(18px) saturate(180%);
-        -webkit-backdrop-filter: blur(18px) saturate(180%);
-        border: 0.5px solid rgba(255,255,255,0.88);
-        box-shadow:
-          0 0 0 0.5px rgba(0,0,0,0.04),
-          0 4px 16px rgba(0,0,0,0.05);
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
         display: none;
       }
-      .cart-bar.visible { display: block; }
+      .cart-bar.visible { display: block; animation: fadeSlide 0.22s ease; }
       .cart-bar-top {
         display: flex; align-items: center; justify-content: space-between;
         margin-bottom: 7px;
       }
       .cart-title {
-        font-size: 10px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-faint);
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.18em; color: rgba(255,255,255,0.50);
       }
-      .cart-total { font-size: 14px; font-weight: 700; color: var(--ink); }
+      .cart-total {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px; font-weight: 400; color: rgba(255,255,255,0.90);
+      }
       .cart-items { display: flex; flex-direction: column; gap: 3px; }
       .cart-item {
         display: flex; justify-content: space-between; align-items: center;
-        font-size: 11.5px;
+        font-size: 11.5px; font-family: 'Jost', sans-serif;
       }
       .cart-item-name {
-        color: var(--text-muted); flex: 1; margin-right: 8px;
+        color: rgba(255,255,255,0.60); flex: 1; margin-right: 8px;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        font-size: 11.5px;
       }
-      .cart-item-price { color: var(--text); white-space: nowrap; }
+      .cart-item-price { color: rgba(255,255,255,0.80); white-space: nowrap; font-size: 11.5px; font-weight: 600; }
       .cart-remove {
         margin-left: 6px; cursor: pointer;
-        color: rgba(0,0,0,0.22); font-size: 11px; font-weight: 700;
+        color: rgba(255,255,255,0.18); font-size: 11px; font-weight: 700;
         transition: color 0.15s;
       }
-      .cart-remove:hover { color: var(--ink); }
-      .cart-duration { margin-top: 6px; font-size: 10px; color: var(--text-faint); letter-spacing: 0.02em; }
+      .cart-remove:hover { color: rgba(255,255,255,0.70); }
+      .cart-duration { margin-top: 6px; font-family: 'Jost', sans-serif; font-size: 10px; color: rgba(255,255,255,0.22); letter-spacing: 0.04em; }
 
       /* ── CALENDAR ── */
       .cal-wrap {
         border-radius: var(--r-md);
-        background: rgba(255,255,255,0.48);
-        backdrop-filter: blur(26px) saturate(200%);
-        -webkit-backdrop-filter: blur(26px) saturate(200%);
-        border: 0.5px solid rgba(255,255,255,0.90);
-        box-shadow:
-          0 0 0 0.5px rgba(0,0,0,0.04),
-          0 4px 18px rgba(0,0,0,0.05);
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(26px);
+        -webkit-backdrop-filter: blur(26px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
         overflow: hidden; margin-bottom: 14px;
       }
       .cal-header {
         display: flex; align-items: center; justify-content: space-between;
         padding: 10px 14px;
-        border-bottom: 0.5px solid rgba(0,0,0,0.06);
+        border-bottom: 0.5px solid rgba(255,255,255,0.06);
       }
       .cal-month-label {
-        font-size: 13px; font-weight: 600; letter-spacing: -0.01em;
-        color: var(--ink-2);
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 15px; font-weight: 400; letter-spacing: 0.02em;
+        color: rgba(255,255,255,0.90);
       }
       .cal-nav {
         width: 30px; height: 30px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         cursor: pointer;
-        background: rgba(255,255,255,0.70);
+        background: rgba(255,255,255,0.07);
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
-        border: 0.5px solid rgba(255,255,255,0.95);
-        box-shadow: 0 0 0 0.5px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.06);
-        color: var(--ink-2); font-size: 14px; line-height: 1;
+        border: 0.5px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.60); font-size: 14px; line-height: 1;
         transition: all 0.18s ease; user-select: none;
       }
       .cal-nav:hover {
-        background: rgba(255,255,255,0.96);
-        box-shadow: 0 0 0 0.5px rgba(0,0,0,0.10), 0 3px 12px rgba(0,0,0,0.09);
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.22);
+        color: rgba(255,255,255,0.90);
         transform: scale(1.08);
       }
-      .cal-nav.disabled { opacity: 0.20; cursor: not-allowed; pointer-events: none; }
+      .cal-nav.disabled { opacity: 0.18; cursor: not-allowed; pointer-events: none; }
       .cal-weekdays {
         display: grid; grid-template-columns: repeat(7, 1fr);
         padding: 6px 10px 2px;
       }
       .cal-wd {
-        text-align: center; font-size: 9.5px; color: rgba(0,0,0,0.32);
-        font-weight: 700; letter-spacing: 0.09em; padding: 2px 0;
+        text-align: center; font-family: 'Jost', sans-serif;
+        font-size: 9px; color: rgba(255,255,255,0.22);
+        font-weight: 700; letter-spacing: 0.10em; padding: 2px 0;
       }
       .cal-days {
         display: grid; grid-template-columns: repeat(7, 1fr);
@@ -426,51 +558,56 @@
         aspect-ratio: 1; border-radius: 10px;
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
+        font-family: 'Jost', sans-serif;
         font-size: 12px; cursor: pointer;
         border: 1px solid transparent;
         transition: all 0.15s ease;
         position: relative; user-select: none;
-        color: var(--text);
+        color: rgba(255,255,255,0.40);
       }
       .cal-day.empty    { pointer-events: none; }
-      .cal-day.past     { opacity: 0.18; cursor: not-allowed; pointer-events: none; }
-      .cal-day.no-slots { opacity: 0.28; cursor: not-allowed; pointer-events: none; }
+      .cal-day.past     { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
+      .cal-day.no-slots { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
       .cal-day.has-slots {
-        background: rgba(255,255,255,0.50);
-        border-color: rgba(255,255,255,0.80);
+        background: rgba(255,255,255,0.07);
+        border-color: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.75);
       }
       .cal-day.has-slots:hover {
-        background: rgba(255,255,255,0.78);
-        border-color: rgba(255,255,255,0.99);
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.95);
         transform: scale(1.08);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.30);
       }
       .cal-day.loading-month {
-        background: rgba(255,255,255,0.22);
-        border-color: rgba(255,255,255,0.40);
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.06);
         pointer-events: none;
+        animation: shimmer 1.6s ease-in-out infinite;
       }
       .cal-day.selected {
-        background: var(--glass-ink) !important;
+        background: rgba(255,255,255,0.96) !important;
         border-color: transparent !important;
-        color: #ffffff !important; font-weight: 700;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.30);
+        color: var(--obsidian) !important; font-weight: 700;
+        box-shadow: 0 4px 18px rgba(255,255,255,0.14);
         transform: scale(1.10);
       }
       .cal-day.today:not(.selected):not(.past) {
-        border-color: rgba(0,0,0,0.28); font-weight: 700;
+        border-color: rgba(255,255,255,0.24); font-weight: 600; color: rgba(255,255,255,0.90);
       }
       .cal-day-dot {
         width: 3.5px; height: 3.5px; border-radius: 50%;
-        background: rgba(0,0,0,0.28);
+        background: rgba(255,255,255,0.30);
         position: absolute; bottom: 4px;
       }
-      .cal-day.selected .cal-day-dot { background: rgba(255,255,255,0.45); }
+      .cal-day.selected .cal-day-dot { background: rgba(4,4,10,0.35); }
 
       /* ── TIME SLOTS ── */
       .time-section-label {
-        font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-        color: var(--text-faint); margin-bottom: 8px; font-weight: 600;
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+        color: rgba(255,255,255,0.50); margin-bottom: 9px; font-weight: 800;
       }
       .time-grid {
         display: grid;
@@ -479,212 +616,274 @@
       }
       .time-slot {
         border-radius: var(--r-sm); padding: 9px 4px;
+        font-family: 'Jost', sans-serif;
         font-size: 12px; text-align: center; cursor: pointer;
-        background: rgba(255,255,255,0.60);
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
-        border: 0.5px solid rgba(255,255,255,0.92);
-        box-shadow: 0 0 0 0.5px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.04);
-        color: var(--text);
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        color: rgba(255,255,255,0.65);
         transition: all 0.15s ease; user-select: none;
         animation: fadeSlide 0.2s ease;
       }
       .time-slot:hover {
-        background: rgba(255,255,255,0.88);
-        border-color: rgba(255,255,255,0.99);
-        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.90);
         transform: translateY(-1px);
       }
       .time-slot.selected {
-        background: var(--glass-ink);
+        background: rgba(255,255,255,0.94);
         border-color: transparent;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.26);
-        color: #ffffff; font-weight: 600;
+        box-shadow: 0 4px 16px rgba(255,255,255,0.10);
+        color: var(--obsidian); font-weight: 600;
       }
 
       /* ── FORM ── */
       .form-group { margin-bottom: 11px; position: relative; }
-      .safety-q-wrap { border-bottom: 0.5px solid rgba(0,0,0,0.06); padding-bottom: 12px; }
+      .safety-q-wrap { border-bottom: 0.5px solid rgba(255,255,255,0.06); padding-bottom: 12px; }
       .safety-q-label {
-        font-size: 13px; font-weight: 500; color: var(--text);
-        margin-bottom: 10px; line-height: 1.5;
+        font-family: 'Jost', sans-serif;
+        font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.80);
+        margin-bottom: 10px; line-height: 1.55;
+      }
+      .safety-q-label small {
+        display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px;
       }
       .safety-yn { display: flex; gap: 8px; margin-bottom: 0; }
       .syn-btn {
         flex: 1; padding: 9px; border-radius: 10px;
-        border: 0.5px solid rgba(0,0,0,0.09);
-        background: rgba(255,255,255,0.50); color: var(--text-muted);
-        font-size: 13px; font-weight: 600; font-family: inherit;
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.40);
+        font-family: 'Jost', sans-serif;
+        font-size: 13px; font-weight: 600;
         cursor: pointer; transition: all 0.15s;
       }
+      .syn-btn:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.70); }
       .syn-btn[data-v="no"].active,
       .syn-btn[data-v="yes"].active {
-        background: rgba(255,255,255,0.82);
-        border-color: var(--ink); color: var(--ink);
-        box-shadow: 0 0 0 0.5px var(--ink);
+        background: rgba(255,255,255,0.92);
+        border-color: transparent; color: var(--obsidian);
+        box-shadow: 0 2px 8px rgba(255,255,255,0.10);
       }
       .safety-detail {
         width: 100%; margin-top: 10px; padding: 10px 13px;
-        background: rgba(255,255,255,0.85);
-        border: 0.5px solid rgba(0,0,0,0.10);
-        border-radius: var(--r-sm); color: var(--text);
-        font-family: inherit; font-size: 13px; outline: none;
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        border-radius: var(--r-sm); color: rgba(255,255,255,0.85);
+        font-family: 'Jost', sans-serif; font-size: 13px; outline: none;
         resize: vertical; min-height: 56px;
         animation: fadeIn 0.15s ease;
       }
+      .safety-detail::placeholder { color: rgba(255,255,255,0.22); }
+      .safety-detail:focus { border-color: rgba(255,255,255,0.22); }
       label {
-        display: block; font-size: 10px; font-weight: 600;
-        letter-spacing: 0.04em;
-        margin-bottom: 4px; color: var(--text-faint);
+        display: block; font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        letter-spacing: 0.18em; text-transform: uppercase;
+        margin-bottom: 5px; color: rgba(255,255,255,0.45);
       }
       .input-wrap { position: relative; display: flex; align-items: center; }
       .input-icon {
         position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
-        color: rgba(0,0,0,0.22); pointer-events: none; line-height: 1; font-size: 14px;
+        color: rgba(255,255,255,0.22); pointer-events: none; line-height: 1; font-size: 14px;
       }
       input[type="text"],
       input[type="email"],
       input[type="tel"] {
-        width: 100%; border-radius: var(--r-sm); padding: 10px 12px;
-        border: 0.5px solid rgba(0,0,0,0.12);
-        background: rgba(255,255,255,0.85); color: var(--text);
-        font-family: inherit; font-size: 13px; outline: none;
-        transition: border-color 0.18s ease, box-shadow 0.18s ease;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        width: 100%; border-radius: var(--r-sm); padding: 11px 12px;
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.90);
+        font-family: 'Jost', sans-serif; font-size: 13px; outline: none;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
       }
       input.has-icon { padding-left: 34px; }
+      input::placeholder { color: rgba(255,255,255,0.22); }
       input:focus {
-        border-color: var(--ink);
-        box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
-        background: rgba(255,255,255,0.98);
+        border-color: rgba(255,255,255,0.22);
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.10);
       }
-      input.input-valid { border-color: rgba(0,0,0,0.06); }
+      input.input-valid { border-color: rgba(255,255,255,0.14); }
       input.input-error {
-        border-color: rgba(220,80,80,0.70);
-        box-shadow: 0 0 0 1px rgba(220,80,80,0.22);
+        border-color: rgba(255,100,100,0.55);
+        box-shadow: 0 0 0 1px rgba(255,100,100,0.16);
       }
-      .field-hint { font-size: 10px; color: rgba(0,0,0,0.38); margin-top: 3px; padding-left: 2px; }
+      .field-hint {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.22); margin-top: 4px; padding-left: 2px;
+      }
 
       /* ── ADDRESS DROPDOWN ── */
       .addr-suggestions {
         position: absolute; top: 100%; left: 0; right: 0; z-index: 9999;
-        background: rgba(255,255,255,0.98);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border: 0.5px solid rgba(0,0,0,0.10);
+        background: rgba(12,12,22,0.98);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border: 0.5px solid rgba(255,255,255,0.16);
         border-radius: 13px;
-        box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+        box-shadow: 0 14px 36px rgba(0,0,0,0.60);
         margin-top: 4px; overflow: hidden; display: none;
       }
       .addr-suggestions.open { display: block; }
       .addr-suggestion-item {
-        padding: 9px 13px; font-size: 12.5px; color: rgba(0,0,0,0.72);
-        border-top: 0.5px solid rgba(0,0,0,0.05);
+        padding: 9px 13px; font-family: 'Jost', sans-serif;
+        font-size: 12.5px; color: rgba(255,255,255,0.65);
+        border-top: 0.5px solid rgba(255,255,255,0.05);
         cursor: pointer; transition: background 0.12s; line-height: 1.4;
       }
       .addr-suggestion-item:first-child { border-top: none; }
       .addr-suggestion-item:hover,
-      .addr-suggestion-item.active { background: rgba(0,0,0,0.04); }
-      .addr-suggestion-main { font-weight: 500; }
-      .addr-suggestion-sec { font-size: 11px; color: rgba(0,0,0,0.45); margin-top: 1px; }
+      .addr-suggestion-item.active { background: rgba(255,255,255,0.07); }
+      .addr-suggestion-main { font-weight: 500; color: rgba(255,255,255,0.88); }
+      .addr-suggestion-sec { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
 
       /* ── SUMMARY CARD ── */
       .summary-card {
-        border-radius: 18px; padding: 18px 16px;
-        background: rgba(255,255,255,0.60);
-        backdrop-filter: blur(22px) saturate(200%);
-        -webkit-backdrop-filter: blur(22px) saturate(200%);
-        border: 0.5px solid rgba(255,255,255,0.95);
-        box-shadow:
-          0 0 0 0.5px rgba(0,0,0,0.04),
-          0 4px 18px rgba(0,0,0,0.05);
+        border-radius: 18px; padding: 15px 14px; margin-bottom: 8px;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
       }
       .summary-row {
         display: flex; justify-content: space-between; align-items: baseline;
-        gap: 8px; font-size: 13px; margin-bottom: 7px;
+        gap: 8px; font-size: 12.5px; margin-bottom: 7px;
       }
-      .summary-label { color: var(--text-muted); }
-      .summary-value { text-align: right; font-size: 12.5px; max-width: 58%; color: var(--ink-2); }
-      .summary-divider { margin: 10px 0; border-top: 0.5px solid rgba(0,0,0,0.08); }
+      .summary-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 11px; }
+      .summary-value { font-family: 'Jost', sans-serif; text-align: right; font-size: 12px; max-width: 58%; color: rgba(255,255,255,0.70); }
+      .summary-divider { margin: 10px 0; border-top: 0.5px solid rgba(255,255,255,0.06); }
       .summary-total-row {
         display: flex; justify-content: space-between; align-items: baseline;
         font-size: 15px; font-weight: 700; margin-bottom: 5px;
       }
-      .summary-deposit-note { font-size: 11.5px; color: var(--text-muted); margin-bottom: 4px; }
-      .summary-deposit-note strong { color: var(--text); }
+      .summary-deposit-note {
+        font-family: 'Jost', sans-serif;
+        font-size: 11.5px; color: rgba(255,255,255,0.30); margin-bottom: 4px;
+      }
+      .summary-deposit-note strong { color: rgba(255,255,255,0.75); }
       .fee-row {
         display: flex; justify-content: space-between; align-items: center;
-        gap: 8px; font-size: 13px; margin-bottom: 7px;
+        gap: 8px; margin-bottom: 7px;
       }
-      .fee-label { color: var(--text-muted); font-size: 13px; }
-      .fee-value { font-size: 13px; color: var(--ink-2); }
+      .fee-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 12px; }
+      .fee-value { font-family: 'Jost', sans-serif; font-size: 13px; color: rgba(255,255,255,0.70); }
       .fee-calculating {
-        font-size: 11px; color: rgba(0,0,0,0.30);
+        font-family: 'Jost', sans-serif;
+        font-size: 11px; color: rgba(255,255,255,0.28);
         display: flex; align-items: center; gap: 5px;
       }
       .summary-grand-total {
         display: flex; justify-content: space-between; align-items: baseline;
-        font-size: 16px; font-weight: 700; margin: 4px 0 6px;
-        color: var(--ink);
+        margin: 4px 0 6px;
+      }
+      .summary-grand-total .gtl {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.30);
+      }
+      .summary-grand-total .gtv {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 24px; font-weight: 400; color: rgba(255,255,255,0.95);
       }
       .deposit-box {
         border-radius: 12px; padding: 11px 13px; margin: 10px 0;
-        background: rgba(0,0,0,0.04);
-        border: 0.5px solid rgba(0,0,0,0.07);
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.10);
         display: flex; justify-content: space-between; align-items: center;
       }
-      .deposit-box-label  { font-size: 11.5px; color: var(--text-muted); }
-      .deposit-box-amount { font-size: 16px; font-weight: 700; color: var(--ink); }
-      .balance-note { font-size: 10.5px; color: var(--text-faint); text-align: right; margin-top: 3px; }
+      .deposit-box-label { font-family: 'Jost', sans-serif; font-size: 11px; color: rgba(255,255,255,0.35); }
+      .deposit-box-amount {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 20px; font-weight: 400; color: rgba(255,255,255,0.95);
+      }
+      .balance-note {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.28); text-align: right; margin-top: 3px;
+      }
+
+      /* ── DIVA TOGGLE ── */
+      .diva-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+      .diva-btn {
+        flex: 1; padding: 11px 8px;
+        border-radius: var(--r-md);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.40);
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 600;
+        cursor: pointer; transition: all 0.18s; letter-spacing: 0.02em;
+      }
+      .diva-btn:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.70); }
+      .diva-btn.active {
+        background: rgba(255,255,255,0.92);
+        border-color: transparent; color: var(--obsidian);
+        box-shadow: 0 4px 18px rgba(255,255,255,0.10);
+      }
+
+      /* Safety banner */
+      .safety-banner {
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        border-radius: var(--r-md); padding: 13px 15px; margin-bottom: 14px;
+      }
+      .safety-banner-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.55);
+        text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 5px;
+      }
+      .safety-banner-body {
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.55;
+      }
+      .safety-banner a {
+        color: rgba(255,255,255,0.55); font-weight: 600;
+        text-decoration: underline; text-underline-offset: 2px;
+        font-size: 11px; display: inline-block; margin-top: 8px;
+      }
 
       /* ── BUTTONS ── */
       .actions { display: flex; gap: 10px; margin-top: 14px; flex-shrink: 0; }
       button {
-        flex: 1; border-radius: 16px; padding: 12px 0;
-        font-size: 13px; font-weight: 600; border: none;
-        cursor: pointer; outline: none;
+        flex: 1; border-radius: 16px; padding: 13px 0;
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 700; border: none;
+        cursor: pointer; outline: none; letter-spacing: 0.08em; text-transform: uppercase;
         transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
-        font-family: inherit;
       }
       .btn-outline {
-        background: rgba(255,255,255,0.60);
-        backdrop-filter: blur(18px) saturate(180%);
-        -webkit-backdrop-filter: blur(18px) saturate(180%);
-        color: var(--ink-2);
-        border: 0.5px solid rgba(255,255,255,0.92);
-        box-shadow:
-          0 0 0 0.5px rgba(0,0,0,0.07),
-          0 2px 8px rgba(0,0,0,0.05);
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        color: rgba(255,255,255,0.50);
+        border: 0.5px solid rgba(255,255,255,0.12);
       }
       .btn-outline:hover {
         transform: translateY(-1px);
-        background: rgba(255,255,255,0.82);
-        box-shadow: 0 0 0 0.5px rgba(0,0,0,0.09), 0 4px 14px rgba(0,0,0,0.07);
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.75);
       }
       .btn-primary {
-        background: linear-gradient(160deg, #1c1c1e 0%, #0a0a0a 100%);
-        color: #ffffff;
+        background: rgba(255,255,255,0.95);
+        color: var(--obsidian);
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.10) inset,
-          0 1px 0 rgba(255,255,255,0.08) inset,
-          0 10px 30px rgba(0,0,0,0.28),
-          0 3px 8px rgba(0,0,0,0.16);
-        letter-spacing: 0.01em;
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 1px 0 rgba(255,255,255,0.50) inset,
+          0 10px 30px rgba(255,255,255,0.08),
+          0 3px 8px rgba(0,0,0,0.30);
       }
       .btn-primary:hover:not(:disabled) {
         transform: translateY(-1.5px);
+        background: rgba(255,255,255,1);
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.12) inset,
-          0 14px 36px rgba(0,0,0,0.34),
-          0 4px 10px rgba(0,0,0,0.18);
+          0 0 0 0.5px rgba(255,255,255,0.40) inset,
+          0 14px 36px rgba(255,255,255,0.12),
+          0 4px 10px rgba(0,0,0,0.35);
       }
-      .btn-primary:active:not(:disabled) {
-        transform: translateY(0px);
-      }
+      .btn-primary:active:not(:disabled) { transform: translateY(0px); }
       .btn-primary:disabled {
-        background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.22);
-        box-shadow: none; border: 0.5px solid rgba(0,0,0,0.07);
+        background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.20);
+        box-shadow: none; border: 0.5px solid rgba(255,255,255,0.06);
         cursor: not-allowed;
       }
 
@@ -694,32 +893,31 @@
         transform: translateX(-50%) translateY(130%);
         min-width: 240px; max-width: 90vw;
         padding: 10px 18px; border-radius: var(--r-pill);
-        font-size: 12px; font-weight: 500; color: var(--text);
-        background: rgba(255,255,255,0.96);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border: 0.5px solid rgba(0,0,0,0.08);
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.90);
+        background: rgba(14,14,24,0.98);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border: 0.5px solid rgba(255,255,255,0.16);
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.80) inset,
-          0 16px 44px rgba(0,0,0,0.16);
+          0 0 0 0.5px rgba(255,255,255,0.06) inset,
+          0 16px 44px rgba(0,0,0,0.60);
         opacity: 0; z-index: 9999; text-align: center;
         transition: transform 0.28s cubic-bezier(0.18,0.89,0.32,1.28), opacity 0.28s ease;
       }
       .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-      .toast.error { background: rgba(254,230,230,0.97); color: #6b1111;
-        border-color: rgba(180,60,60,0.15); }
+      .toast.error { color: rgba(255,130,130,0.95); border-color: rgba(255,100,100,0.25); }
 
       /* ── LOADER ── */
       .loader {
         display: inline-block; width: 17px; height: 17px; border-radius: 50%;
-        border: 2px solid rgba(255,255,255,0.18);
-        border-top-color: rgba(255,255,255,0.85);
+        border: 2px solid rgba(4,4,10,0.12);
+        border-top-color: rgba(4,4,10,0.70);
         animation: spin 0.85s linear infinite; vertical-align: middle;
       }
-      /* Loader in disabled state */
-      .btn-primary:disabled .loader {
-        border-color: rgba(0,0,0,0.08);
-        border-top-color: rgba(0,0,0,0.32);
+      .btn-outline .loader, .toast .loader {
+        border-color: rgba(255,255,255,0.14);
+        border-top-color: rgba(255,255,255,0.70);
       }
 
       /* ── SUCCESS ── */
@@ -730,43 +928,45 @@
       .success-view.active { display: flex; animation: fadeSlide 0.4s ease; }
       .success-icon {
         width: 66px; height: 66px; border-radius: 50%;
-        background: linear-gradient(145deg, #1c1c1e, #0a0a0a);
+        background: rgba(255,255,255,0.95);
         display: flex; align-items: center; justify-content: center;
         margin-bottom: 18px;
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.12) inset,
-          0 10px 32px rgba(0,0,0,0.30);
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 10px 36px rgba(255,255,255,0.12);
       }
       .success-title {
-        font-size: 19px; font-weight: 600; margin-bottom: 6px;
-        font-family: 'Playfair Display', Georgia, serif;
-        color: var(--ink-2);
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 24px; font-weight: 300; margin-bottom: 6px;
+        color: rgba(255,255,255,0.95); letter-spacing: 0.02em;
       }
-      .success-sub   { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+      .success-sub { font-family: 'Jost', sans-serif; font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.6; }
       .success-totals {
         margin-top: 18px; width: 100%;
         border-radius: var(--r-md); padding: 14px;
-        background: rgba(255,255,255,0.65);
-        backdrop-filter: blur(22px) saturate(200%);
-        -webkit-backdrop-filter: blur(22px) saturate(200%);
-        border: 0.5px solid rgba(255,255,255,0.92);
-        box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 0.5px solid rgba(255,255,255,0.10);
         text-align: left;
       }
       .success-total-row {
         display: flex; justify-content: space-between;
-        font-size: 12.5px; margin-bottom: 5px; color: var(--text-muted);
+        font-family: 'Jost', sans-serif;
+        font-size: 12.5px; margin-bottom: 5px; color: rgba(255,255,255,0.38);
       }
-      .success-total-row.highlight { color: var(--ink); font-weight: 700; font-size: 14px; }
+      .success-total-row.highlight {
+        color: rgba(255,255,255,0.90); font-weight: 700; font-size: 14px;
+      }
 
       /* ── SKELETON SHIMMER ── */
       .skel {
         border-radius:16px;padding:14px;margin-bottom:8px;
-        background:rgba(0,0,0,0.04);border:0.5px solid rgba(0,0,0,0.05);
-        animation:shimmer 1.4s ease-in-out infinite;
+        background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.06);
+        animation:shimmer 1.6s ease-in-out infinite;
       }
       .skel-line {
-        height:11px;border-radius:6px;background:rgba(0,0,0,0.05);margin-bottom:8px;
+        height:10px;border-radius:5px;background:rgba(255,255,255,0.06);margin-bottom:8px;
       }
     </style>
   </head>
@@ -777,16 +977,24 @@
           <div class="logo-wrap">
             <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty" class="logo">
           </div>
-          <div class="brand-tag">Mobile Beauty Studio</div>
-          <h1 id="view-title">Choose Services</h1>
+          <div class="brand-tag" style="text-shadow: 0 0 20px rgba(180,160,255,0.40);">Mobile Beauty Studio</div>
+          <div style="width:32px;height:0.5px;margin:10px auto 6px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.40),transparent);"></div>
+          <h1 id="view-title" style="text-shadow: 0 2px 20px rgba(200,180,255,0.20);">Choose Services</h1>
           <div class="sub-heading">Premium At-Home Treatments</div>
           <div class="step-indicator">
-            <div class="step-pill"><div class="step-pill-inner" id="step-bar-1"></div></div>
-            <div class="step-pill"><div class="step-pill-inner" id="step-bar-2"></div></div>
-            <div class="step-pill"><div class="step-pill-inner" id="step-bar-3"></div></div>
-            <div class="step-pill"><div class="step-pill-inner" id="step-bar-4"></div></div>
+            <div class="step-track-row">
+              <div class="step-pill"><div class="step-pill-inner" id="step-bar-1"></div></div>
+              <div class="step-pill"><div class="step-pill-inner" id="step-bar-2"></div></div>
+              <div class="step-pill"><div class="step-pill-inner" id="step-bar-3"></div></div>
+              <div class="step-pill"><div class="step-pill-inner" id="step-bar-4"></div></div>
+            </div>
+            <div class="step-dots-row">
+              <div class="step-dot sd-active" id="sdot-1"><div class="step-dot-num" id="sdot-num-1">1</div><div class="step-dot-lbl">Services</div></div>
+              <div class="step-dot" id="sdot-2"><div class="step-dot-num" id="sdot-num-2">2</div><div class="step-dot-lbl">Schedule</div></div>
+              <div class="step-dot" id="sdot-3"><div class="step-dot-num" id="sdot-num-3">3</div><div class="step-dot-lbl">Details</div></div>
+              <div class="step-dot" id="sdot-4"><div class="step-dot-num" id="sdot-num-4">4</div><div class="step-dot-lbl">Review</div></div>
+            </div>
           </div>
-          <div class="step-label" id="step-label">Step 1 of 4 · Services</div>
         </header>
 
         <div class="surface">
@@ -848,15 +1056,16 @@
                   <label style="margin-bottom:8px;display:block;">Have you booked with us before?</label>
                   <div style="display:flex;gap:8px;">
                     <button type="button" id="diva-existing" onclick="toggleDiva('existing')"
-                      style="flex:1;padding:10px;border-radius:12px;border:0.5px solid rgba(0,0,0,0.12);
-                             background:rgba(0,0,0,0.07);color:#0a0a0a;font-weight:600;
-                             font-size:13px;cursor:pointer;transition:all 0.15s;font-family:inherit;">
+                      style="flex:1;padding:10px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.18);
+                             background:rgba(255,255,255,0.92);color:var(--obsidian);font-weight:700;
+                             font-size:13px;cursor:pointer;transition:all 0.15s;font-family:'Jost',sans-serif;
+                             box-shadow:0 2px 8px rgba(255,255,255,0.10);">
                       ✨ Existing Diva
                     </button>
                     <button type="button" id="diva-new" onclick="toggleDiva('new')"
-                      style="flex:1;padding:10px;border-radius:12px;border:0.5px solid rgba(0,0,0,0.08);
-                             background:rgba(255,255,255,0.40);color:rgba(0,0,0,0.40);font-weight:600;
-                             font-size:13px;cursor:pointer;transition:all 0.15s;font-family:inherit;">
+                      style="flex:1;padding:10px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.10);
+                             background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);font-weight:600;
+                             font-size:13px;cursor:pointer;transition:all 0.15s;font-family:'Jost',sans-serif;">
                       🌸 New Diva
                     </button>
                   </div>
@@ -908,45 +1117,46 @@
                   <div class="input-wrap" style="padding:0;">
                     <select id="client-source"
                       style="width:100%;padding:12px 14px;
-                             background:rgba(255,255,255,0.75);
-                             border:0.5px solid rgba(0,0,0,0.10);
-                             border-radius:var(--r-sm);color:var(--text);
-                             font-family:inherit;font-size:13px;outline:none;cursor:pointer;
+                             background:rgba(255,255,255,0.07);
+                             border:0.5px solid rgba(255,255,255,0.10);
+                             border-radius:var(--r-sm);color:rgba(255,255,255,0.80);
+                             font-family:'Jost',sans-serif;font-size:13px;outline:none;cursor:pointer;
                              -webkit-appearance:none;appearance:none;">
-                      <option value="">Select an option…</option>
-                      <option value="Instagram">Instagram</option>
-                      <option value="TikTok">TikTok</option>
-                      <option value="Facebook">Facebook</option>
-                      <option value="Google">Google Search</option>
-                      <option value="Word of Mouth">Word of Mouth</option>
-                      <option value="Referred by Friend">Referred by a Friend</option>
-                      <option value="Returning Client">I'm a returning client</option>
-                      <option value="Other">Other</option>
+                      <option value="" style="background:#0d0d1a;">Select an option…</option>
+                      <option value="Instagram" style="background:#0d0d1a;">Instagram</option>
+                      <option value="TikTok" style="background:#0d0d1a;">TikTok</option>
+                      <option value="Facebook" style="background:#0d0d1a;">Facebook</option>
+                      <option value="Google" style="background:#0d0d1a;">Google Search</option>
+                      <option value="Word of Mouth" style="background:#0d0d1a;">Word of Mouth</option>
+                      <option value="Referred by Friend" style="background:#0d0d1a;">Referred by a Friend</option>
+                      <option value="Returning Client" style="background:#0d0d1a;">I'm a returning client</option>
+                      <option value="Other" style="background:#0d0d1a;">Other</option>
                     </select>
                   </div>
                 </div>
 
                 <!-- Safety assessment — new divas only -->
                 <div id="safety-section" style="display:none;margin-top:4px;">
-                  <div style="background:rgba(0,0,0,0.04);border:0.5px solid rgba(0,0,0,0.07);
+                  <div style="background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.10);
                                border-radius:14px;padding:14px 16px;margin-bottom:14px;">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink);
-                                text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px;">
+                    <div style="font-family:'Jost',sans-serif;font-size:9px;font-weight:700;
+                                color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.18em;margin-bottom:5px;">
                       🌸 New Client Safety Check
                     </div>
-                    <div style="font-size:12px;color:var(--text-muted);line-height:1.5;">
+                    <div style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.38);line-height:1.55;">
                       Answer all questions honestly. Your information is strictly confidential.
                     </div>
                     <a href="/policy.html" target="_blank"
-                       style="display:inline-block;margin-top:8px;font-size:11.5px;font-weight:600;
-                              color:var(--ink);text-decoration:underline;text-underline-offset:2px;">
+                       style="display:inline-block;margin-top:8px;font-family:'Jost',sans-serif;
+                              font-size:11px;font-weight:600;
+                              color:rgba(255,255,255,0.55);text-decoration:underline;text-underline-offset:2px;">
                       View full consultation &amp; policy document ↗
                     </a>
                   </div>
 
                   <div class="form-group safety-q-wrap">
                     <div class="safety-q-label">1. Any skin conditions in the treatment area?
-                      <span style="color:var(--text-muted);font-weight:400;display:block;font-size:11.5px;margin-top:2px;">Rashes, cuts, sunburn, eczema, acne, etc.</span>
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Rashes, cuts, sunburn, eczema, acne, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="skin">
                       <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'skin')">No</button>
@@ -956,7 +1166,7 @@
                   </div>
                   <div class="form-group safety-q-wrap">
                     <div class="safety-q-label">2. Any medications or recent skin treatments?
-                      <span style="color:var(--text-muted);font-weight:400;display:block;font-size:11.5px;margin-top:2px;">Retinoids, blood thinners, chemical peels, laser, etc.</span>
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Retinoids, blood thinners, chemical peels, laser, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="meds">
                       <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'meds')">No</button>
@@ -966,7 +1176,7 @@
                   </div>
                   <div class="form-group safety-q-wrap">
                     <div class="safety-q-label">3. Any known allergies to wax or beauty products?
-                      <span style="color:var(--text-muted);font-weight:400;display:block;font-size:11.5px;margin-top:2px;">Resins, latex, fragrances, oils, creams, etc.</span>
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Resins, latex, fragrances, oils, creams, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="allergies">
                       <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'allergies')">No</button>
@@ -983,7 +1193,7 @@
                   </div>
                   <div class="form-group safety-q-wrap">
                     <div class="safety-q-label">5. Any health conditions affecting skin, healing, or safety?
-                      <span style="color:var(--text-muted);font-weight:400;display:block;font-size:11.5px;margin-top:2px;">Diabetes, varicose veins, immune conditions, recent surgery, etc.</span>
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Diabetes, varicose veins, immune conditions, recent surgery, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="health">
                       <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'health')">No</button>
@@ -993,7 +1203,7 @@
                   </div>
                   <div class="form-group safety-q-wrap">
                     <div class="safety-q-label">6. Significant environmental exposure?
-                      <span style="color:var(--text-muted);font-weight:400;display:block;font-size:11.5px;margin-top:2px;">Sun, heat, chemicals, frequent water or sweat contact in the area.</span>
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Sun, heat, chemicals, frequent water or sweat contact in the area.</span>
                     </div>
                     <div class="safety-yn" data-q="enviro">
                       <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'enviro')">No</button>
@@ -1003,7 +1213,7 @@
                   </div>
                   <div class="form-group safety-q-wrap">
                     <div class="safety-q-label">7. Frequent pressure or friction on areas to be waxed?
-                      <span style="color:var(--text-muted);font-weight:400;display:block;font-size:11.5px;margin-top:2px;">Due to work, sport, tight clothing, etc.</span>
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Due to work, sport, tight clothing, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="physical">
                       <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'physical')">No</button>
@@ -1013,7 +1223,7 @@
                   </div>
                   <div class="form-group safety-q-wrap" style="margin-bottom:4px;">
                     <div class="safety-q-label">8. At least 2 weeks of uninterrupted hair growth?
-                      <span style="color:var(--text-muted);font-weight:400;display:block;font-size:11.5px;margin-top:2px;">This is required for effective waxing results.</span>
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">This is required for effective waxing results.</span>
                     </div>
                     <div class="safety-yn" data-q="hair">
                       <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'hair')">No</button>
@@ -1023,9 +1233,9 @@
                   <div class="form-group" style="margin-top:10px;">
                     <label for="safety-notes" style="font-size:12px;">Anything else we should know? <span style="color:var(--text-faint);font-weight:400;">(optional)</span></label>
                     <textarea id="safety-notes" maxlength="500" placeholder="Additional information…"
-                      style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.80);
-                             border:0.5px solid rgba(0,0,0,0.10);border-radius:var(--r-sm);
-                             color:var(--text);font-family:inherit;font-size:13px;
+                      style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.07);
+                             border:0.5px solid rgba(255,255,255,0.10);border-radius:var(--r-sm);
+                             color:rgba(255,255,255,0.85);font-family:'Jost',sans-serif;font-size:13px;
                              outline:none;resize:vertical;min-height:56px;"></textarea>
                   </div>
                 </div>
@@ -1047,13 +1257,13 @@
                   <div class="fee-row">
                     <span class="fee-label">Call-out fee</span>
                     <span class="fee-value" id="sum-callout-fee">
-                      <span class="fee-calculating"><span class="loader" style="width:11px;height:11px;border-width:1.5px;border-color:rgba(0,0,0,0.10);border-top-color:rgba(0,0,0,0.55);"></span> Calculating…</span>
+                      <span class="fee-calculating"><span class="loader" style="width:11px;height:11px;border-width:1.5px;border-color:rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.60);"></span> Calculating…</span>
                     </span>
                   </div>
                   <div class="summary-divider"></div>
                   <div class="summary-grand-total">
-                    <span>Total</span>
-                    <span id="sum-total">—</span>
+                    <span class="gtl">Total</span>
+                    <span class="gtv" id="sum-total">—</span>
                   </div>
                   <div class="deposit-box">
                     <div>
@@ -1064,10 +1274,10 @@
                   </div>
                 </div>
                 <div style="text-align:center;padding:10px 4px 2px;">
-                  <p style="margin:0;font-size:11.5px;color:var(--text-muted);line-height:1.6;">
+                  <p style="margin:0;font-family:'Jost',sans-serif;font-size:11px;color:rgba(255,255,255,0.22);line-height:1.7;letter-spacing:0.02em;">
                     By making payment you agree to our
                     <a href="/policy.html?terms" target="_blank"
-                       style="color:var(--ink);text-decoration:underline;text-underline-offset:2px;font-weight:600;white-space:nowrap;">
+                       style="color:rgba(255,255,255,0.50);text-decoration:underline;text-underline-offset:2px;font-weight:600;white-space:nowrap;">
                       Terms &amp; Conditions
                     </a>
                   </p>
@@ -1160,42 +1370,42 @@
         document.getElementById('success-totals').innerHTML = `
           <div style="text-align:center;padding:4px 0 18px;">
             <div style="font-size:42px;margin-bottom:10px;">🌸</div>
-            <p style="margin:0 0 18px;font-size:13px;color:rgba(0,0,0,0.55);line-height:1.75;font-family:'Playfair Display',Georgia,serif;">
+            <p style="margin:0 0 18px;font-family:'Cormorant Garamond',serif;font-size:15px;color:rgba(255,255,255,0.55);line-height:1.80;font-style:italic;">
               Your deposit is confirmed and your stylist<br>is looking forward to pampering you.
             </p>
           </div>
           ${data ? `
-          <div style="background:rgba(0,0,0,0.04);border:0.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:15px 17px;margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
-              <span style="color:rgba(0,0,0,0.45);">📅 Date</span>
-              <strong style="color:#0a0a0a;">${escHtml(fmtDateDisplay(data.date))}</strong>
+          <div style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:15px 17px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:8px;">
+              <span style="color:rgba(255,255,255,0.35);">📅 Date</span>
+              <strong style="color:rgba(255,255,255,0.90);">${escHtml(fmtDateDisplay(data.date))}</strong>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
-              <span style="color:rgba(0,0,0,0.45);">🕐 Time</span>
-              <strong style="color:#0a0a0a;">${escHtml(data.time||'')}</strong>
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:8px;">
+              <span style="color:rgba(255,255,255,0.35);">🕐 Time</span>
+              <strong style="color:rgba(255,255,255,0.90);">${escHtml(data.time||'')}</strong>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;">
-              <span style="color:rgba(0,0,0,0.45);">💅 Service</span>
-              <span style="text-align:right;max-width:55%;font-size:12px;color:#1c1c1e;">${escHtml(data.services||'')}</span>
-            </div>
-          </div>
-          <div style="background:rgba(0,0,0,0.03);border:0.5px solid rgba(0,0,0,0.06);border-radius:14px;padding:15px 17px;margin-bottom:14px;">
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
-              <span style="color:rgba(0,0,0,0.45);">Deposit Paid ✅</span>
-              <strong style="color:#0a0a0a;">R${escHtml(String(data.deposit||'0'))}</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;">
-              <span style="color:rgba(0,0,0,0.45);">Balance (after service)</span>
-              <strong style="color:#0a0a0a;">R${escHtml(String(data.balance||'0'))}</strong>
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;">
+              <span style="color:rgba(255,255,255,0.35);">💅 Service</span>
+              <span style="text-align:right;max-width:55%;font-size:11px;color:rgba(255,255,255,0.65);">${escHtml(data.services||'')}</span>
             </div>
           </div>
-          <p style="font-size:11.5px;color:rgba(0,0,0,0.30);text-align:center;margin:0 0 4px;">
+          <div style="background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:15px 17px;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:6px;">
+              <span style="color:rgba(255,255,255,0.35);">Deposit Paid ✅</span>
+              <strong style="color:rgba(255,255,255,0.90);">R${escHtml(String(data.deposit||'0'))}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;">
+              <span style="color:rgba(255,255,255,0.35);">Balance (after service)</span>
+              <strong style="color:rgba(255,255,255,0.90);">R${escHtml(String(data.balance||'0'))}</strong>
+            </div>
+          </div>
+          <p style="font-family:'Jost',sans-serif;font-size:11px;color:rgba(255,255,255,0.28);text-align:center;margin:0 0 4px;">
             A confirmation email is on its way 📧
           </p>
-          <p style="font-size:10px;color:rgba(0,0,0,0.20);text-align:center;margin:0;letter-spacing:0.03em;">
+          <p style="font-family:'Jost',sans-serif;font-size:10px;color:rgba(255,255,255,0.18);text-align:center;margin:0;letter-spacing:0.04em;">
             Ref: ${escHtml(data.bookingId||'')}
           </p>` : `
-          <p style="font-size:13px;color:rgba(0,0,0,0.40);text-align:center;">
+          <p style="font-family:'Jost',sans-serif;font-size:13px;color:rgba(255,255,255,0.38);text-align:center;">
             A confirmation email is on its way 📧
           </p>`}
         `;
@@ -1216,23 +1426,23 @@
             <h2 style="margin:0 0 8px;font-size:18px;font-weight:400;color:#1d1d1f;font-family:'Playfair Display',Georgia,serif;">
               Thank you, ${escHtml(firstName)}
             </h2>
-            <p style="margin:0 0 20px;font-size:13px;color:rgba(0,0,0,0.55);line-height:1.75;">
+            <p style="margin:0 0 20px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.75;">
               Your full payment is in and we are so grateful<br>for your trust in PhenomeBeauty.
             </p>
           </div>
           <div style="background:rgba(0,0,0,0.04);border:0.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:16px 18px;margin-bottom:18px;text-align:center;">
-            <div style="font-size:11px;color:rgba(0,0,0,0.40);margin-bottom:4px;text-transform:uppercase;letter-spacing:.1em;">Total Paid</div>
-            <div style="font-size:26px;font-weight:700;color:#0a0a0a;">R${escHtml(String(data.total||'0'))} ✅</div>
+            <div style="font-family:'Jost',sans-serif;font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:5px;text-transform:uppercase;letter-spacing:.14em;">Total Paid</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:rgba(255,255,255,0.95);">R${escHtml(String(data.total||'0'))} ✅</div>
           </div>
           <div style="background:rgba(0,0,0,0.03);border:0.5px solid rgba(0,0,0,0.06);border-radius:14px;padding:18px;margin-bottom:16px;text-align:center;">
-            <p style="margin:0 0 14px;font-size:12.5px;color:rgba(0,0,0,0.50);line-height:1.75;font-family:'Playfair Display',Georgia,serif;">
+            <p style="margin:0 0 14px;font-family:'Cormorant Garamond',serif;font-size:14px;color:rgba(255,255,255,0.50);line-height:1.80;font-style:italic;">
               Beauty is a lifestyle, not a luxury.<br>We'd love to see you again soon.
             </p>
             <a href="${escHtml(appBase)}" style="display:inline-block;background:linear-gradient(160deg,#1c1c1e,#0a0a0a);color:#ffffff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:.01em;">
               Book Your Next Appointment →
             </a>
           </div>
-          <p style="font-size:11px;color:rgba(0,0,0,0.25);text-align:center;margin:0;">
+          <p style="font-family:'Jost',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin:0;">
             A receipt has been sent to your email 📧
           </p>` : `
           <div style="text-align:center;padding:8px 0 18px;">
@@ -1240,12 +1450,12 @@
             <h2 style="margin:0 0 8px;font-size:18px;font-weight:400;color:#1d1d1f;font-family:'Playfair Display',Georgia,serif;">
               Payment is being processed
             </h2>
-            <p style="margin:0 0 20px;font-size:13px;color:rgba(0,0,0,0.55);line-height:1.75;">
+            <p style="margin:0 0 20px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.75;">
               Thank you, ${escHtml(firstName)}! Your payment is on its way.<br>
               We'll send you a confirmation email shortly.
             </p>
           </div>
-          <div style="background:rgba(0,0,0,0.04);border:0.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:16px 18px;margin-bottom:16px;text-align:center;font-size:13px;color:rgba(0,0,0,0.50);">
+          <div style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:16px 18px;margin-bottom:16px;text-align:center;font-family:'Jost',sans-serif;font-size:13px;color:rgba(255,255,255,0.50);">
             ⏳ Payments can take a moment — please don't pay again.
           </div>`;
         document.getElementById('success-view').classList.add('active');
@@ -1274,7 +1484,7 @@
         b.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:99999;' +
           'max-width:92vw;padding:13px 18px;border-radius:14px;font-size:13px;font-weight:600;' +
           'text-align:center;box-shadow:0 16px 40px rgba(0,0,0,.2);cursor:pointer;' +
-          'background:rgba(255,255,255,0.96);color:#0a0a0a;border:0.5px solid rgba(0,0,0,0.10);' +
+          'background:rgba(255,255,255,0.92);color:var(--obsidian);border:0.5px solid transparent;' +
           'backdrop-filter:blur(20px);';
         b.textContent = msg;
         document.body.appendChild(b);
@@ -1486,16 +1696,43 @@
       function updateStepUI() {
         const views  = ['services','datetime','details','summary'];
         const titles = ['Choose Services','Select Date & Time','Your Details','Review Booking'];
-        const labels = ['Step 1 of 4 · Services','Step 2 of 4 · Date & Time',
-                        'Step 3 of 4 · Details','Step 4 of 4 · Review'];
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById('step-' + views[currentStep - 1]).classList.add('active');
-        document.getElementById('view-title').textContent  = titles[currentStep - 1];
-        document.getElementById('step-label').textContent  = labels[currentStep - 1];
+        document.getElementById('view-title').textContent  = 'PhenomeBeauty';
         document.getElementById('btn-back').style.display  = currentStep === 1 ? 'none' : 'block';
         document.getElementById('btn-next').textContent    = currentStep === 4 ? 'Proceed to Payment' : 'Next';
-        for (let i = 1; i <= 4; i++)
-          document.getElementById('step-bar-' + i).style.width = i <= currentStep ? '100%' : '0';
+
+        /* ── ANIMATED PROGRESS BAR ──────────────────────────────────────
+           Each segment fills to 100% when that step is completed.
+           The current step's bar fills to 55% with a shimmer active pulse.
+           Future bars stay empty (0%).
+           ────────────────────────────────────────────────────────────── */
+        const CHECK_SVG = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        for (let i = 1; i <= 4; i++) {
+          const bar  = document.getElementById('step-bar-' + i);
+          const dot  = document.getElementById('sdot-' + i);
+          const num  = document.getElementById('sdot-num-' + i);
+          if (i < currentStep) {
+            // Completed — full bar, white filled dot with checkmark
+            bar.style.width = '100%';
+            bar.classList.remove('pb-active');
+            dot.className = 'step-dot sd-done';
+            num.innerHTML = CHECK_SVG;
+          } else if (i === currentStep) {
+            // Active — 55% fill with trailing shimmer
+            bar.style.width = '55%';
+            bar.classList.add('pb-active');
+            dot.className = 'step-dot sd-active';
+            num.textContent = i;
+          } else {
+            // Future — empty
+            bar.style.width = '0%';
+            bar.classList.remove('pb-active');
+            dot.className = 'step-dot';
+            num.textContent = i;
+          }
+        }
+
         if (currentStep === 2) {
           calDrawDays();
           if (selectedDate) {
@@ -1657,7 +1894,7 @@
           <div class="summary-row"><span class="summary-label">Address</span><span class="summary-value" style="font-size:11.5px;">${escHtml(address)}</span></div>`;
         document.getElementById('sum-services-total').textContent = 'R' + sTotal.toFixed(2);
         document.getElementById('sum-callout-fee').innerHTML =
-          '<span class="fee-calculating"><span class="loader" style="width:11px;height:11px;border-width:1.5px;border-color:rgba(0,0,0,0.10);border-top-color:rgba(0,0,0,0.55);"></span> Calculating…</span>';
+          '<span class="fee-calculating"><span class="loader" style="width:11px;height:11px;border-width:1.5px;border-color:rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.60);"></span> Calculating…</span>';
         document.getElementById('sum-total').textContent   = '—';
         document.getElementById('sum-deposit').textContent = '—';
         document.getElementById('sum-balance-note').textContent = 'Balance due on the day';
@@ -1720,7 +1957,7 @@
           btnNew.style.color           = '#0a0a0a';
           btnNew.style.borderColor     = 'rgba(0,0,0,0.18)';
           btnExisting.style.background = 'rgba(255,255,255,0.40)';
-          btnExisting.style.color      = 'rgba(0,0,0,0.40)';
+          btnExisting.style.color      = 'rgba(255,255,255,0.40)';
           btnExisting.style.borderColor= 'rgba(0,0,0,0.08)';
         } else {
           safetySection.style.display = 'none';
@@ -1731,7 +1968,7 @@
           btnExisting.style.color      = '#0a0a0a';
           btnExisting.style.borderColor= 'rgba(0,0,0,0.18)';
           btnNew.style.background      = 'rgba(255,255,255,0.40)';
-          btnNew.style.color           = 'rgba(0,0,0,0.40)';
+          btnNew.style.color           = 'rgba(255,255,255,0.40)';
           btnNew.style.borderColor     = 'rgba(0,0,0,0.08)';
         }
         updateNextBtn();
