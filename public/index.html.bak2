@@ -912,7 +912,7 @@
                              border:0.5px solid rgba(0,0,0,0.10);
                              border-radius:var(--r-sm);color:var(--text);
                              font-family:inherit;font-size:13px;outline:none;cursor:pointer;
-                             -webkit-appearance:none;appearance:none;">
+                             -webkit-appearance:none;">
                       <option value="">Select an option…</option>
                       <option value="Instagram">Instagram</option>
                       <option value="TikTok">TikTok</option>

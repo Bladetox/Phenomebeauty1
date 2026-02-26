@@ -100,7 +100,8 @@ async function getAvailabilityRows(doc) {
 function bustDocCache() {
     _docExpiry      = 0;
     _servicesExpiry = 0;
-    _avExpiry       = 0;
+    _settingsExpiry = 0;
+  _avExpiry     = 0;
 }
 
 // ── FIND BOOKING ROW ──────────────────────────────────────────────────────────

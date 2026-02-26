@@ -61,6 +61,14 @@ app.use(express.json({
 // RATE LIMITER (in-memory, per IP+path)
 // =============================================================================
 const rateLimitMap = new Map();
+// Rate limiter GC — purge stale entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimitMap.entries()) {
+    if (now - entry.start > 5 * 60 * 1000) rateLimitMap.delete(key);
+  }
+}, 5 * 60 * 1000).unref();
+
 function rateLimit(maxReqs, windowMs) {
     return (req, res, next) => {
         const key   = req.ip + req.path;
@@ -87,9 +95,10 @@ function sanitize(val, maxLen = 200) {
 // =============================================================================
 // ADMIN AUTH — stateless HMAC tokens (survive Vercel cold starts)
 // =============================================================================
-const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || (() => {
-    console.warn('ADMIN_TOKEN_SECRET not set — using insecure fallback');
-    return 'phenome-fallback-secret-change-me';
+const ADMIN_TOKEN_SECRET = (() => {
+  const s = process.env.ADMIN_TOKEN_SECRET;
+  if (!s) throw new Error('ADMIN_TOKEN_SECRET env var is required');
+  return s;
 })();
 
 function makeAdminToken(password) {
@@ -513,7 +522,7 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
 // =============================================================================
 // POST /api/webhook/yoco
 // =============================================================================
-app.post('/api/webhook/yoco', async (req, res) => {
+app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
 
     // ── Verify Yoco webhook signature via Svix ──────────────────────────
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
@@ -686,7 +695,7 @@ app.post('/api/webhook/yoco', async (req, res) => {
 // =============================================================================
 // GET /api/check-payment
 // =============================================================================
-app.get('/api/check-payment', async (req, res) => {
+app.get('/api/check-payment', rateLimit(30, 60000), async (req, res) => {
     const ref = (req.query.ref || '').trim();
     if (!ref) return res.status(400).json({ error: 'ref required' });
     try {
