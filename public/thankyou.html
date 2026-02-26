@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Date With Yourself — PhenomeBeauty</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Jost', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #1d1d1f;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            color: #ffffff;
+            font-weight: 300;
+        }
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            font-weight: 400;
+            color: #1d1d1f;
+            margin-bottom: 16px;
+            letter-spacing: 0.02em;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 32px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .message {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #2d2d2d;
+            margin-bottom: 36px;
+            font-style: italic;
+            font-weight: 300;
+        }
+        .details {
+            background: rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+        .details h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: #1d1d1f;
+            margin-bottom: 20px;
+        }
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .detail-item:last-child { margin-bottom: 0; }
+        .detail-label {
+            font-weight: 500;
+            color: #667eea;
+            min-width: 140px;
+        }
+        .detail-value {
+            color: #2d2d2d;
+            flex: 1;
+        }
+        .closing {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 17px;
+            line-height: 1.75;
+            color: #2d2d2d;
+            margin-bottom: 24px;
+            font-style: italic;
+            font-weight: 300;
+        }
+        .signature {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            color: #667eea;
+            margin-top: 16px;
+        }
+        .refresh-note {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">.pb</div>
+        <h1>A date with yourself</h1>
+        <p class="subtitle">I see you choosing you</p>
+        
+        <p class="message">
+            I've received your deposit, and your space in my calendar is now officially held. 
+            This isn't just a booking; it's a promise you've made to yourself to pause, and 
+            I am so honored to be the one holding that space for you.
+        </p>
+        
+        <div class="details">
+            <h2>What happens next:</h2>
+            <div class="detail-item">
+                <span class="detail-label">The Arrival:</span>
+                <span class="detail-value" id="arrival">I'll be traveling on <strong id="booking-date"></strong> at <strong id="booking-time"></strong>.</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">The Space:</span>
+                <span class="detail-value">No need to overthink it, just find a spot where you feel most at peace, and I'll handle the rest.</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">The Intent:</span>
+                <span class="detail-value">Bring nothing but yourself.</span>
+            </div>
+        </div>
+        
+        <p class="closing">
+            We spend so much of our lives pouring into others. Thank you for trusting me to pour back into you.<br>
+            I'm looking forward to our time together.
+        </p>
+        
+        <p class="closing">
+            Until then, keep choosing yourself in the small moments, too.
+        </p>
+        
+        <p class="signature">Toodles 💜</p>
+        
+        <p class="refresh-note">
+            Refreshing this page will take you back to the booking page.
+        </p>
+    </div>
+    
+    <script>
+        // Get booking reference from URL
+        const params = new URLSearchParams(window.location.search);
+        const ref = params.get('ref');
+        
+        if (ref) {
+            // Fetch booking details
+            fetch('/api/check-payment?ref=' + encodeURIComponent(ref))
+                .then(r => r.json())
+                .then(data => {
+                    if (data.date && data.time) {
+                        document.getElementById('booking-date').textContent = data.date;
+                        document.getElementById('booking-time').textContent = data.time;
+                    } else {
+                        document.getElementById('arrival').textContent = "I'll be in touch soon with the exact details.";
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('arrival').textContent = "I'll be in touch soon with the exact details.";
+                });
+        }
+        
+        // Check if this is a refresh (not first visit)
+        const hasVisited = sessionStorage.getItem('thankyou-visited');
+        
+        if (hasVisited) {
+            // Redirect to booking page on refresh
+            window.location.href = '/';
+        } else {
+            // Mark as visited
+            sessionStorage.setItem('thankyou-visited', 'true');
+        }
+    </script>
+</body>
+</html>

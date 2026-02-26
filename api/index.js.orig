@@ -462,9 +462,7 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
 
         // ── Build Yoco payment URL ────────────────────────────────────────────
         const appBase    = s.app_base_url           || 'http://localhost:3000';
-        const successUrl = s.booking_success_url    || `${appBase}/thankyou.html?ref=${bookingId}`;
-        const cancelUrl  = s.booking_cancel_url     || `${appBase}/?payment=cancelled`;
-        const 
+        const successUrl = s.booking_success_url    || `${appBase}/?payment=success&ref=${bookingId}`;
         const cancelUrl  = s.booking_cancel_url     || `${appBase}/?payment=cancelled&ref=${bookingId}`;
         const yocoKey    = s.yoco_secret_key        || '';
         const rawSlug    = s.yoco_payment_page_slug || '';
@@ -891,8 +889,8 @@ app.post('/api/admin/update-status', adminOnly, async (req, res) => {
             if (bal >= 2 && row.get('Balance Status') !== 'Paid' && row.get('Balance Status') !== 'Requested') {
                 const s    = req.settings;
                 const base = s.app_base_url || 'http://localhost:3000';
-                const sUrl = `${base}/?thankyou.html?balance=true&ref=${bookingId}`;
-                const cUrl = `${base}/??payment=cancelled&ref=${bookingId}`;
+                const sUrl = `${base}/?payment=balance-success&ref=${bookingId}`;
+                const cUrl = `${base}/?payment=balance-cancelled&ref=${bookingId}`;
                 const slug = (s.yoco_payment_page_slug || '').replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
                 const np   = (row.get('Client Name') || '').split(/\s+/);
                 let paymentUrl = null;
@@ -1003,8 +1001,8 @@ app.post('/api/admin/request-balance', adminOnly, async (req, res) => {
 
         const s    = req.settings;
         const base = s.app_base_url || 'http://localhost:3000';
-        const sUrl = `${base}/?thankyou.html?balance=true&ref=${bookingId}`;
-        const cUrl = `${base}/??payment=cancelled&ref=${bookingId}`;
+        const sUrl = `${base}/?payment=balance-success&ref=${bookingId}`;
+        const cUrl = `${base}/?payment=balance-cancelled&ref=${bookingId}`;
         const slug = (s.yoco_payment_page_slug || '').replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
         const np   = (row.get('Client Name') || '').split(/\s+/);
         let paymentUrl = null;
