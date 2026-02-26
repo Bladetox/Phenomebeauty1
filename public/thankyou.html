@@ -4,134 +4,258 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A Date With Yourself — PhenomeBeauty</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Jost', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: #ffffff;
-        }
-        .container {
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 24px;
-            padding: 50px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            animation: fadeIn 0.8s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: #1d1d1f;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 32px;
-            color: #ffffff;
-            font-weight: 300;
-        }
-        h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 36px;
-            font-weight: 400;
-            color: #1d1d1f;
-            margin-bottom: 16px;
-            letter-spacing: 0.02em;
-        }
-        .subtitle {
-            font-size: 15px;
-            color: #667eea;
-            font-weight: 500;
-            margin-bottom: 32px;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-        .message {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px;
-            line-height: 1.8;
-            color: #2d2d2d;
-            margin-bottom: 36px;
-            font-style: italic;
-            font-weight: 300;
-        }
-        .details {
-            background: rgba(102, 126, 234, 0.08);
-            border: 1px solid rgba(102, 126, 234, 0.15);
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 32px;
-            text-align: left;
-        }
-        .details h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 20px;
-            font-weight: 400;
-            color: #1d1d1f;
-            margin-bottom: 20px;
-        }
-        .detail-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 16px;
-            font-size: 14px;
-            line-height: 1.7;
-        }
-        .detail-item:last-child { margin-bottom: 0; }
-        .detail-label {
-            font-weight: 500;
-            color: #667eea;
-            min-width: 140px;
-        }
-        .detail-value {
-            color: #2d2d2d;
-            flex: 1;
-        }
-        .closing {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 17px;
-            line-height: 1.75;
-            color: #2d2d2d;
-            margin-bottom: 24px;
-            font-style: italic;
-            font-weight: 300;
-        }
-        .signature {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px;
-            color: #667eea;
-            margin-top: 16px;
-        }
-        .refresh-note {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            font-size: 12px;
-            color: #999;
-        }
+      :root {
+        --obsidian:   #04040a;
+        --void:       #070710;
+        --onyx:       #0d0d1a;
+        --text-pri:   rgba(255,255,255,0.94);
+        --text-sec:   rgba(255,255,255,0.60);
+        --text-ter:   rgba(255,255,255,0.38);
+        --r-card:     28px;
+      }
+      
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      
+      body {
+        font-family: 'Jost', system-ui, sans-serif;
+        color: var(--text-pri);
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse at 15% 5%,  rgba(100, 60,220,0.80) 0%, transparent 36%),
+          radial-gradient(ellipse at 85% 4%,  rgba(65,  35,165,0.70) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 52%, rgba(50,  25,130,0.60) 0%, transparent 42%),
+          radial-gradient(ellipse at 8%  94%, rgba(80,  45,175,0.65) 0%, transparent 34%),
+          radial-gradient(ellipse at 92% 92%, rgba(58,  28,130,0.60) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 50%, rgba(18,  10, 55,0.92) 0%, transparent 66%),
+          var(--obsidian);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      
+      .shell {
+        width: 100%;
+        max-width: 480px;
+        background: rgba(255,255,255,0.10);
+        backdrop-filter: blur(72px) saturate(200%);
+        -webkit-backdrop-filter: blur(72px) saturate(200%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.20) inset,
+          0 1px 0 rgba(255,255,255,0.14) inset,
+          0 0 0 0.5px rgba(255,255,255,0.06),
+          0 28px 80px rgba(0,0,0,0.70),
+          0 4px 16px rgba(0,0,0,0.50);
+        border-radius: var(--r-card);
+        padding: 48px 32px;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .shell::before {
+        content: '';
+        position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+        background: linear-gradient(90deg,
+          transparent,
+          rgba(255,255,255,0.45) 30%,
+          rgba(255,255,255,0.80) 50%,
+          rgba(255,255,255,0.45) 70%,
+          transparent);
+        border-radius: 99px;
+      }
+      
+      .shell::after {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+        pointer-events: none;
+      }
+      
+      .logo-box {
+        width: 82px;
+        height: 82px;
+        margin: 0 auto 20px;
+        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
+        border-radius: 23px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.08) inset,
+          0 8px 28px rgba(0,0,0,0.60);
+      }
+      
+      .logo-box::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+        border-radius: 23px;
+        pointer-events: none;
+      }
+      
+      .logo-text {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 34px;
+        font-weight: 300;
+        color: rgba(255,255,255,0.95);
+        position: relative;
+        z-index: 1;
+      }
+      
+      .brand-tag {
+        margin-top: 14px;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.36em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.70);
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      
+      h1 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 34px;
+        font-weight: 400;
+        color: var(--text-pri);
+        text-align: center;
+        margin-bottom: 12px;
+        letter-spacing: 0.01em;
+      }
+      
+      .subtitle {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 16px;
+        font-style: italic;
+        font-weight: 300;
+        color: var(--text-sec);
+        text-align: center;
+        margin-bottom: 32px;
+        line-height: 1.6;
+      }
+      
+      .message {
+        font-family: 'Jost', sans-serif;
+        font-size: 14px;
+        line-height: 1.85;
+        color: var(--text-sec);
+        text-align: center;
+        margin-bottom: 36px;
+        font-weight: 400;
+      }
+      
+      .details-card {
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        border-radius: 18px;
+        padding: 24px 20px;
+        margin-bottom: 32px;
+      }
+      
+      .details-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px;
+        font-weight: 400;
+        color: var(--text-pri);
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      
+      .detail-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+      
+      .detail-row:last-child { margin-bottom: 0; }
+      
+      .detail-icon {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      
+      .detail-content {
+        flex: 1;
+      }
+      
+      .detail-label {
+        font-family: 'Jost', sans-serif;
+        font-weight: 600;
+        color: var(--text-pri);
+        margin-bottom: 4px;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+      }
+      
+      .detail-value {
+        font-family: 'Jost', sans-serif;
+        color: var(--text-sec);
+        font-weight: 400;
+      }
+      
+      .detail-value strong {
+        color: var(--text-pri);
+        font-weight: 500;
+      }
+      
+      .closing {
+        font-family: 'Jost', sans-serif;
+        font-size: 14px;
+        line-height: 1.85;
+        color: var(--text-sec);
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 400;
+      }
+      
+      .signature {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 20px;
+        font-style: italic;
+        color: rgba(220,200,255,0.90);
+        text-align: center;
+        margin-top: 8px;
+      }
+      
+      .divider {
+        width: 32px;
+        height: 0.5px;
+        margin: 24px auto;
+        background: linear-gradient(90deg,transparent,rgba(255,255,255,0.40),transparent);
+      }
+      
+      .refresh-note {
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 0.5px solid rgba(255,255,255,0.08);
+        font-family: 'Jost', sans-serif;
+        font-size: 11px;
+        color: var(--text-ter);
+        text-align: center;
+        letter-spacing: 0.01em;
+      }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">.pb</div>
+    <div class="shell">
+        <div class="logo-box">
+            <span class="logo-text">.pb</span>
+        </div>
+        <div class="brand-tag">MOBILE BEAUTY STUDIO</div>
+        
         <h1>A date with yourself</h1>
-        <p class="subtitle">I see you choosing you</p>
+        <p class="subtitle">I see you choosing you.</p>
         
         <p class="message">
             I've received your deposit, and your space in my calendar is now officially held. 
@@ -139,26 +263,49 @@
             I am so honored to be the one holding that space for you.
         </p>
         
-        <div class="details">
-            <h2>What happens next:</h2>
-            <div class="detail-item">
-                <span class="detail-label">The Arrival:</span>
-                <span class="detail-value" id="arrival">I'll be traveling on <strong id="booking-date"></strong> at <strong id="booking-time"></strong>.</span>
+        <div class="details-card">
+            <div class="details-title">What happens next</div>
+            
+            <div class="detail-row">
+                <span class="detail-icon">✨</span>
+                <div class="detail-content">
+                    <div class="detail-label">The Arrival</div>
+                    <div class="detail-value" id="arrival-text">
+                        I'll be traveling on <strong id="booking-date">your chosen date</strong> at <strong id="booking-time">your selected time</strong>.
+                    </div>
+                </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-label">The Space:</span>
-                <span class="detail-value">No need to overthink it, just find a spot where you feel most at peace, and I'll handle the rest.</span>
+            
+            <div class="detail-row">
+                <span class="detail-icon">🕊️</span>
+                <div class="detail-content">
+                    <div class="detail-label">The Space</div>
+                    <div class="detail-value">
+                        No need to overthink it, just find a spot where you feel most at peace, and I'll handle the rest.
+                    </div>
+                </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-label">The Intent:</span>
-                <span class="detail-value">Bring nothing but yourself.</span>
+            
+            <div class="detail-row">
+                <span class="detail-icon">💜</span>
+                <div class="detail-content">
+                    <div class="detail-label">The Intent</div>
+                    <div class="detail-value">
+                        Bring nothing but yourself.
+                    </div>
+                </div>
             </div>
         </div>
         
         <p class="closing">
-            We spend so much of our lives pouring into others. Thank you for trusting me to pour back into you.<br>
+            We spend so much of our lives pouring into others. Thank you for trusting me to pour back into you.
+        </p>
+        
+        <p class="closing">
             I'm looking forward to our time together.
         </p>
+        
+        <div class="divider"></div>
         
         <p class="closing">
             Until then, keep choosing yourself in the small moments, too.
@@ -172,36 +319,29 @@
     </div>
     
     <script>
-        // Get booking reference from URL
         const params = new URLSearchParams(window.location.search);
         const ref = params.get('ref');
         
         if (ref) {
-            // Fetch booking details
             fetch('/api/check-payment?ref=' + encodeURIComponent(ref))
                 .then(r => r.json())
                 .then(data => {
                     if (data.date && data.time) {
                         document.getElementById('booking-date').textContent = data.date;
                         document.getElementById('booking-time').textContent = data.time;
-                    } else {
-                        document.getElementById('arrival').textContent = "I'll be in touch soon with the exact details.";
                     }
                 })
                 .catch(() => {
-                    document.getElementById('arrival').textContent = "I'll be in touch soon with the exact details.";
+                    console.log('Could not fetch booking details');
                 });
         }
         
-        // Check if this is a refresh (not first visit)
-        const hasVisited = sessionStorage.getItem('thankyou-visited');
+        const hasVisited = sessionStorage.getItem('thankyou-visited-' + ref);
         
         if (hasVisited) {
-            // Redirect to booking page on refresh
             window.location.href = '/';
         } else {
-            // Mark as visited
-            sessionStorage.setItem('thankyou-visited', 'true');
+            sessionStorage.setItem('thankyou-visited-' + ref, 'true');
         }
     </script>
 </body>
