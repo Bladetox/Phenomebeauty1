@@ -463,8 +463,6 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         // ── Build Yoco payment URL ────────────────────────────────────────────
         const appBase    = s.app_base_url           || 'http://localhost:3000';
         const successUrl = s.booking_success_url    || `${appBase}/thankyou.html?ref=${bookingId}`;
-        const cancelUrl  = s.booking_cancel_url     || `${appBase}/?payment=cancelled`;
-        const 
         const cancelUrl  = s.booking_cancel_url     || `${appBase}/?payment=cancelled&ref=${bookingId}`;
         const yocoKey    = s.yoco_secret_key        || '';
         const rawSlug    = s.yoco_payment_page_slug || '';
