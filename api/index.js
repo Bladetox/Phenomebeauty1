@@ -891,7 +891,7 @@ app.post('/api/admin/update-status', adminOnly, async (req, res) => {
             if (bal >= 2 && row.get('Balance Status') !== 'Paid' && row.get('Balance Status') !== 'Requested') {
                 const s    = req.settings;
                 const base = s.app_base_url || 'http://localhost:3000';
-                const sUrl = `${base}/?thankyou.html?balance=true&ref=${bookingId}`;
+                const sUrl = `${base}/thankyou.html?balance=true&ref=${bookingId}`;
                 const cUrl = `${base}/??payment=cancelled&ref=${bookingId}`;
                 const slug = (s.yoco_payment_page_slug || '').replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
                 const np   = (row.get('Client Name') || '').split(/\s+/);
@@ -1003,7 +1003,7 @@ app.post('/api/admin/request-balance', adminOnly, async (req, res) => {
 
         const s    = req.settings;
         const base = s.app_base_url || 'http://localhost:3000';
-        const sUrl = `${base}/?thankyou.html?balance=true&ref=${bookingId}`;
+        const sUrl = `${base}/thankyou.html?balance=true&ref=${bookingId}`;
         const cUrl = `${base}/??payment=cancelled&ref=${bookingId}`;
         const slug = (s.yoco_payment_page_slug || '').replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
         const np   = (row.get('Client Name') || '').split(/\s+/);
