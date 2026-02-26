@@ -344,47 +344,67 @@ async function sendRebookEmail(s, b) {
         s.app_base_url ||
         s.appbaseurl ||
         'http://localhost:3000';
+    const reviewUrl = 
+        s.google_review_url ||
+        s.googlereviewurl ||
+        '';
 
     try {
-        const reviewHtml = emailReviewBlock(
-            s,
-            'If you enjoyed your treatment, a short Google review helps other clients discover PhenomeBeauty. It is completely optional, but greatly appreciated.'
-        );
+        // Build review section only if URL exists
+        const reviewSection = reviewUrl ? `
+        <div style="background:rgba(197,168,128,0.08);border:1px solid rgba(197,168,128,0.25);border-radius:14px;padding:20px;margin-bottom:20px;">
+          <p style="font-size:13px;color:rgba(248,250,252,0.85);line-height:1.8;margin:0 0 16px;">
+            As mothers, sisters, daughters, we know how easily we put ourselves last. 
+            By sharing your experience on Google, you help other women remember they matter too. 
+            Your words might be exactly what they need to hear.
+          </p>
+          <a href="${reviewUrl}" style="display:block;background:linear-gradient(135deg,#c5a880,#a68864);color:#0b1120;text-align:center;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:0;">
+            Share Your Experience on Google →
+          </a>
+        </div>` : '';
 
         await transporter.sendMail({
             from:    `"PhenomeBeauty" <${(s.smtp_user || s.smtpuser || adminEmail)}>`,
             to:      b.email,
-            subject: `🤍 Thank you, ${firstName} : Payment Complete`,
+            subject: `💛 Thank you for letting me into your sanctuary, ${firstName}`,
             html: emailWrap(
                 emailHeader(
-                    '🤍',
-                    'Payment Successful',
-                    'Thank you for trusting PhenomeBeauty.',
-                    'linear-gradient(135deg,#7b9e87,#5f826b)' // Elegant Sage Green
+                    '💛',
+                    'Thank you for choosing you',
+                    'Payment complete',
+                    'linear-gradient(135deg,#f4d03f,#e6c229)' // Golden yellow gradient
                 ),
                 `
-                <p style="font-size:14px;line-height:1.7;color:rgba(248,250,252,0.9);margin:0 0 20px;">
+                <p style="font-size:14.5px;line-height:1.85;color:rgba(248,250,252,0.9);margin:0 0 24px;text-align:center;">
                   Hi <strong>${firstName}</strong>,<br><br>
-                  We have received your full payment. Thank you so much for choosing PhenomeBeauty.
-                  It was a pleasure treating you, and I hope you feel relaxed and renewed.
+                  Thank you for letting me into your sanctuary today.<br>
+                  I'm honored you chose me as your self-care partner.
                 </p>
 
-                <div style="background:rgba(123,158,135,0.08);border:1px solid rgba(123,158,135,0.25);border-radius:14px;padding:16px 20px;margin-bottom:20px;text-align:center;">
+                <div style="background:rgba(123,158,135,0.08);border:1px solid rgba(123,158,135,0.25);border-radius:14px;padding:16px 20px;margin-bottom:24px;text-align:center;">
                   <div style="font-size:13px;color:rgba(148,163,184,0.8);margin-bottom:4px;">Total Paid</div>
                   <div style="font-size:24px;font-weight:700;color:#7b9e87;">R${Number(b.total || 0).toFixed(2)} ✨</div>
                 </div>
 
-                <p style="font-size:13px;color:rgba(148,163,184,0.8);line-height:1.7;margin:0 0 20px;">
-                  I look forward to treating you again in the future. Whenever you are ready to book your next appointment, simply click below:
+                ${reviewSection}
+
+                <p style="font-size:13.5px;color:rgba(248,250,252,0.8);line-height:1.85;margin:0 0 22px;text-align:center;">
+                  Consistency is how we grow, inside and out.<br>
+                  Now go ahead and honor yourself in the same way.
                 </p>
 
-                <a href="${appBase}" style="display:block;background:linear-gradient(135deg,#7b9e87,#5f826b);color:#fff;text-align:center;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:18px;">
-                  Book Your Next Appointment →
-                </a>
+                <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:20px;margin-bottom:18px;">
+                  <p style="font-size:12px;color:rgba(148,163,184,0.65);margin:0 0 14px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Book Your Next Appointment</p>
+                  <a href="${appBase}" style="display:block;background:linear-gradient(135deg,#7b9e87,#5f826b);color:#fff;text-align:center;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:700;text-decoration:none;">
+                    Schedule Your Next Session →
+                  </a>
+                </div>
 
-                ${reviewHtml}
+                <p style="font-size:16px;font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(220,200,255,0.90);text-align:center;margin:20px 0 0;">
+                  Toodles.
+                </p>
 
-                <p style="font-size:12px;color:rgba(148,163,184,0.4);text-align:center;margin:0;">
+                <p style="font-size:12px;color:rgba(148,163,184,0.4);text-align:center;margin:16px 0 0;">
                   Booking Ref: ${b.bookingId}
                 </p>
                 `
@@ -395,15 +415,3 @@ async function sendRebookEmail(s, b) {
         console.error('Rebook email error:', e.message);
     }
 }
-
-// =============================================================================
-// EXPORTS
-// =============================================================================
-
-module.exports = {
-    sendAdminDepositNotification,
-    sendAdminBalancePaidNotification,
-    sendCustomerConfirmationEmail,
-    sendBalanceRequestEmail,
-    sendRebookEmail,
-};
