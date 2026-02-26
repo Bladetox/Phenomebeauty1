@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhenomeBeauty — A Date with Yourself</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════════════════════════════
+       PHENOMEBEAUTY — THANK YOU PAGE v1.0
+       Obsidian canvas · Liquid glass card · Cormorant serif soul
+       B&W only. No violet. No compromise.
+       ══════════════════════════════════════════════════════════════════ */
+
+    :root {
+      --obsidian: #04040a;
+      --r-xl: 28px; --r-lg: 22px; --r-md: 16px; --r-pill: 999px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0; padding: 0;
+      font-family: 'Jost', system-ui, sans-serif;
+      min-height: 100vh;
+      /* Deep obsidian with pure white luminance — no violet */
+      background:
+        radial-gradient(ellipse at 20%  0%,  rgba(255,255,255,0.065) 0%, transparent 40%),
+        radial-gradient(ellipse at 80%  0%,  rgba(255,255,255,0.045) 0%, transparent 36%),
+        radial-gradient(ellipse at 50% 45%,  rgba(255,255,255,0.025) 0%, transparent 50%),
+        radial-gradient(ellipse at  5% 95%,  rgba(255,255,255,0.055) 0%, transparent 36%),
+        radial-gradient(ellipse at 95% 95%,  rgba(255,255,255,0.040) 0%, transparent 36%),
+        radial-gradient(ellipse at 50% 50%,  rgba(30,30,30,0.80)     0%, transparent 70%),
+        var(--obsidian);
+      background-attachment: fixed;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .frame {
+      width: 100%; min-height: 100vh;
+      padding: 32px 16px;
+      display: flex; align-items: flex-start; justify-content: center;
+    }
+
+    /* ── GLASS CARD ── */
+    .card {
+      width: 100%; max-width: 480px;
+      border-radius: var(--r-xl);
+      padding: 36px 28px 40px;
+      background: rgba(255,255,255,0.10);
+      backdrop-filter: blur(72px) saturate(200%);
+      -webkit-backdrop-filter: blur(72px) saturate(200%);
+      box-shadow:
+        0 0 0 0.5px rgba(255,255,255,0.20) inset,
+        0 1px 0   rgba(255,255,255,0.14) inset,
+        0 0 0 0.5px rgba(255,255,255,0.06),
+        0 28px 80px rgba(0,0,0,0.70),
+        0 4px  16px rgba(0,0,0,0.50);
+      position: relative; overflow: hidden;
+      animation: cardEnter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* Top prismatic highlight */
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.50) 30%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0.50) 70%, transparent);
+      pointer-events: none;
+    }
+
+    /* ── HEADER ── */
+    .logo-wrap {
+      width: 68px; height: 68px; border-radius: 22px; padding: 2px;
+      background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
+      box-shadow:
+        0 0 0 0.5px rgba(255,255,255,0.16) inset,
+        0 8px 28px rgba(0,0,0,0.60),
+        0 2px 8px rgba(0,0,0,0.40);
+      margin: 0 auto 14px;
+      position: relative;
+    }
+    .logo-wrap::before {
+      content: '';
+      position: absolute; inset: 0; border-radius: inherit;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .logo-wrap img {
+      width: 100%; height: 100%; border-radius: 19px;
+      object-fit: cover; display: block;
+    }
+
+    .brand-name {
+      font-family: 'Abril Fatface', Georgia, serif;
+      font-size: 20px; font-weight: 400;
+      color: rgba(255,255,255,0.90);
+      text-align: center; margin-bottom: 4px; letter-spacing: 0.01em;
+    }
+    .brand-sub {
+      font-family: 'Jost', sans-serif;
+      font-size: 8.5px; font-weight: 600;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(255,255,255,0.30);
+      text-align: center; margin-bottom: 28px;
+    }
+
+    /* ── DIVIDER ── */
+    .hairline {
+      width: 40px; height: 0.5px; margin: 0 auto 28px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    }
+
+    /* ── HERO HEADLINE ── */
+    .hero-eyebrow {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 11px; font-weight: 400; font-style: italic;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      text-align: center; margin-bottom: 10px;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 32px; font-weight: 300; line-height: 1.15;
+      color: rgba(255,255,255,0.97);
+      text-align: center; margin-bottom: 8px;
+      letter-spacing: 0.01em;
+    }
+    .hero-sub {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 16px; font-weight: 300; font-style: italic;
+      color: rgba(255,255,255,0.45);
+      text-align: center; margin-bottom: 28px;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── BODY COPY ── */
+    .body-copy {
+      font-family: 'Jost', sans-serif;
+      font-size: 13px; font-weight: 400; line-height: 1.80;
+      color: rgba(255,255,255,0.55);
+      text-align: center; margin-bottom: 28px;
+    }
+
+    /* ── BOOKING DETAILS GLASS BOX ── */
+    .details-box {
+      border-radius: var(--r-md);
+      padding: 20px 18px;
+      background: rgba(255,255,255,0.06);
+      border: 0.5px solid rgba(255,255,255,0.12);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      margin-bottom: 28px;
+    }
+    .details-box-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 14px;
+    }
+    .detail-row {
+      display: flex; align-items: baseline;
+      justify-content: space-between; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .detail-row:last-child { margin-bottom: 0; }
+    .detail-key {
+      font-family: 'Jost', sans-serif;
+      font-size: 11px; font-weight: 500;
+      color: rgba(255,255,255,0.30);
+      letter-spacing: 0.06em; white-space: nowrap;
+    }
+    .detail-val {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 15px; font-weight: 400;
+      color: rgba(255,255,255,0.88);
+      text-align: right; flex: 1;
+    }
+
+    /* ── WHAT HAPPENS NEXT ── */
+    .next-section {
+      margin-bottom: 28px;
+    }
+    .next-title {
+      font-family: 'Jost', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 16px;
+    }
+    .next-item {
+      display: flex; gap: 14px; margin-bottom: 14px;
+      align-items: flex-start;
+    }
+    .next-item:last-child { margin-bottom: 0; }
+    .next-bullet {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: rgba(255,255,255,0.40);
+      flex-shrink: 0; margin-top: 8px;
+    }
+    .next-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 3px;
+    }
+    .next-body {
+      font-family: 'Jost', sans-serif;
+      font-size: 12.5px; font-weight: 400; line-height: 1.65;
+      color: rgba(255,255,255,0.40);
+    }
+    .next-body strong {
+      color: rgba(255,255,255,0.80); font-weight: 600;
+    }
+
+    /* ── CLOSING QUOTE ── */
+    .closing {
+      border-top: 0.5px solid rgba(255,255,255,0.08);
+      padding-top: 24px; margin-bottom: 28px;
+    }
+    .closing-body {
+      font-family: 'Jost', sans-serif;
+      font-size: 12.5px; font-weight: 400; line-height: 1.80;
+      color: rgba(255,255,255,0.40);
+      text-align: center; margin-bottom: 20px;
+    }
+    .closing-sign {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 18px; font-weight: 300; font-style: italic;
+      color: rgba(255,255,255,0.60);
+      text-align: center;
+    }
+
+    /* ── DEPOSIT BADGE ── */
+    .deposit-badge {
+      display: flex; align-items: center; justify-content: space-between;
+      border-radius: 14px; padding: 14px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 0.5px solid rgba(255,255,255,0.10);
+      margin-bottom: 20px;
+    }
+    .deposit-label {
+      font-family: 'Jost', sans-serif;
+      font-size: 10px; font-weight: 600;
+      color: rgba(255,255,255,0.30);
+      letter-spacing: 0.06em;
+    }
+    .deposit-amount {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 20px; font-weight: 500;
+      color: rgba(255,255,255,0.90);
+    }
+    .deposit-check {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(255,255,255,0.10);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── CTA BUTTON ── */
+    .btn-book-again {
+      display: block; width: 100%;
+      padding: 14px 0; border-radius: 16px;
+      background: linear-gradient(160deg, #1c1c1e 0%, #0a0a0a 100%);
+      color: rgba(255,255,255,0.90);
+      font-family: 'Jost', sans-serif;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      text-align: center; text-decoration: none;
+      box-shadow:
+        0 0 0 0.5px rgba(255,255,255,0.12) inset,
+        0 1px 0   rgba(255,255,255,0.08) inset,
+        0 10px 30px rgba(0,0,0,0.50);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+    .btn-book-again:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 0 0.5px rgba(255,255,255,0.14) inset,
+        0 16px 40px rgba(0,0,0,0.60);
+    }
+
+    /* ── FOOTER NOTE ── */
+    .footer-note {
+      font-family: 'Jost', sans-serif;
+      font-size: 10px; color: rgba(255,255,255,0.18);
+      text-align: center; margin-top: 16px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── LOADING STATE ── */
+    .loading-state {
+      text-align: center; padding: 40px 0;
+      color: rgba(255,255,255,0.30);
+      font-family: 'Jost', sans-serif;
+      font-size: 12px; letter-spacing: 0.06em;
+    }
+    .spinner {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.10);
+      border-top-color: rgba(255,255,255,0.60);
+      animation: spin 0.85s linear infinite;
+      margin: 0 auto 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (min-width: 480px) {
+      .frame { padding: 48px 20px; }
+      .card  { padding: 40px 36px 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="card">
+
+      <!-- Header -->
+      <div class="logo-wrap">
+        <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty">
+      </div>
+      <div class="brand-name">PhenomeBeauty</div>
+      <div class="brand-sub">Mobile Beauty Studio</div>
+
+      <div class="hairline"></div>
+
+      <!-- Loading state (shown while fetching booking data) -->
+      <div class="loading-state" id="loading-state">
+        <div class="spinner"></div>
+        Retrieving your booking…
+      </div>
+
+      <!-- Content (hidden until data loads) -->
+      <div id="page-content" style="display:none;">
+
+        <!-- Hero -->
+        <div class="hero-eyebrow">A date with yourself</div>
+        <div class="hero-title">I see you<br>choosing you.</div>
+        <div class="hero-sub">Your space is officially held.</div>
+
+        <!-- Body copy -->
+        <div class="body-copy">
+          I've received your deposit, and your space in my calendar is now officially held.
+          <br><br>
+          This isn't just a booking; it's a promise you've made to yourself to pause,
+          and I am so honored to be the one holding that space for you.
+        </div>
+
+        <!-- Booking details -->
+        <div class="details-box" id="details-box">
+          <div class="details-box-label">Your Appointment</div>
+          <div class="detail-row">
+            <span class="detail-key">Date</span>
+            <span class="detail-val" id="d-date">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Time</span>
+            <span class="detail-val" id="d-time">—</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Service</span>
+            <span class="detail-val" id="d-service" style="font-size:13px;">—</span>
+          </div>
+        </div>
+
+        <!-- Deposit badge -->
+        <div class="deposit-badge" id="deposit-badge" style="display:none;">
+          <div>
+            <div class="deposit-label">Deposit Received ✓</div>
+          </div>
+          <div class="deposit-amount" id="d-deposit">—</div>
+          <div class="deposit-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+
+        <!-- What happens next -->
+        <div class="next-section">
+          <div class="next-title">What happens next</div>
+
+          <div class="next-item">
+            <div class="next-bullet"></div>
+            <div>
+              <div class="next-label">The Arrival</div>
+              <div class="next-body" id="next-arrival">
+                I'll be traveling on <strong id="d-arrival-date">—</strong> at <strong id="d-arrival-time">—</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="next-item">
+            <div class="next-bullet"></div>
+            <div>
+              <div class="next-label">The Space</div>
+              <div class="next-body">
+                No need to overthink it — just find a spot where you feel most at peace, and I'll handle the rest.
+              </div>
+            </div>
+          </div>
+
+          <div class="next-item">
+            <div class="next-bullet"></div>
+            <div>
+              <div class="next-label">The Intent</div>
+              <div class="next-body">
+                Bring nothing but yourself.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Closing -->
+        <div class="closing">
+          <div class="closing-body">
+            We spend so much of our lives pouring into others.<br>
+            Thank you for trusting me to pour back into you.
+            <br><br>
+            I'm looking forward to our time together.<br>
+            Until then, keep choosing yourself in the small moments, too.
+          </div>
+          <div class="closing-sign">Toodles. 🌸</div>
+        </div>
+
+        <!-- CTA -->
+        <a href="/" class="btn-book-again" id="btn-book">Book Another Treatment</a>
+        <div class="footer-note" id="footer-ref"></div>
+
+      </div><!-- /page-content -->
+
+    </div><!-- /card -->
+  </div><!-- /frame -->
+
+  <script>
+    function fmtDate(ds) {
+      if (!ds) return '—';
+      const [y, m, d] = ds.split('-').map(Number);
+      const dt  = new Date(y, m - 1, d);
+      const DAY = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return DAY[dt.getDay()] + ', ' + d + ' ' + MON[m - 1] + ' ' + y;
+    }
+
+    function populate(data) {
+      const date    = data && data.date    ? fmtDate(data.date) : '—';
+      const time    = data && data.time    ? data.time          : '—';
+      const service = data && data.services ? data.services     : '—';
+      const dep     = data && data.deposit  ? 'R' + data.deposit : null;
+      const ref     = data && data.bookingId ? data.bookingId   : '';
+
+      document.getElementById('d-date').textContent    = date;
+      document.getElementById('d-time').textContent    = time;
+      document.getElementById('d-service').textContent = service;
+      document.getElementById('d-arrival-date').textContent = date;
+      document.getElementById('d-arrival-time').textContent = time;
+
+      if (dep) {
+        document.getElementById('d-deposit').textContent    = dep;
+        document.getElementById('deposit-badge').style.display = 'flex';
+      }
+      if (ref) {
+        document.getElementById('footer-ref').textContent = 'Booking ref: ' + ref;
+      }
+
+      // Update booking URL if available
+      if (data && data.appBase) {
+        document.getElementById('btn-book').href = data.appBase;
+      }
+
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('page-content').style.display  = 'block';
+    }
+
+    // Read query params on load — ?ref=XXXX
+    // Polls until depositStatus is confirmed (Yoco webhook may take a few seconds)
+    window.addEventListener('DOMContentLoaded', () => {
+      const params  = new URLSearchParams(window.location.search);
+      const pRef    = params.get('ref');
+      let   attempts = 0;
+      const MAX = 6, DELAY = 2500;
+
+      function tryFetch() {
+        if (!pRef) { populate(null); return; }
+        fetch('/api/check-payment?ref=' + encodeURIComponent(pRef))
+          .then(r => r.json())
+          .then(data => {
+            populate(data);
+            // If deposit not yet confirmed, silently retry once more in background
+            if (data && data.depositStatus !== 'Paid' && attempts < MAX) {
+              attempts++;
+              setTimeout(() => {
+                fetch('/api/check-payment?ref=' + encodeURIComponent(pRef))
+                  .then(r => r.json())
+                  .then(updated => {
+                    if (updated && updated.deposit) {
+                      document.getElementById('d-deposit').textContent = 'R' + updated.deposit;
+                      document.getElementById('deposit-badge').style.display = 'flex';
+                    }
+                  }).catch(() => {});
+              }, DELAY * 2);
+            }
+          })
+          .catch(() => {
+            if (attempts < MAX) { attempts++; setTimeout(tryFetch, DELAY); }
+            else populate(null);
+          });
+      }
+
+      tryFetch();
+    });
+  </script>
+</body>
+</html>
