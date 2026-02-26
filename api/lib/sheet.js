@@ -58,6 +58,10 @@ async function getSettings(doc) {
         const v = (r.get('Value')       || '').trim();
         if (k) s[k] = v;
     });
+    
+    // Merge environment variables (prioritize env vars over sheet values)
+    if (process.env.SMTP_USER) s.smtp_user = process.env.SMTP_USER;
+    if (process.env.SMTP_PASS) s.smtp_pass = process.env.SMTP_PASS;
     _settingsCache  = s;
     _settingsExpiry = Date.now() + 10 * 60 * 1000;
     return s;

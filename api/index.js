@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 // api/index.js — PhenomeBeauty Booking Server v5.2
 // Vercel serverless entry point — exports Express app, never calls app.listen()
 'use strict';
