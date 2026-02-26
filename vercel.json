@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "echo 'No build needed'",
+  "outputDirectory": "public",
   "functions": {
     "api/index.js": {
       "maxDuration": 30
@@ -12,11 +14,11 @@
     },
     {
       "source": "/",
-      "destination": "/public/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/:path*",
-      "destination": "/public/:path*"
+      "destination": "/:path*"
     }
   ],
   "redirects": [
