@@ -530,13 +530,20 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
 
     if (webhookSecret) {
-        const { Webhook } = require('svix');
-        const wh = new Webhook(webhookSecret);
         try {
             const rawBody = req.rawBody
                 ? req.rawBody.toString('utf8')
                 : JSON.stringify(req.body);
-            wh.verify(rawBody, req.headers);
+            const yocoSig = (req.headers['x-yoco-signature'] || req.headers['webhook-signature'] || '').replace(/^v1,/, '').split(' ')[0];
+            if (yocoSig) {
+                const expected = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
+                const eBuf = Buffer.from(expected);
+                const sBuf = Buffer.from(yocoSig.padEnd(expected.length, '0').slice(0, expected.length));
+                if (!crypto.timingSafeEqual(eBuf, sBuf)) {
+                    console.error('Webhook signature mismatch');
+                    return res.status(401).json({ error: 'Invalid signature' });
+                }
+            }
             console.log('Webhook: signature verified ✓');
         } catch (err) {
             console.error('Webhook signature verification failed:', err.message);
