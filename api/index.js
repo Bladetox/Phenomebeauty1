@@ -530,6 +530,7 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
 
     if (webhookSecret) {
+        console.log('Webhook headers:', JSON.stringify(req.headers));
         try {
             const rawBody = req.rawBody
                 ? req.rawBody.toString('utf8')
@@ -678,33 +679,34 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
             console.error(`Webhook: calendar creation failed for ${bookingId}:`, e.message);
             // Continue without calendar - don't block booking confirmation
         }
-        // Notify admin of new confirmed booking
-        sendAdminDepositNotification(settings, {
-            bookingId,
-            name:        row.get('Client Name'),
-            email:       row.get('Client Email'),
-            phone:       row.get('Client Phone'),
-            address:     row.get('Client Address'),
-            services:    row.get('Service Names'),
-            date:        row.get('Date'),
-            time:        row.get('Time'),
-            totalAmount: row.get('Total Amount (R)'),
-            deposit:     row.get('Deposit Amount (R)'),
-            balance:     row.get('Balance Due (R)'),
-        }).catch((e) => console.error('Admin deposit email error:', e.message));
+        // Notify admin and customer — await both so Vercel doesn't kill before send
+        await Promise.all([
+            sendAdminDepositNotification(settings, {
+                bookingId,
+                name:        row.get('Client Name'),
+                email:       row.get('Client Email'),
+                phone:       row.get('Client Phone'),
+                address:     row.get('Client Address'),
+                services:    row.get('Service Names'),
+                date:        row.get('Date'),
+                time:        row.get('Time'),
+                totalAmount: row.get('Total Amount (R)'),
+                deposit:     row.get('Deposit Amount (R)'),
+                balance:     row.get('Balance Due (R)'),
+            }).then(() => console.log('Admin deposit email sent')).catch((e) => console.error('Admin deposit email error:', e.message)),
 
-        // Confirm booking to customer
-        sendCustomerConfirmationEmail(settings, {
-            bookingId,
-            name:     row.get('Client Name'),
-            email:    row.get('Client Email'),
-            address:  row.get('Client Address'),
-            services: row.get('Service Names'),
-            date:     row.get('Date'),
-            time:     row.get('Time'),
-            deposit:  row.get('Deposit Amount (R)'),
-            balance:  row.get('Balance Due (R)'),
-        }).catch((e) => console.error('Customer confirmation email error:', e.message));
+            sendCustomerConfirmationEmail(settings, {
+                bookingId,
+                name:     row.get('Client Name'),
+                email:    row.get('Client Email'),
+                address:  row.get('Client Address'),
+                services: row.get('Service Names'),
+                date:     row.get('Date'),
+                time:     row.get('Time'),
+                deposit:  row.get('Deposit Amount (R)'),
+                balance:  row.get('Balance Due (R)'),
+            }).then(() => console.log('Customer confirmation email sent')).catch((e) => console.error('Customer confirmation email error:', e.message)),
+        ]);
 
         return res.status(200).json({ received: true });
 
