@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
 // api/index.js — PhenomeBeauty Booking Server v5.2
 // Vercel serverless entry point — exports Express app, never calls app.listen()
@@ -638,24 +638,39 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
         const settings = await getSettings(doc);
 
         // Create Google Calendar event
-        const calId = await calCreate(settings, {
-            bookingId,
-            name:        row.get('Client Name'),
-            email:       row.get('Client Email'),
-            phone:       row.get('Client Phone'),
-            address:     row.get('Client Address'),
-            services:    row.get('Service Names'),
-            date:        row.get('Date'),
-            time:        row.get('Time'),
-            totalAmount: row.get('Total Amount (R)'),
-            deposit:     row.get('Deposit Amount (R)'),
-            balance:     row.get('Balance Due (R)'),
-        });
-        if (calId) {
-            row.set('Calendar Event ID', calId);
-            await row.save();
+        // Create Google Calendar event (with timeout protection)
+        let calId = null;
+        try {
+            calId = await Promise.race([
+                calCreate(settings, {
+                    bookingId,
+                    name:        row.get('Client Name'),
+                    email:       row.get('Client Email'),
+                    phone:       row.get('Client Phone'),
+                    address:     row.get('Client Address'),
+                    services:    row.get('Service Names'),
+                    date:        row.get('Date'),
+                    time:        row.get('Time'),
+                    totalAmount: row.get('Total Amount (R)'),
+                    deposit:     row.get('Deposit Amount (R)'),
+                    balance:     row.get('Balance Due (R)'),
+                }),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Calendar timeout')), 5000)
+                )
+            ]);
+            
+            if (calId) {
+                row.set('Calendar Event ID', calId);
+                await row.save();
+                console.log(`Webhook: calendar event ${calId} created for ${bookingId}`);
+            } else {
+                console.log(`Webhook: calendar creation returned null for ${bookingId}`);
+            }
+        } catch (e) {
+            console.error(`Webhook: calendar creation failed for ${bookingId}:`, e.message);
+            // Continue without calendar - don't block booking confirmation
         }
-
         // Notify admin of new confirmed booking
         sendAdminDepositNotification(settings, {
             bookingId,
@@ -839,21 +854,24 @@ app.post('/api/admin/update-status', adminOnly, async (req, res) => {
         await row.save();
 
         // ── Manual confirm: create calendar event + send emails ──────────────
-        if (status === 'Confirmed' && !row.get('Calendar Event ID')) {
-            const calId = await calCreate(req.settings, {
-                bookingId,
-                name:        row.get('Client Name'),
-                email:       row.get('Client Email'),
-                phone:       row.get('Client Phone'),
-                address:     row.get('Client Address'),
-                services:    row.get('Service Names'),
-                date:        row.get('Date'),
-                time:        row.get('Time'),
-                totalAmount: row.get('Total Amount (R)'),
-                deposit:     row.get('Deposit Amount (R)'),
-                balance:     row.get('Balance Due (R)'),
-            });
-            if (calId) { row.set('Calendar Event ID', calId); await row.save(); }
+        if (status === 'Confirmed') {
+            // ── Create calendar event only if one doesn't exist yet ──────────
+            if (!row.get('Calendar Event ID')) {
+                const calId = await calCreate(req.settings, {
+                    bookingId,
+                    name:        row.get('Client Name'),
+                    email:       row.get('Client Email'),
+                    phone:       row.get('Client Phone'),
+                    address:     row.get('Client Address'),
+                    services:    row.get('Service Names'),
+                    date:        row.get('Date'),
+                    time:        row.get('Time'),
+                    totalAmount: row.get('Total Amount (R)'),
+                    deposit:     row.get('Deposit Amount (R)'),
+                    balance:     row.get('Balance Due (R)'),
+                });
+                if (calId) { row.set('Calendar Event ID', calId); await row.save(); }
+            }
 
             if (prev !== 'Confirmed') {
                 sendAdminDepositNotification(req.settings, {
