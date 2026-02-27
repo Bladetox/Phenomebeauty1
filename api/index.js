@@ -529,8 +529,10 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
     // ── Verify Yoco webhook signature via Svix ──────────────────────────
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
 
+    // Always log headers so we can debug signature issues
+    console.log('Webhook headers:', JSON.stringify(req.headers));
+
     if (webhookSecret) {
-        console.log('Webhook headers:', JSON.stringify(req.headers));
         try {
             const rawBody = req.rawBody
                 ? req.rawBody.toString('utf8')
