@@ -331,3 +331,55 @@ async function sendBalanceRequestEmail(s, b) {
 // 4. Rebook / thank-you email (after full balance paid)
 // =============================================================================
 
+
+async function sendRebookEmail(s, b) {
+    const transporter = createTransporter(s);
+    const adminEmail = s.admin_email || s.adminemail || '';
+    if (!transporter || !b.email) return;
+
+    const firstName = (b.name || '').split(/\s+/)[0] || '';
+    const reviewHtml = emailReviewBlock(s,
+        `We'd love to hear about your experience, ${firstName}. Your feedback helps us grow.`
+    );
+
+    try {
+        await transporter.sendMail({
+            from:    `"PhenomeBeauty" <${(s.smtp_user || s.smtpuser || adminEmail)}>`,
+            to:      b.email,
+            subject: `🤍 Thank you ${firstName} — you're fully paid!`,
+            html: emailWrap(
+                emailHeader(
+                    '🌸',
+                    `All done, ${firstName}!`,
+                    'Your booking is fully paid. Thank you for choosing PhenomeBeauty.',
+                    'linear-gradient(135deg,#c5a880,#a68864)'
+                ),
+                `
+                <p style="font-size:14px;line-height:1.7;color:rgba(248,250,252,0.9);margin:0 0 20px;">
+                  Hi <strong>${firstName}</strong>,<br><br>
+                  Your balance has been received — you are fully paid. We hope you enjoyed your experience and look forward to seeing you again.
+                </p>
+                <div style="background:rgba(197,168,128,0.08);border:1px solid rgba(197,168,128,0.25);border-radius:14px;padding:16px 20px;margin-bottom:18px;">
+                  <table style="width:100%;border-collapse:collapse;">
+                    ${emailRow('Services', b.services || '')}
+                    ${emailRow('Total Paid', `<strong style="color:#c5a880;">R${Number(b.total || 0).toFixed(2)}</strong>`)}
+                    ${emailRow('Booking Ref', b.bookingId)}
+                  </table>
+                </div>
+                ${reviewHtml}
+                `
+            ),
+        });
+        console.log('Rebook email sent to', b.email);
+    } catch (e) {
+        console.error('Rebook email error:', e.message);
+    }
+}
+
+module.exports = {
+    sendAdminDepositNotification,
+    sendAdminBalancePaidNotification,
+    sendCustomerConfirmationEmail,
+    sendBalanceRequestEmail,
+    sendRebookEmail,
+};
