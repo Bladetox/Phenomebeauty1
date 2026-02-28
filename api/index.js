@@ -636,27 +636,29 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
 
             const settings = await getSettings(doc);
 
-            sendRebookEmail(settings, {
-                bookingId,
-                name:     row.get('Client Name'),
-                email:    row.get('Client Email'),
-                total:    row.get('Total Amount (R)'),
-                services: row.get('Service Names'),
-            }).catch((e) => console.error('Rebook email error:', e.message));
+            await Promise.all([
+                sendRebookEmail(settings, {
+                    bookingId,
+                    name:     row.get('Client Name'),
+                    email:    row.get('Client Email'),
+                    total:    row.get('Total Amount (R)'),
+                    services: row.get('Service Names'),
+                }).then(() => console.log('Rebook email sent')).catch((e) => console.error('Rebook email error:', e.message)),
 
-            sendAdminBalancePaidNotification(settings, {
-                bookingId,
-                name:        row.get('Client Name'),
-                email:       row.get('Client Email'),
-                phone:       row.get('Client Phone'),
-                address:     row.get('Client Address'),
-                services:    row.get('Service Names'),
-                date:        row.get('Date'),
-                time:        row.get('Time'),
-                totalAmount: row.get('Total Amount (R)'),
-                deposit:     row.get('Deposit Amount (R)'),
-                balance:     row.get('Balance Due (R)'),
-            }).catch((e) => console.error('Admin balance-paid email error:', e.message));
+                sendAdminBalancePaidNotification(settings, {
+                    bookingId,
+                    name:        row.get('Client Name'),
+                    email:       row.get('Client Email'),
+                    phone:       row.get('Client Phone'),
+                    address:     row.get('Client Address'),
+                    services:    row.get('Service Names'),
+                    date:        row.get('Date'),
+                    time:        row.get('Time'),
+                    totalAmount: row.get('Total Amount (R)'),
+                    deposit:     row.get('Deposit Amount (R)'),
+                    balance:     row.get('Balance Due (R)'),
+                }).then(() => console.log('Admin balance-paid email sent')).catch((e) => console.error('Admin balance-paid email error:', e.message)),
+            ]);
 
             return res.status(200).json({ received: true });
         }
@@ -941,70 +943,6 @@ app.post('/api/admin/update-status', adminOnly, async (req, res) => {
                     deposit:  row.get('Deposit Amount (R)'),
                     balance:  row.get('Balance Due (R)'),
                 }).catch(() => {});
-            }
-        }
-
-        // ── Service Complete: generate balance link + email customer ──────────
-        if (status === 'Service Complete' && prev !== 'Service Complete') {
-            const bal = parseFloat((row.get('Balance Due (R)') || '').replace(/[R\s]/g, '')) || 0;
-            if (bal >= 2 && row.get('Balance Status') !== 'Paid' && row.get('Balance Status') !== 'Requested') {
-                const s    = req.settings;
-                const base = s.app_base_url || 'http://localhost:3000';
-                const sUrl = `${base}/thankyou.html?balance=true&ref=${bookingId}`;
-                const cUrl = `${base}/??payment=cancelled&ref=${bookingId}`;
-                const slug = (s.yoco_payment_page_slug || '').replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
-                const np   = (row.get('Client Name') || '').split(/\s+/);
-                let paymentUrl = null;
-
-                if (s.yoco_secret_key) {
-                    const { ok, data } = await yocoCheckout({
-                        key:        s.yoco_secret_key,
-                        cents:      Math.round(bal * 100),
-                        successUrl: sUrl,
-                        cancelUrl:  cUrl,
-                        customer:   { email: row.get('Client Email') || '', firstName: np[0] || '', lastName: np.slice(1).join(' ') || '', phone: row.get('Client Phone') || '' },
-                        metadata:   { bookingId, type: 'balance' },
-                        desc:       `PhenomeBeauty balance — ${row.get('Service Names')}`,
-                    });
-                    if (ok && data.redirectUrl) paymentUrl = data.redirectUrl;
-                }
-
-                if (!paymentUrl && slug) {
-                    const p = new URLSearchParams({
-                        amount:                   bal.toFixed(2),
-                        reference:                `${bookingId}-BAL`,
-                        firstName:                np[0] || '',
-                        lastName:                 np.slice(1).join(' ') || '',
-                        email:                    row.get('Client Email') || '',
-                        redirectOnPaymentSuccess: sUrl,
-                    });
-                    paymentUrl = `https://pay.yoco.com/${slug}?${p}`;
-                }
-
-                if (paymentUrl) {
-                    row.set('Balance Status', 'Requested');
-                    row.set('Yoco Link',      paymentUrl);
-                    await row.save();
-
-        sendBalanceRequestEmail(s, {
-            bookingId,
-            name:       row.get('Client Name'),
-            email:      row.get('Client Email'),
-            services:   row.get('Service Names'),
-            deposit:    row.get('Deposit Amount (R)'),
-            balance:    bal.toFixed(2),
-            paymentUrl: paymentUrl,
-        }).catch((e) => console.error('Balance request email error:', e.message));
-                    sendBalanceRequestEmail(req.settings, {
-                        bookingId,
-                        name:       row.get('Client Name'),
-                        email:      row.get('Client Email'),
-                        services:   row.get('Service Names'),
-                        deposit:    row.get('Deposit Amount (R)'),
-                        balance:    bal,
-                        paymentUrl,
-                    }).catch(() => {});
-                }
             }
         }
 
