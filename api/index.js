@@ -342,12 +342,20 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         // ── Input validation ─────────────────────────────────────────────────
         const cleanName  = sanitize(name,    80);
         const cleanEmail = sanitize(email,  120);
-        const cleanPhone = String(phone || '').replace(/\D/g, '').slice(0, 15);
+        // Normalize phone: strip formatting, handle leading zero + country code
+        let cleanPhone = String(phone || '').replace(/[\s\-().]/g, '');
+        // Remove (0) after country code e.g. +27(0)82 → +2782
+        cleanPhone = cleanPhone.replace(/^(\+\d{1,3})(0)/, '$1');
+        // If no country code, strip leading zero and prepend +27
+        if (!cleanPhone.startsWith('+')) {
+            cleanPhone = '+27' + cleanPhone.replace(/^0/, '');
+        }
+        cleanPhone = cleanPhone.slice(0, 16);
         const cleanAddr  = sanitize(address, 200);
         const cleanSrc   = sanitize(source,   50);
 
         if (cleanName.length < 2)                                              return res.status(400).json({ error: 'Invalid name' });
-        if (!/^[+]?[\d\s\-().]{7,20}$/.test(cleanPhone))                    return res.status(400).json({ error: 'Invalid phone number' });
+        if (!/^\+\d{7,15}$/.test(cleanPhone))                                 return res.status(400).json({ error: 'Invalid phone number' });
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail))               return res.status(400).json({ error: 'Invalid email' });
         if (cleanAddr.length < 5)                                              return res.status(400).json({ error: 'Invalid address' });
         if (!Array.isArray(services) || services.length === 0)                return res.status(400).json({ error: 'No services selected' });

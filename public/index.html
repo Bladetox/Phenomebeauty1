@@ -968,7 +968,26 @@
       .skel-line {
         height:10px;border-radius:5px;background:rgba(255,255,255,0.06);margin-bottom:8px;
       }
-    </style>
+    
+      .phone-wrap { display: flex; gap: 0; }
+      .phone-country-select {
+        border: 1.5px solid var(--border, #ddd);
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        background: var(--surface, #f9f9f9);
+        padding: 0 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        outline: none;
+        min-width: 90px;
+        height: 100%;
+      }
+      .phone-wrap .has-country {
+        border-radius: 0 10px 10px 0 !important;
+        flex: 1;
+      }
+
+      </style>
   </head>
   <body>
     <div class="app-frame">
@@ -1082,14 +1101,26 @@
                 </div>
                 <div class="form-group">
                   <label for="client-phone">Phone Number</label>
-                  <div class="input-wrap">
-                    <span class="input-icon">📱</span>
-                    <input type="tel" id="client-phone" class="has-icon"
-                           placeholder="082 123 4567" autocomplete="tel"
-                           inputmode="tel" maxlength="12"
+                  <div class="input-wrap phone-wrap">
+                    <select id="phone-country" class="phone-country-select" onchange="formatPhone(document.getElementById('client-phone'))">
+                      <option value="+27" data-flag="🇿🇦">🇿🇦 +27</option>
+                      <option value="+1"  data-flag="🇺🇸">🇺🇸 +1</option>
+                      <option value="+44" data-flag="🇬🇧">🇬🇧 +44</option>
+                      <option value="+61" data-flag="🇦🇺">🇦🇺 +61</option>
+                      <option value="+64" data-flag="🇳🇿">🇳🇿 +64</option>
+                      <option value="+49" data-flag="🇩🇪">🇩🇪 +49</option>
+                      <option value="+33" data-flag="🇫🇷">🇫🇷 +33</option>
+                      <option value="+31" data-flag="🇳🇱">🇳🇱 +31</option>
+                      <option value="+971" data-flag="🇦🇪">🇦🇪 +971</option>
+                      <option value="+91" data-flag="🇮🇳">🇮🇳 +91</option>
+                      <option value="+other" data-flag="🌍">🌍 Other</option>
+                    </select>
+                    <input type="tel" id="client-phone" class="has-country"
+                           placeholder="82 123 4567" autocomplete="tel"
+                           inputmode="tel" maxlength="20"
                            oninput="formatPhone(this)">
                   </div>
-                  <div class="field-hint">SA mobile number — e.g. 082 123 4567</div>
+                  <div class="field-hint">e.g. 082 123 4567 or +44 7911 123456</div>
                 </div>
                 <div class="form-group">
                   <label for="client-email">Email Address</label>
@@ -1763,19 +1794,41 @@
           const phone = document.getElementById('client-phone').value.replace(/\D/g,'');
           const email = document.getElementById('client-email').value.trim();
           const addr  = document.getElementById('client-address').value.trim();
-          btn.disabled = name.length < 2 || !/^[+]?[\d\s\-().]{7,20}$/.test(phone) ||
+          btn.disabled = name.length < 2 || (() => { const d = normalizePhone().replace(/\D/g,''); return d.length < 7 || d.length > 15; })() ||
                          !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || addr.length < 5 || !safetyComplete();
         } else { btn.disabled = false; }
       }
 
       // ── PHONE / EMAIL ───────────────────────────────────────────────────────
+      function normalizePhone() {
+        const select = document.getElementById('phone-country');
+        const input  = document.getElementById('client-phone');
+        const countryCode = select ? select.value : '+27';
+        // Strip everything except digits and leading +
+        let raw = input.value.replace(/[\s\-().]/g, '');
+        // Remove leading zeros after country code e.g. +27(0)82 → +2782
+        // If user typed full number with country code, use as-is
+        if (raw.startsWith('+')) {
+          // Remove (0) pattern: +27082 → +2782
+          raw = raw.replace(/^(\+\d{1,3})(0)/, '$1');
+          return raw;
+        }
+        // Remove leading zero then prepend country code
+        raw = raw.replace(/^0/, '');
+        return countryCode + raw;
+      }
+
       function formatPhone(input) {
-        let d = input.value.replace(/\D/g,'').slice(0,10);
-        input.value = d.length > 6 ? d.slice(0,3)+' '+d.slice(3,6)+' '+d.slice(6)
-                    : d.length > 3 ? d.slice(0,3)+' '+d.slice(3) : d;
-        const ok = /^0\d{9}$/.test(d);
+        if (!input) input = document.getElementById('client-phone');
+        // Allow digits, spaces, hyphens, parens, plus
+        let val = input.value.replace(/[^\d\s\-().+]/g, '');
+        input.value = val;
+        const normalized = normalizePhone();
+        // Valid if normalized is 7-15 digits (after stripping non-digits)
+        const digitsOnly = normalized.replace(/\D/g, '');
+        const ok = digitsOnly.length >= 7 && digitsOnly.length <= 15;
         input.classList.toggle('input-valid', ok);
-        input.classList.toggle('input-error', d.length === 10 && !ok);
+        input.classList.toggle('input-error', val.length > 4 && !ok);
         updateNextBtn();
       }
       function validateEmail(input) {
