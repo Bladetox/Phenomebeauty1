@@ -537,15 +537,34 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
             const rawBody = req.rawBody
                 ? req.rawBody.toString('utf8')
                 : JSON.stringify(req.body);
-            const yocoSig = (req.headers['x-yoco-signature'] || req.headers['webhook-signature'] || '').replace(/^v1,/, '').split(' ')[0];
-            if (yocoSig) {
-                const expected = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
-                const eBuf = Buffer.from(expected);
-                const sBuf = Buffer.from(yocoSig.padEnd(expected.length, '0').slice(0, expected.length));
-                if (!crypto.timingSafeEqual(eBuf, sBuf)) {
-                    console.error('Webhook signature mismatch');
-                    return res.status(401).json({ error: 'Invalid signature' });
-                }
+
+            // Svix signs: "{webhook-id}.{webhook-timestamp}.{body}"
+            const msgId        = req.headers['webhook-id'] || '';
+            const msgTimestamp = req.headers['webhook-timestamp'] || '';
+            const sigHeader    = req.headers['webhook-signature'] || '';
+
+            // Secret may be raw or whsec_ prefixed — decode to bytes either way
+            const secretStr = webhookSecret.startsWith('whsec_')
+                ? webhookSecret.slice(6)
+                : Buffer.from(webhookSecret).toString('base64');
+            const secretBytes = Buffer.from(secretStr, 'base64');
+
+            const toSign  = `${msgId}.${msgTimestamp}.${rawBody}`;
+            const expected = crypto.createHmac('sha256', secretBytes).update(toSign).digest('base64');
+
+            // webhook-signature may contain multiple space-separated "v1,<sig>" values
+            const sigs = sigHeader.split(' ').map(s => s.replace(/^v1,/, ''));
+            const matched = sigs.some(sig => {
+                try {
+                    const eBuf = Buffer.from(expected);
+                    const sBuf = Buffer.from(sig);
+                    return eBuf.length === sBuf.length && crypto.timingSafeEqual(eBuf, sBuf);
+                } catch { return false; }
+            });
+
+            if (!matched) {
+                console.error('Webhook signature mismatch');
+                return res.status(401).json({ error: 'Invalid signature' });
             }
             console.log('Webhook: signature verified ✓');
         } catch (err) {
