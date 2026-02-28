@@ -347,7 +347,7 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         const cleanSrc   = sanitize(source,   50);
 
         if (cleanName.length < 2)                                              return res.status(400).json({ error: 'Invalid name' });
-        if (!/^0\d{9}$/.test(cleanPhone))                                     return res.status(400).json({ error: 'Invalid phone number' });
+        if (!/^[+]?[\d\s\-().]{7,20}$/.test(cleanPhone))                    return res.status(400).json({ error: 'Invalid phone number' });
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail))               return res.status(400).json({ error: 'Invalid email' });
         if (cleanAddr.length < 5)                                              return res.status(400).json({ error: 'Invalid address' });
         if (!Array.isArray(services) || services.length === 0)                return res.status(400).json({ error: 'No services selected' });

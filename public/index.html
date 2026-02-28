@@ -1860,7 +1860,7 @@
         const email = document.getElementById('client-email').value.trim();
         const addr  = document.getElementById('client-address').value.trim();
         if (name.length < 2)                       { showToast('Please enter your full name', true);            return false; }
-        if (!/^0\d{9}$/.test(phone))               { showToast('Enter a valid 10-digit SA phone number', true); return false; }
+        if (!/^[+]?[\d\s\-().]{7,20}$/.test(phone.replace(/\s/g,''))) { showToast('Enter a valid phone number', true); return false; }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showToast('Enter a valid email address', true);    return false; }
         if (addr.length < 5)                       { showToast('Please enter your full address', true);         return false; }
         return true;
