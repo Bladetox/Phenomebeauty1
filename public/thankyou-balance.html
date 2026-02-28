@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You — PhenomeBeauty</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --obsidian:   #04040a;
+        --void:       #070710;
+        --onyx:       #0d0d1a;
+        --text-pri:   rgba(255,255,255,0.94);
+        --text-sec:   rgba(255,255,255,0.60);
+        --text-ter:   rgba(255,255,255,0.38);
+        --r-card:     28px;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: 'Jost', system-ui, sans-serif;
+        color: var(--text-pri);
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse at 15% 5%,  rgba(100, 60,220,0.80) 0%, transparent 36%),
+          radial-gradient(ellipse at 85% 4%,  rgba(65,  35,165,0.70) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 52%, rgba(50,  25,130,0.60) 0%, transparent 42%),
+          radial-gradient(ellipse at 8%  94%, rgba(80,  45,175,0.65) 0%, transparent 34%),
+          radial-gradient(ellipse at 92% 92%, rgba(58,  28,130,0.60) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 50%, rgba(18,  10, 55,0.92) 0%, transparent 66%),
+          var(--obsidian);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .shell {
+        width: 100%;
+        max-width: 480px;
+        background: rgba(255,255,255,0.10);
+        backdrop-filter: blur(72px) saturate(200%);
+        -webkit-backdrop-filter: blur(72px) saturate(200%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.20) inset,
+          0 1px 0 rgba(255,255,255,0.14) inset,
+          0 0 0 0.5px rgba(255,255,255,0.06),
+          0 28px 80px rgba(0,0,0,0.70),
+          0 4px 16px rgba(0,0,0,0.50);
+        border-radius: var(--r-card);
+        padding: 48px 32px;
+        position: relative;
+        overflow: hidden;
+      }
+      .shell::before {
+        content: '';
+        position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+        background: linear-gradient(90deg,
+          transparent,
+          rgba(255,255,255,0.45) 30%,
+          rgba(255,255,255,0.80) 50%,
+          rgba(255,255,255,0.45) 70%,
+          transparent);
+        border-radius: 99px;
+      }
+      .shell::after {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+        pointer-events: none;
+      }
+      .logo-box {
+        width: 82px; height: 82px;
+        margin: 0 auto 20px;
+        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
+        border-radius: 23px;
+        display: flex; align-items: center; justify-content: center;
+        position: relative;
+        box-shadow: 0 0 0 0.5px rgba(255,255,255,0.08) inset, 0 8px 28px rgba(0,0,0,0.60);
+      }
+      .logo-box::before {
+        content: '';
+        position: absolute; inset: -1px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+        border-radius: 23px; pointer-events: none;
+      }
+      .brand-tag {
+        margin-top: 14px;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; letter-spacing: 0.36em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.70);
+        font-weight: 800; text-align: center; margin-bottom: 8px;
+      }
+      h1 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 34px; font-weight: 400;
+        color: var(--text-pri); text-align: center;
+        margin-bottom: 12px; letter-spacing: 0.01em;
+      }
+      .subtitle {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 16px; font-style: italic; font-weight: 300;
+        color: var(--text-sec); text-align: center;
+        margin-bottom: 32px; line-height: 1.6;
+      }
+      .message {
+        font-family: 'Jost', sans-serif;
+        font-size: 14px; line-height: 1.85;
+        color: var(--text-sec); text-align: center;
+        margin-bottom: 28px; font-weight: 400;
+      }
+      .review-card {
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        border-radius: 18px;
+        padding: 24px 20px;
+        margin-bottom: 28px;
+        text-align: center;
+      }
+      .review-card p {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 15px; font-style: italic; font-weight: 300;
+        color: var(--text-sec); line-height: 1.85;
+        margin-bottom: 20px;
+      }
+      .btn {
+        display: inline-block;
+        background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+        border: 0.5px solid rgba(255,255,255,0.25);
+        color: var(--text-pri);
+        padding: 12px 28px;
+        border-radius: 999px;
+        font-family: 'Jost', sans-serif;
+        font-size: 13px; font-weight: 600;
+        text-decoration: none;
+        letter-spacing: 0.04em;
+        transition: background 0.2s;
+      }
+      .btn-review {
+        background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        border: none;
+        margin-bottom: 12px;
+      }
+      .closing {
+        font-family: 'Jost', sans-serif;
+        font-size: 14px; line-height: 1.85;
+        color: var(--text-sec); text-align: center;
+        margin-bottom: 16px; font-weight: 400;
+      }
+      .signature {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 22px; font-style: italic;
+        color: rgba(220,200,255,0.90);
+        text-align: center; margin-top: 8px;
+      }
+      .divider {
+        width: 32px; height: 0.5px; margin: 24px auto;
+        background: linear-gradient(90deg,transparent,rgba(255,255,255,0.40),transparent);
+      }
+      .rebook-wrap { text-align: center; margin-top: 24px; }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <div class="logo-box">
+            <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty" style="width:100%;height:100%;object-fit:cover;border-radius:23px;">
+        </div>
+        <div class="brand-tag">MOBILE BEAUTY STUDIO</div>
+
+        <h1>Thank you, love 💛</h1>
+        <p class="subtitle">Thank you for letting me into your sanctuary today.</p>
+
+        <p class="message">
+            I'm honored you chose me as your self-care partner.
+        </p>
+
+        <div class="review-card">
+            <p>
+                As mothers, sisters, daughters, we know how easily we put ourselves last.
+                By sharing your experience on Google, you help other women remember they matter too.
+                Your words might be exactly what they need to hear.
+            </p>
+            <a id="review-btn" class="btn btn-review" href="#" target="_blank" rel="noopener">
+                Share your experience ✨
+            </a>
+        </div>
+
+        <p class="closing">
+            Consistency is how we grow, inside and out.<br>
+            Now go ahead and honor yourself in the same way.
+        </p>
+
+        <div class="divider"></div>
+
+        <div class="rebook-wrap">
+            <a href="/" class="btn">
+                Book your next girl time 💜
+            </a>
+        </div>
+
+        <p class="signature" style="margin-top:32px;">Toodles 💜</p>
+    </div>
+
+    <script>
+        // Pull google review URL from config
+        fetch('/api?action=getConfig')
+            .then(r => r.json())
+            .then(cfg => {
+                const url = cfg.googlereviewurl || cfg.google_review_url || '';
+                if (url) {
+                    document.getElementById('review-btn').href = url;
+                } else {
+                    document.getElementById('review-btn').style.display = 'none';
+                }
+            })
+            .catch(() => {});
+    </script>
+</body>
+</html>
