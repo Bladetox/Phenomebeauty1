@@ -654,13 +654,15 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
         }
 
         // ── Deposit payment branch ────────────────────────────────────────────
-        if (row.get('Deposit Status') === 'Confirmed') {
+        const incomingPaymentId = payment.id || '';
+        if (row.get('Deposit Status') === 'Confirmed' ||
+            (incomingPaymentId && row.get('Yoco Checkout ID') === incomingPaymentId)) {
             console.log(`Webhook: deposit already confirmed for ${bookingId} — idempotent skip`);
             return res.status(200).json({ received: true });
         }
 
         row.set('Deposit Status',   'Confirmed');
-        row.set('Yoco Checkout ID', payment.id || row.get('Yoco Checkout ID') || '');
+        row.set('Yoco Checkout ID', incomingPaymentId || row.get('Yoco Checkout ID') || '');
         await row.save();
         console.log(`Webhook: deposit confirmed for ${bookingId}`);
 
