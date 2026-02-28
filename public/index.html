@@ -1763,7 +1763,7 @@
           const phone = document.getElementById('client-phone').value.replace(/\D/g,'');
           const email = document.getElementById('client-email').value.trim();
           const addr  = document.getElementById('client-address').value.trim();
-          btn.disabled = name.length < 2 || !/^0\d{9}$/.test(phone) ||
+          btn.disabled = name.length < 2 || !/^[+]?[\d\s\-().]{7,20}$/.test(phone) ||
                          !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || addr.length < 5 || !safetyComplete();
         } else { btn.disabled = false; }
       }
