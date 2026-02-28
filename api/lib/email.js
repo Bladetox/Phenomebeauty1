@@ -338,35 +338,47 @@ async function sendRebookEmail(s, b) {
     if (!transporter || !b.email) return;
 
     const firstName = (b.name || '').split(/\s+/)[0] || '';
-    const reviewHtml = emailReviewBlock(s,
-        `We'd love to hear about your experience, ${firstName}. Your feedback helps us grow.`
-    );
+    const reviewUrl  = s.googlereviewurl || s.google_review_url || '';
+    const bookingUrl = (s.app_base_url || 'https://phenomebeauty1.vercel.app') + '/';
+
+    const reviewBlock = reviewUrl ? `
+        <div style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.12);border-radius:18px;padding:24px 20px;margin:24px 0;text-align:center;">
+          <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;line-height:1.85;color:rgba(255,255,255,0.75);margin:0 0 20px;">
+            As mothers, sisters, daughters, we know how easily we put ourselves last. By sharing your experience on Google, you help other women remember they matter too. Your words might be exactly what they need to hear.
+          </p>
+          <a href="${reviewUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;padding:12px 28px;border-radius:999px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:0.03em;">
+            Share your experience ✨
+          </a>
+        </div>` : '';
 
     try {
         await transporter.sendMail({
             from:    `"PhenomeBeauty" <${(s.smtp_user || s.smtpuser || adminEmail)}>`,
             to:      b.email,
-            subject: `🤍 Thank you ${firstName} — you're fully paid!`,
+            subject: `💛 Thank you for letting me into your sanctuary, ${firstName}`,
             html: emailWrap(
                 emailHeader(
-                    '🌸',
-                    `All done, ${firstName}!`,
-                    'Your booking is fully paid. Thank you for choosing PhenomeBeauty.',
-                    'linear-gradient(135deg,#c5a880,#a68864)'
+                    '💛',
+                    `Thank you, ${firstName}`,
+                    'Thank you for letting me into your sanctuary today.',
+                    'linear-gradient(135deg,#6d28d9,#4338ca)'
                 ),
                 `
-                <p style="font-size:14px;line-height:1.7;color:rgba(248,250,252,0.9);margin:0 0 20px;">
-                  Hi <strong>${firstName}</strong>,<br><br>
-                  Your balance has been received — you are fully paid. We hope you enjoyed your experience and look forward to seeing you again.
+                <p style="font-size:14px;line-height:1.85;color:rgba(248,250,252,0.85);margin:0 0 8px;text-align:center;">
+                  I'm honored you chose me as your self-care partner.
                 </p>
-                <div style="background:rgba(197,168,128,0.08);border:1px solid rgba(197,168,128,0.25);border-radius:14px;padding:16px 20px;margin-bottom:18px;">
-                  <table style="width:100%;border-collapse:collapse;">
-                    ${emailRow('Services', b.services || '')}
-                    ${emailRow('Total Paid', `<strong style="color:#c5a880;">R${Number(b.total || 0).toFixed(2)}</strong>`)}
-                    ${emailRow('Booking Ref', b.bookingId)}
-                  </table>
+                ${reviewBlock}
+                <p style="font-size:14px;line-height:1.85;color:rgba(248,250,252,0.75);margin:20px 0 8px;text-align:center;">
+                  Consistency is how we grow, inside and out. Now go ahead and honor yourself in the same way.
+                </p>
+                <div style="text-align:center;margin:24px 0;">
+                  <a href="${bookingUrl}" style="display:inline-block;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.20);color:rgba(255,255,255,0.90);padding:12px 28px;border-radius:999px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:0.03em;">
+                    Book your next girl time 💜
+                  </a>
                 </div>
-                ${reviewHtml}
+                <p style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:rgba(220,200,255,0.90);text-align:center;margin-top:28px;">
+                  Toodles 💜
+                </p>
                 `
             ),
         });
