@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Date With Yourself — PhenomeBeauty</title>
+    <title>Thank You — PhenomeBeauty</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,9 +17,7 @@
         --text-ter:   rgba(255,255,255,0.38);
         --r-card:     28px;
       }
-      
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      
       body {
         font-family: 'Jost', system-ui, sans-serif;
         color: var(--text-pri);
@@ -37,7 +35,6 @@
         justify-content: center;
         padding: 20px;
       }
-      
       .shell {
         width: 100%;
         max-width: 480px;
@@ -55,7 +52,6 @@
         position: relative;
         overflow: hidden;
       }
-      
       .shell::before {
         content: '';
         position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
@@ -67,184 +63,102 @@
           transparent);
         border-radius: 99px;
       }
-      
       .shell::after {
         content: '';
         position: absolute; top: 0; left: 0; right: 0; bottom: 0;
         background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
         pointer-events: none;
       }
-      
       .logo-box {
-        width: 82px;
-        height: 82px;
+        width: 82px; height: 82px;
         margin: 0 auto 20px;
         background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
         border-radius: 23px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         position: relative;
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.08) inset,
-          0 8px 28px rgba(0,0,0,0.60);
+        box-shadow: 0 0 0 0.5px rgba(255,255,255,0.08) inset, 0 8px 28px rgba(0,0,0,0.60);
       }
-      
       .logo-box::before {
         content: '';
-        position: absolute;
-        inset: -1px;
+        position: absolute; inset: -1px;
         background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
-        border-radius: 23px;
-        pointer-events: none;
+        border-radius: 23px; pointer-events: none;
       }
-      
-      .logo-text {
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 34px;
-        font-weight: 300;
-        color: rgba(255,255,255,0.95);
-        position: relative;
-        z-index: 1;
-      }
-      
       .brand-tag {
         margin-top: 14px;
         font-family: 'Jost', sans-serif;
-        font-size: 10px;
-        letter-spacing: 0.36em;
+        font-size: 10px; letter-spacing: 0.36em;
         text-transform: uppercase;
         color: rgba(255,255,255,0.70);
-        font-weight: 800;
-        text-align: center;
-        margin-bottom: 8px;
+        font-weight: 800; text-align: center; margin-bottom: 8px;
       }
-      
       h1 {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 34px;
-        font-weight: 400;
-        color: var(--text-pri);
-        text-align: center;
-        margin-bottom: 12px;
-        letter-spacing: 0.01em;
+        font-size: 34px; font-weight: 400;
+        color: var(--text-pri); text-align: center;
+        margin-bottom: 12px; letter-spacing: 0.01em;
       }
-      
       .subtitle {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 16px;
-        font-style: italic;
-        font-weight: 300;
-        color: var(--text-sec);
-        text-align: center;
-        margin-bottom: 32px;
-        line-height: 1.6;
+        font-size: 16px; font-style: italic; font-weight: 300;
+        color: var(--text-sec); text-align: center;
+        margin-bottom: 32px; line-height: 1.6;
       }
-      
       .message {
         font-family: 'Jost', sans-serif;
-        font-size: 14px;
-        line-height: 1.85;
-        color: var(--text-sec);
-        text-align: center;
-        margin-bottom: 36px;
-        font-weight: 400;
+        font-size: 14px; line-height: 1.85;
+        color: var(--text-sec); text-align: center;
+        margin-bottom: 28px; font-weight: 400;
       }
-      
-      .details-card {
+      .review-card {
         background: rgba(255,255,255,0.06);
         border: 0.5px solid rgba(255,255,255,0.12);
         border-radius: 18px;
         padding: 24px 20px;
-        margin-bottom: 32px;
-      }
-      
-      .details-title {
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 18px;
-        font-weight: 400;
-        color: var(--text-pri);
-        margin-bottom: 20px;
+        margin-bottom: 28px;
         text-align: center;
       }
-      
-      .detail-row {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        margin-bottom: 18px;
-        font-size: 13px;
-        line-height: 1.7;
+      .review-card p {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 15px; font-style: italic; font-weight: 300;
+        color: var(--text-sec); line-height: 1.85;
+        margin-bottom: 20px;
       }
-      
-      .detail-row:last-child { margin-bottom: 0; }
-      
-      .detail-icon {
-        font-size: 16px;
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
-      
-      .detail-content {
-        flex: 1;
-      }
-      
-      .detail-label {
-        font-family: 'Jost', sans-serif;
-        font-weight: 600;
+      .btn {
+        display: inline-block;
+        background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+        border: 0.5px solid rgba(255,255,255,0.25);
         color: var(--text-pri);
-        margin-bottom: 4px;
-        font-size: 12px;
-        letter-spacing: 0.02em;
-      }
-      
-      .detail-value {
+        padding: 12px 28px;
+        border-radius: 999px;
         font-family: 'Jost', sans-serif;
-        color: var(--text-sec);
-        font-weight: 400;
+        font-size: 13px; font-weight: 600;
+        text-decoration: none;
+        letter-spacing: 0.04em;
+        transition: background 0.2s;
       }
-      
-      .detail-value strong {
-        color: var(--text-pri);
-        font-weight: 500;
+      .btn-review {
+        background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        border: none;
+        margin-bottom: 12px;
       }
-      
       .closing {
         font-family: 'Jost', sans-serif;
-        font-size: 14px;
-        line-height: 1.85;
-        color: var(--text-sec);
-        text-align: center;
-        margin-bottom: 20px;
-        font-weight: 400;
+        font-size: 14px; line-height: 1.85;
+        color: var(--text-sec); text-align: center;
+        margin-bottom: 16px; font-weight: 400;
       }
-      
       .signature {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 20px;
-        font-style: italic;
+        font-size: 22px; font-style: italic;
         color: rgba(220,200,255,0.90);
-        text-align: center;
-        margin-top: 8px;
+        text-align: center; margin-top: 8px;
       }
-      
       .divider {
-        width: 32px;
-        height: 0.5px;
-        margin: 24px auto;
+        width: 32px; height: 0.5px; margin: 24px auto;
         background: linear-gradient(90deg,transparent,rgba(255,255,255,0.40),transparent);
       }
-      
-      .refresh-note {
-        margin-top: 32px;
-        padding-top: 24px;
-        border-top: 0.5px solid rgba(255,255,255,0.08);
-        font-family: 'Jost', sans-serif;
-        font-size: 11px;
-        color: var(--text-ter);
-        text-align: center;
-        letter-spacing: 0.01em;
-      }
+      .rebook-wrap { text-align: center; margin-top: 24px; }
     </style>
 </head>
 <body>
@@ -253,96 +167,54 @@
             <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty" style="width:100%;height:100%;object-fit:cover;border-radius:23px;">
         </div>
         <div class="brand-tag">MOBILE BEAUTY STUDIO</div>
-        
-        <h1>A date with yourself</h1>
-        <p class="subtitle">I see you choosing you.</p>
-        
+
+        <h1>Thank you, love 💛</h1>
+        <p class="subtitle">Thank you for letting me into your sanctuary today.</p>
+
         <p class="message">
-            I've received your deposit, and your space in my calendar is now officially held. 
-            This isn't just a booking; it's a promise you've made to yourself to pause, and 
-            I am so honored to be the one holding that space for you.
+            I'm honored you chose me as your self-care partner.
         </p>
-        
-        <div class="details-card">
-            <div class="details-title">What happens next</div>
-            
-            <div class="detail-row">
-                <span class="detail-icon">✨</span>
-                <div class="detail-content">
-                    <div class="detail-label">The Arrival</div>
-                    <div class="detail-value" id="arrival-text">
-                        I'll be traveling on <strong id="booking-date">your chosen date</strong> at <strong id="booking-time">your selected time</strong>.
-                    </div>
-                </div>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-icon">🕊️</span>
-                <div class="detail-content">
-                    <div class="detail-label">The Space</div>
-                    <div class="detail-value">
-                        No need to overthink it, just find a spot where you feel most at peace, and I'll handle the rest.
-                    </div>
-                </div>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-icon">💜</span>
-                <div class="detail-content">
-                    <div class="detail-label">The Intent</div>
-                    <div class="detail-value">
-                        Bring nothing but yourself.
-                    </div>
-                </div>
-            </div>
+
+        <div class="review-card">
+            <p>
+                As mothers, sisters, daughters, we know how easily we put ourselves last.
+                By sharing your experience on Google, you help other women remember they matter too.
+                Your words might be exactly what they need to hear.
+            </p>
+            <a id="review-btn" class="btn btn-review" href="#" target="_blank" rel="noopener">
+                Share your experience ✨
+            </a>
         </div>
-        
+
         <p class="closing">
-            We spend so much of our lives pouring into others. Thank you for trusting me to pour back into you.
+            Consistency is how we grow, inside and out.<br>
+            Now go ahead and honor yourself in the same way.
         </p>
-        
-        <p class="closing">
-            I'm looking forward to our time together.
-        </p>
-        
+
         <div class="divider"></div>
-        
-        <p class="closing">
-            Until then, keep choosing yourself in the small moments, too.
-        </p>
-        
-        <p class="signature">Toodles 💜</p>
-        
-        <p class="refresh-note">
-            Refreshing this page will take you back to the booking page.
-        </p>
+
+        <div class="rebook-wrap">
+            <a href="/" class="btn">
+                Looking forward to our next girl time 💜
+            </a>
+        </div>
+
+        <p class="signature" style="margin-top:32px;">Toodles 💜</p>
     </div>
-    
+
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const ref = params.get('ref');
-        
-        if (ref) {
-            fetch('/api/check-payment?ref=' + encodeURIComponent(ref))
-                .then(r => r.json())
-                .then(data => {
-                    if (data.date && data.time) {
-                        document.getElementById('booking-date').textContent = data.date;
-                        document.getElementById('booking-time').textContent = data.time;
-                    }
-                })
-                .catch(() => {
-                    console.log('Could not fetch booking details');
-                });
-        }
-        
-        const hasVisited = sessionStorage.getItem('thankyou-visited-' + ref);
-        
-        if (hasVisited) {
-            window.location.href = '/';
-        } else {
-            sessionStorage.setItem('thankyou-visited-' + ref, 'true');
-        }
+        // Pull google review URL from config
+        fetch('/api?action=getConfig')
+            .then(r => r.json())
+            .then(cfg => {
+                const url = cfg.googlereviewurl || cfg.google_review_url || '';
+                if (url) {
+                    document.getElementById('review-btn').href = url;
+                } else {
+                    document.getElementById('review-btn').style.display = 'none';
+                }
+            })
+            .catch(() => {});
     </script>
 </body>
 </html>
