@@ -293,6 +293,8 @@ async function doLogin(){
   const pwd=document.getElementById('lpwd').value.trim();if(!pwd)return;
   try{
     const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+    const ct=r.headers.get('content-type')||'';
+    if(!ct.includes('application/json')){document.getElementById('lerr').textContent=`Server error (${r.status}) — check Vercel function logs`;return;}
     const d=await r.json();
     if(!r.ok){document.getElementById('lerr').textContent=d.error||'Invalid password';return;}
     token=d.token;sessionStorage.setItem('pbAdminToken',token);showApp();
