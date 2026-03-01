@@ -31,9 +31,46 @@
   --font-b: 'Jost', system-ui, sans-serif;
 }
 
-html,body { height:100%; background:var(--bg); color:var(--t100); font-family:var(--font-b); -webkit-font-smoothing:antialiased; overflow:hidden; }
+html,body { height:100%; background:var(--bg); color:var(--t100); font-family:var(--font-b); -webkit-font-smoothing:antialiased; }
+@media(min-width:641px){ html,body{ overflow:hidden; } }
 
 .app { display:flex; height:100vh; }
+@media(max-width:640px){ .app{ height:auto; min-height:100dvh; flex-direction:column; } }
+
+/* ── LOGIN ── */
+#pg-login {
+  display:flex; align-items:center; justify-content:center;
+  min-height:100dvh; padding:24px;
+  background:var(--bg);
+}
+#pg-login.hidden { display:none; }
+.login-card {
+  width:100%; max-width:360px; padding:36px 30px;
+  background:rgba(255,255,255,0.06); border:0.5px solid var(--border-hi);
+  border-radius:24px; position:relative; overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,0.60);
+}
+.login-card::before {
+  content:''; position:absolute; top:0; left:10%; right:10%; height:0.5px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.40) 50%,transparent);
+}
+.login-logo {
+  width:52px; height:52px; border-radius:16px; overflow:hidden;
+  border:0.5px solid var(--t20); margin:0 auto 20px; display:block;
+}
+.login-logo img { width:100%; height:100%; object-fit:cover; }
+.login-title { font-family:var(--font-d); font-size:26px; font-weight:400; text-align:center; margin-bottom:4px; }
+.login-sub { font-size:9px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--t40); text-align:center; margin-bottom:28px; }
+.login-label { display:block; font-size:9px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--t40); margin-bottom:6px; }
+.login-input { width:100%; height:44px; padding:0 14px; background:var(--t06); border:0.5px solid var(--border); border-radius:11px; color:var(--t100); font-family:var(--font-b); font-size:14px; outline:none; transition:border-color 0.15s; }
+.login-input:focus { border-color:var(--t40); }
+.login-input::placeholder { color:var(--t20); }
+.login-btn { width:100%; height:46px; margin-top:20px; background:var(--t100); color:var(--black); border:none; border-radius:11px; font-family:var(--font-b); font-size:13px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:opacity 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.login-btn:hover { opacity:0.88; }
+.login-btn:disabled { opacity:0.4; cursor:not-allowed; }
+.login-err { margin-top:12px; font-size:11.5px; color:rgba(248,113,113,0.85); text-align:center; display:none; line-height:1.5; }
+.login-spinner { width:16px; height:16px; border-radius:50%; border:2px solid rgba(0,0,0,0.15); border-top-color:var(--black); animation:lspin 0.7s linear infinite; }
+@keyframes lspin { to { transform:rotate(360deg); } }
 
 /* ── SIDEBAR ── */
 .sidebar {
@@ -49,6 +86,64 @@ html,body { height:100%; background:var(--bg); color:var(--t100); font-family:va
   background:linear-gradient(to bottom, transparent, rgba(255,255,255,0.15) 30%, rgba(255,255,255,0.08) 70%, transparent);
 }
 @media(min-width:1024px){ .sidebar{width:220px;align-items:stretch;padding:16px 10px;} }
+
+/* Mobile sidebar */
+.sb-hamburger {
+  display:none; width:36px; height:36px; border-radius:10px;
+  background:var(--t06); border:0.5px solid var(--border);
+  align-items:center; justify-content:center; cursor:pointer;
+  font-size:18px; color:var(--t60); flex-shrink:0;
+}
+@media(max-width:640px){
+  .sb-hamburger { display:flex; }
+  .sidebar {
+    position:fixed; top:0; left:0; bottom:0; z-index:200;
+    transform:translateX(-100%); transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    width:220px !important; align-items:stretch !important; padding:16px 10px !important;
+  }
+  .sidebar.mobile-open { transform:translateX(0); }
+  .sidebar-brand { display:block !important; }
+  .nav-lbl { display:block !important; }
+  .nav-badge { display:inline-block !important; }
+  .sb-overlay {
+    display:none; position:fixed; inset:0; z-index:190;
+    background:rgba(5,5,8,0.65); backdrop-filter:blur(4px);
+  }
+  .sb-overlay.show { display:block; }
+  .app { flex-direction:column; height:auto; min-height:100dvh; }
+  .main { overflow-y:auto; height:auto; }
+  .topbar { position:sticky; top:0; }
+  .detail-panel { width:100vw !important; }
+}
+.loyalty-strip {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;
+}
+@media(max-width:900px){ .loyalty-strip{ grid-template-columns:repeat(2,1fr); } }
+@media(max-width:480px){ .loyalty-strip{ grid-template-columns:repeat(2,1fr); } }
+.lstrip-card {
+  padding:14px 12px; cursor:pointer; transition:border-color 0.15s;
+}
+.lstrip-card:hover { border-color:var(--border-hi); }
+.lstrip-val { font-family:var(--font-d); font-size:28px; font-weight:300; color:var(--t100); line-height:1; }
+.lstrip-val.green { color:var(--green); }
+.lstrip-val.amber { color:var(--amber); }
+.lstrip-val.red   { color:var(--red); }
+.wa-link {
+  display:inline-flex; align-items:center; gap:4px; padding:3px 10px;
+  border-radius:99px; background:rgba(37,211,102,0.10); border:0.5px solid rgba(37,211,102,0.22);
+  color:rgba(37,211,102,0.85); font-size:10px; font-weight:700; text-decoration:none; transition:all 0.14s;
+}
+.wa-link:hover { background:rgba(37,211,102,0.20); }
+.loyalty-filter { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px; }
+.loyalty-table { width:100%; border-collapse:collapse; min-width:540px; }
+.loyalty-table th { text-align:left; padding:9px 12px; font-size:9px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--t40); border-bottom:0.5px solid var(--border); white-space:nowrap; }
+.loyalty-table td { padding:11px 12px; font-size:12px; color:var(--t80); border-bottom:0.5px solid var(--t06); vertical-align:middle; }
+.loyalty-table tr:last-child td { border-bottom:none; }
+.loyalty-table tr:hover td { background:rgba(255,255,255,0.02); }
+.l-ontrack { background:rgba(74,222,128,0.10); color:var(--green); border:0.5px solid rgba(74,222,128,0.22); }
+.l-overdue { background:rgba(248,113,113,0.10); color:var(--red); border:0.5px solid rgba(248,113,113,0.22); }
+.l-ttbook  { background:rgba(251,191,36,0.10); color:var(--amber); border:0.5px solid rgba(251,191,36,0.22); }
+.l-pill { font-size:9.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:3px 9px; border-radius:99px; white-space:nowrap; }
 
 .sidebar-logo-wrap {
   display:flex; align-items:center; gap:10px;
@@ -416,7 +511,28 @@ html,body { height:100%; background:var(--bg); color:var(--t100); font-family:va
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- ══ LOGIN ══ -->
+<div id="pg-login">
+  <div class="login-card">
+    <div class="login-logo"><img src="https://iili.io/fpiAjBj.jpg" alt="PB"></div>
+    <h1 class="login-title">Admin Portal</h1>
+    <p class="login-sub">PhenomeBeauty Studio</p>
+    <div>
+      <label class="login-label" for="l-pass">Password</label>
+      <input type="password" id="l-pass" class="login-input" placeholder="Enter admin password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" id="l-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="l-err"></div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div class="app" id="pg-app" style="display:none;">
+
+<!-- Mobile sidebar overlay -->
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
@@ -425,18 +541,21 @@ html,body { height:100%; background:var(--bg); color:var(--t100); font-family:va
     <span class="sidebar-brand">PhenomeBeauty</span>
   </div>
   <div class="nav-item active" onclick="show('dashboard',this)"><span class="nav-icon">◈</span><span class="nav-lbl">Dashboard</span></div>
-  <div class="nav-item" onclick="show('bookings',this)"><span class="nav-icon">◷</span><span class="nav-lbl">Bookings</span><span class="nav-badge nav-lbl" id="badge-bookings">4</span></div>
-  <div class="nav-item" onclick="show('consults',this)"><span class="nav-icon">✦</span><span class="nav-lbl">New Divas</span><span class="nav-badge nav-lbl" id="badge-consults">2</span></div>
+  <div class="nav-item" onclick="show('bookings',this)"><span class="nav-icon">◷</span><span class="nav-lbl">Bookings</span><span class="nav-badge nav-lbl" id="badge-bookings" style="display:none;"></span></div>
+  <div class="nav-item" onclick="show('consults',this)"><span class="nav-icon">✦</span><span class="nav-lbl">New Divas</span><span class="nav-badge nav-lbl" id="badge-consults" style="display:none;"></span></div>
+  <div class="nav-item" onclick="show('loyalty',this)"><span class="nav-icon">♡</span><span class="nav-lbl">Loyalty Tracker</span><span class="nav-badge nav-lbl" id="badge-loyalty" style="display:none;"></span></div>
   <div class="nav-item" onclick="show('availability',this)"><span class="nav-icon">⊡</span><span class="nav-lbl">Availability</span></div>
-  <div class="nav-item" onclick="show('stock',this)"><span class="nav-icon">◫</span><span class="nav-lbl">Stock</span></div>
+  <div class="nav-item" onclick="show('stock',this)"><span class="nav-icon">◫</span><span class="nav-lbl">Stock</span><span class="nav-badge nav-lbl" id="badge-stock" style="display:none;"></span></div>
   <div class="sidebar-spacer"></div>
   <div class="nav-item" onclick="show('integrations',this)"><span class="nav-icon">⟡</span><span class="nav-lbl">Integrations</span></div>
   <div class="nav-item" onclick="show('settings',this)"><span class="nav-icon">⊙</span><span class="nav-lbl">Settings</span></div>
+  <div class="nav-item" onclick="doLogout()" style="margin-top:4px;"><span class="nav-icon">↩</span><span class="nav-lbl">Sign Out</span></div>
 </aside>
 
 <!-- ── MAIN ── -->
 <div class="main">
   <div class="topbar">
+    <div class="sb-hamburger" onclick="openSidebar()">☰</div>
     <div class="topbar-title" id="topbar-title">Dashboard</div>
     <input class="search-bar" placeholder="🔍  Search…" oninput="searchBookings(this.value)">
     <button class="tbtn" onclick="refresh()">↻ Refresh</button>
@@ -693,7 +812,7 @@ html,body { height:100%; background:var(--bg); color:var(--t100); font-family:va
           <div class="int-feature">Rebook &amp; review emails</div>
         </div>
         <div class="int-footer">
-          <div class="int-status"><div class="int-dot live"></div><span style="font-size:11px;font-weight:600;color:var(--green);">Connected · phenomebeautys@gmail.com</span></div>
+          <div class="int-status"><div class="int-dot live"></div><span style="font-size:11px;font-weight:600;color:var(--green);">Connected · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="53233b363d3c3e3631363226272a2013343e323a3f7d303c3e">[email&#160;protected]</a></span></div>
           <span class="int-configure" onclick="show('settings',document.querySelector('[onclick*=settings]'))">Configure →</span>
         </div>
       </div>
@@ -809,8 +928,46 @@ html,body { height:100%; background:var(--bg); color:var(--t100); font-family:va
     </div>
   </div>
 
+  <!-- ═══ LOYALTY TRACKER ═══ -->
+  <div class="view" id="view-loyalty">
+    <div class="loyalty-strip" id="loyalty-strip">
+      <div class="card card-grad-1 lstrip-card" onclick="filterLoyalty('All')">
+        <div class="label-caps" style="margin-bottom:6px;">Total Clients</div>
+        <div class="lstrip-val" id="ls-total">—</div>
+      </div>
+      <div class="card card-grad-3 lstrip-card" onclick="filterLoyalty('ON TRACK')">
+        <div class="label-caps" style="margin-bottom:6px;">On Track</div>
+        <div class="lstrip-val green" id="ls-ontrack">—</div>
+      </div>
+      <div class="card card-grad-5 lstrip-card" onclick="filterLoyalty('TIME TO BOOK')">
+        <div class="label-caps" style="margin-bottom:6px;">Time to Book</div>
+        <div class="lstrip-val amber" id="ls-ttbook">—</div>
+      </div>
+      <div class="card card-grad-4 lstrip-card" onclick="filterLoyalty('OVERDUE')">
+        <div class="label-caps" style="margin-bottom:6px;">Overdue</div>
+        <div class="lstrip-val red" id="ls-overdue">—</div>
+      </div>
+    </div>
+    <div class="loyalty-filter filter-row">
+      <div class="chip on" onclick="fc(this);filterLoyalty('All')">All</div>
+      <div class="chip" onclick="fc(this);filterLoyalty('ON TRACK')">On Track</div>
+      <div class="chip" onclick="fc(this);filterLoyalty('TIME TO BOOK')">Time to Book</div>
+      <div class="chip" onclick="fc(this);filterLoyalty('OVERDUE')">Overdue</div>
+    </div>
+    <div class="card" style="overflow-x:auto;">
+      <table class="loyalty-table">
+        <thead><tr>
+          <th>Client</th><th>Phone</th><th>Status</th><th>Last Wax</th>
+          <th>Next Due</th><th>Pack Progress</th><th>Notes</th><th>WhatsApp</th>
+        </tr></thead>
+        <tbody id="loyalty-body">
+          <tr><td colspan="8"><div class="data-note">Loading loyalty data…</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div><!-- /main -->
-</div><!-- /app -->
 
 <!-- BOOKING DETAIL PANEL -->
 <div class="detail-panel" id="detail-panel">
@@ -849,35 +1006,105 @@ html,body { height:100%; background:var(--bg); color:var(--t100); font-family:va
     <button class="action-btn danger" onclick="panelAction('Cancelled')">✕ Cancel</button>
     <button class="action-btn primary" onclick="panelAction('requestBalance')">💳 Request Balance Payment</button>
   </div>
-</div>
+</div><!-- /detail-panel -->
+
+</div><!-- /pg-app -->
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────
-const API = ''; // same origin
+// ══════════════════════════════════════════════════════
+// PHENOMEBEAUTY ADMIN — FIXED v2
+// ══════════════════════════════════════════════════════
+const API = '';
 let token = sessionStorage.getItem('pbAdminToken') || '';
-let allBookings = [], currentFilter = 'All', currentBookingId = '';
+let allBookings = [], allConsults = [], allLoyalty = [], allStock = [];
+let currentFilter = 'All', currentLoyaltyFilter = 'All', currentBookingId = '';
+let loyaltyLoaded = false, stockLoaded = false;
 
-// ── AUTH ────────────────────────────────────────────────────
-function apiCall(url, opts = {}) {
-  opts.headers = { ...(opts.headers || {}), 'x-admin-token': token };
-  return fetch(API + url, opts).then(r => {
-    if (r.status === 401) doLogout();
-    return r;
-  });
+// ── LOGIN / LOGOUT ──────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (token) { showApp(); } else { showLoginPage(); }
+});
+
+function showLoginPage() {
+  document.getElementById('pg-login').classList.remove('hidden');
+  document.getElementById('pg-app').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('pg-login').classList.add('hidden');
+  document.getElementById('pg-app').style.display = 'flex';
+  init();
+}
+
+async function doLogin() {
+  const btn = document.getElementById('l-btn');
+  const pass = document.getElementById('l-pass').value;
+  const err = document.getElementById('l-err');
+  if (!pass) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="login-spinner"></span>';
+  err.style.display = 'none';
+  try {
+    const r = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pass })
+    });
+    const ct = r.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) throw new Error('Server error — is the app deployed?');
+    const d = await r.json();
+    if (!r.ok || !d.token) throw new Error(d.error || 'Incorrect password');
+    token = d.token;
+    sessionStorage.setItem('pbAdminToken', token);
+    showApp();
+  } catch(e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
 }
 
 function doLogout() {
   sessionStorage.removeItem('pbAdminToken');
   token = '';
+  allBookings = []; allConsults = []; allLoyalty = []; allStock = [];
+  loyaltyLoaded = false; stockLoaded = false;
+  closeSidebar();
+  document.getElementById('l-pass').value = '';
+  document.getElementById('l-btn').textContent = 'Sign In';
+  document.getElementById('l-btn').disabled = false;
+  document.getElementById('l-err').style.display = 'none';
+  showLoginPage();
   showToast('Signed out');
 }
 
-// ── NAV ─────────────────────────────────────────────────────
+// ── MOBILE SIDEBAR ──────────────────────────────────
+function openSidebar() {
+  document.querySelector('.sidebar').classList.add('mobile-open');
+  document.getElementById('sb-overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('mobile-open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+// ── API CALL ────────────────────────────────────────
+function apiCall(url, opts = {}) {
+  opts.headers = { ...(opts.headers || {}), 'x-admin-token': token, 'Content-Type': 'application/json' };
+  return fetch(API + url, opts).then(r => {
+    if (r.status === 401) { doLogout(); throw new Error('Session expired'); }
+    return r;
+  });
+}
+
+// ── NAV ─────────────────────────────────────────────
 const viewTitles = {
   dashboard:'Dashboard', bookings:'Bookings', consults:'New Divas',
-  availability:'Availability', stock:'Stock', integrations:'Integrations', settings:'Settings'
+  loyalty:'Loyalty Tracker', availability:'Availability', stock:'Stock',
+  integrations:'Integrations', settings:'Settings'
 };
 
 function show(view, el) {
@@ -887,46 +1114,35 @@ function show(view, el) {
   if (el) el.classList.add('active');
   document.getElementById('topbar-title').textContent = viewTitles[view] || view;
   closePanel();
-  if (view === 'dashboard') loadDashboard();
-  if (view === 'bookings') loadBookings();
+  closeSidebar();
+  if (view === 'dashboard')    loadDashboard();
+  if (view === 'bookings')     renderBookings();
+  if (view === 'consults')     renderConsults();
+  if (view === 'loyalty')      { if (!loyaltyLoaded) loadLoyalty(); else renderLoyalty(); }
   if (view === 'availability') renderAvailability();
-  if (view === 'stock') renderStock();
-  if (view === 'settings') loadSettings();
+  if (view === 'stock')        { if (!stockLoaded) loadStock(); else renderStock(); }
+  if (view === 'settings')     loadSettings();
 }
 
-// ── FILTER CHIPS ────────────────────────────────────────────
+// ── FILTER CHIPS ────────────────────────────────────
 function fc(chip) {
   chip.closest('.filter-row').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
   chip.classList.add('on');
 }
 
-// ── BOOKINGS ────────────────────────────────────────────────
+// ── BOOKINGS ─────────────────────────────────────────
 async function loadBookings() {
   try {
     const r = await apiCall('/api/admin/bookings');
     const d = await r.json();
-    allBookings = d.bookings || d || [];
+    // API returns array directly; field names: name, services, date, time, status, total, deposit, balanceDue, phone, email, address, bookingId, balanceStatus, checkoutId, calEventId
+    allBookings = Array.isArray(d) ? d : (d.bookings || []);
+    updateBadges();
     renderBookings();
-  } catch (e) {
-    allBookings = demoBookings();
-    renderBookings();
-  }
+  } catch(e) { showToast('Bookings error: ' + e.message); }
 }
 
-function demoBookings() {
-  return [
-    { bookingId:'PB-A1B2C3D4', clientName:'Arshad Segal', serviceNames:'Hollywood Lash Set', date:'2026-02-27', time:'13:00', depositStatus:'Confirmed', balanceStatus:'Pending', totalAmount:'600', depositAmount:'300', balanceDue:'300', clientPhone:'+27821234567', clientEmail:'arshad@example.com', clientAddress:'14 York Road, Wynberg' },
-    { bookingId:'PB-B2C3D4E5', clientName:'Thandeka Mokoena', serviceNames:'Nail Artistry + Brow Sculpt', date:'2026-02-28', time:'10:00', depositStatus:'Pending Payment', balanceStatus:'', totalAmount:'730', depositAmount:'365', balanceDue:'365', clientPhone:'+27831234567', clientEmail:'thandeka@example.com', clientAddress:'7 Main Road, Rondebosch' },
-    { bookingId:'PB-C3D4E5F6', clientName:'Leila van der Berg', serviceNames:'Lash Infill', date:'2026-02-26', time:'09:00', depositStatus:'Service Complete', balanceStatus:'Requested', totalAmount:'350', depositAmount:'175', balanceDue:'175', clientPhone:'+27841234567', clientEmail:'leila@example.com', clientAddress:'22 Beach Road, Sea Point' },
-    { bookingId:'PB-D4E5F6G7', clientName:'Nomsa Dlamini', serviceNames:'Hollywood Lash Set', date:'2026-02-25', time:'14:00', depositStatus:'Cancelled', balanceStatus:'', totalAmount:'600', depositAmount:'300', balanceDue:'300', clientPhone:'+27851234567', clientEmail:'nomsa@example.com', clientAddress:'5 Oak Ave, Claremont' },
-    { bookingId:'PB-E5F6G7H8', clientName:'Zanele Khumalo', serviceNames:'Nail Artistry', date:'2026-03-02', time:'11:00', depositStatus:'Confirmed', balanceStatus:'Paid', totalAmount:'450', depositAmount:'225', balanceDue:'0', clientPhone:'+27861234567', clientEmail:'zanele@example.com', clientAddress:'88 Long Street, Cape Town' },
-  ];
-}
-
-function filterBookings(f) {
-  currentFilter = f;
-  renderBookings();
-}
+function filterBookings(f) { currentFilter = f; renderBookings(); }
 
 function renderBookings() {
   const list = document.getElementById('booking-list');
@@ -934,28 +1150,24 @@ function renderBookings() {
   let items = allBookings;
   if (currentFilter !== 'All') {
     if (currentFilter === 'Today') items = items.filter(b => b.date === today);
-    else items = items.filter(b => b.depositStatus === currentFilter);
+    else items = items.filter(b => b.status === currentFilter);
   }
   if (!items.length) { list.innerHTML = '<div class="data-note">No bookings found.</div>'; return; }
 
   list.innerHTML = items.map(b => {
-    const init = (b.clientName || b['Client Name'] || '?')[0];
-    const name = b.clientName || b['Client Name'] || '—';
-    const svc  = b.serviceNames || b['Service Names'] || '—';
-    const date = b.date || b['Date'] || '';
-    const time = b.time || b['Time'] || '';
-    const stat = b.depositStatus || b['Deposit Status'] || 'Pending';
-    const amt  = b.totalAmount || b['Total Amount (R)'] || '0';
-    const id   = b.bookingId || b['Booking ID'] || '';
+    const name = b.name || '—';
+    const svc  = b.services || '—';
+    const stat = b.status || 'Pending Payment';
+    const total = b.total || '0';
+    const id   = b.bookingId || '';
     const sc   = stat === 'Pending Payment' ? 's-pending' : stat === 'Confirmed' ? 's-confirmed' : stat === 'Service Complete' ? 's-complete' : stat === 'Cancelled' ? 's-cancelled' : 's-pending';
-
-    return `<div class="card booking-row" onclick="openPanel('${id}')">
-      <div class="booking-avatar">${init}</div>
+    return `<div class="card booking-row" onclick="openPanel('${esc(id)}')">
+      <div class="booking-avatar">${(name[0]||'?').toUpperCase()}</div>
       <div>
         <div class="booking-name">${esc(name)}</div>
-        <div class="booking-meta">${esc(svc)} · ${fmtD(date)} · ${time}</div>
+        <div class="booking-meta">${esc(svc.split(',')[0])} · ${fmtD(b.date)} · ${b.time||''}</div>
       </div>
-      <div class="booking-amount">R ${Number(amt).toLocaleString()}</div>
+      <div class="booking-amount">R ${Number(total).toLocaleString()}</div>
       <div class="status-pill ${sc}">${stat === 'Pending Payment' ? 'Pending' : stat}</div>
     </div>`;
   }).join('');
@@ -964,43 +1176,41 @@ function renderBookings() {
 function searchBookings(q) {
   if (!q) { renderBookings(); return; }
   const ql = q.toLowerCase();
+  const items = allBookings.filter(b =>
+    (b.name||'').toLowerCase().includes(ql) ||
+    (b.services||'').toLowerCase().includes(ql) ||
+    (b.bookingId||'').toLowerCase().includes(ql) ||
+    (b.phone||'').toLowerCase().includes(ql)
+  );
   const list = document.getElementById('booking-list');
-  const items = allBookings.filter(b => {
-    const name = (b.clientName || b['Client Name'] || '').toLowerCase();
-    const svc  = (b.serviceNames || b['Service Names'] || '').toLowerCase();
-    const id   = (b.bookingId || '').toLowerCase();
-    return name.includes(ql) || svc.includes(ql) || id.includes(ql);
-  });
   if (!items.length) { list.innerHTML = '<div class="data-note">No results for "' + esc(q) + '"</div>'; return; }
-  const saved = allBookings;
-  allBookings = items; renderBookings(); allBookings = saved;
+  const saved = allBookings; allBookings = items; renderBookings(); allBookings = saved;
 }
 
-// ── DETAIL PANEL ────────────────────────────────────────────
+// ── DETAIL PANEL ────────────────────────────────────
 function openPanel(id) {
-  const b = allBookings.find(x => (x.bookingId || x['Booking ID']) === id);
+  const b = allBookings.find(x => x.bookingId === id);
   if (!b) return;
   currentBookingId = id;
 
-  const name = b.clientName || b['Client Name'] || '—';
-  const stat = b.depositStatus || b['Deposit Status'] || '—';
+  const stat = b.status || '—';
   const sc   = stat === 'Pending Payment' ? 's-pending' : stat === 'Confirmed' ? 's-confirmed' : stat === 'Service Complete' ? 's-complete' : stat === 'Cancelled' ? 's-cancelled' : 's-pending';
 
-  document.getElementById('panel-name').textContent = name;
-  document.getElementById('panel-ref').textContent = id;
+  document.getElementById('panel-name').textContent   = b.name || '—';
+  document.getElementById('panel-ref').textContent    = id;
   document.getElementById('panel-status').textContent = stat;
-  document.getElementById('panel-status').className = 'status-pill ' + sc;
-  document.getElementById('panel-date').textContent = fmtD(b.date || b['Date'] || '');
-  document.getElementById('panel-time').textContent = b.time || b['Time'] || '—';
-  document.getElementById('panel-services').textContent = b.serviceNames || b['Service Names'] || '—';
-  document.getElementById('panel-address').textContent = b.clientAddress || b['Client Address'] || '—';
-  document.getElementById('panel-client-name').textContent = name;
-  document.getElementById('panel-phone').textContent = b.clientPhone || b['Client Phone'] || '—';
-  document.getElementById('panel-email').textContent = b.clientEmail || b['Client Email'] || '—';
-  document.getElementById('panel-total').textContent = 'R ' + Number(b.totalAmount || b['Total Amount (R)'] || 0).toLocaleString();
-  document.getElementById('panel-deposit').textContent = 'R ' + Number(b.depositAmount || b['Deposit Amount (R)'] || 0).toLocaleString();
-  document.getElementById('panel-balance').textContent = 'R ' + Number(b.balanceDue || b['Balance Due (R)'] || 0).toLocaleString();
-  document.getElementById('panel-bal-status').textContent = b.balanceStatus || b['Balance Status'] || '—';
+  document.getElementById('panel-status').className   = 'status-pill ' + sc;
+  document.getElementById('panel-date').textContent   = fmtD(b.date);
+  document.getElementById('panel-time').textContent   = b.time || '—';
+  document.getElementById('panel-services').textContent = b.services || '—';
+  document.getElementById('panel-address').textContent  = b.address || '—';
+  document.getElementById('panel-client-name').textContent = b.name || '—';
+  document.getElementById('panel-phone').textContent  = b.phone || '—';
+  document.getElementById('panel-email').textContent  = b.email || '—';
+  document.getElementById('panel-total').textContent  = 'R ' + Number(b.total || 0).toLocaleString();
+  document.getElementById('panel-deposit').textContent = 'R ' + Number(b.deposit || 0).toLocaleString();
+  document.getElementById('panel-balance').textContent = 'R ' + Number(b.balanceDue || 0).toLocaleString();
+  document.getElementById('panel-bal-status').textContent = b.balanceStatus || '—';
 
   document.getElementById('detail-panel').classList.add('open');
 }
@@ -1008,21 +1218,183 @@ function openPanel(id) {
 function closePanel() { document.getElementById('detail-panel').classList.remove('open'); }
 
 async function panelAction(action) {
+  if (!currentBookingId) return;
   if (action === 'requestBalance') {
-    showToast('Balance request sent ✓');
+    try {
+      await apiCall('/api/admin/request-balance', { method:'POST', body: JSON.stringify({ bookingId: currentBookingId }) });
+      showToast('Balance request sent ✓');
+    } catch(e) { showToast('Error: ' + e.message); }
     closePanel(); return;
   }
-  if (action === 'reschedule') {
-    showToast('Reschedule — coming soon');
-    return;
-  }
-  showToast('Status → ' + action);
+  if (action === 'reschedule') { showToast('Reschedule — coming soon'); return; }
+  // Update status
+  try {
+    await apiCall('/api/admin/update-status', { method:'POST', body: JSON.stringify({ bookingId: currentBookingId, status: action }) });
+    showToast('Status → ' + action + ' ✓');
+    await loadBookings();
+  } catch(e) { showToast('Error: ' + e.message); }
   closePanel();
 }
 
-// ── DASHBOARD ───────────────────────────────────────────────
+// ── CONSULTATIONS ────────────────────────────────────
+async function loadConsults() {
+  try {
+    const r = await apiCall('/api/admin/consultations');
+    const d = await r.json();
+    allConsults = Array.isArray(d) ? d : [];
+    updateBadges();
+    renderConsults();
+  } catch(e) { showToast('Consultations error: ' + e.message); }
+}
+
+function renderConsults() {
+  const el = document.getElementById('consults-list');
+  if (!allConsults.length) { el.innerHTML = '<div class="data-note">No consultations yet.</div>'; return; }
+  el.innerHTML = allConsults.map(c => {
+    const tags = [];
+    if ((c.clientType||'').toLowerCase()==='new') tags.push('New Diva');
+    if ((c.pregnancy||'').toLowerCase()==='yes') tags.push('Pregnant');
+    if (c.allergies && c.allergies!=='None' && c.allergies.trim()) tags.push('Allergies');
+    if (c.medications && c.medications!=='None' && c.medications.trim()) tags.push('Meds');
+    if (c.leadSource && c.leadSource.trim()) tags.push(c.leadSource);
+    return `<div class="card consult-card" onclick="openConsultPanel('${esc(c.bookingId)}')">
+      <div class="consult-header">
+        <div>
+          <div class="consult-name">${esc(c.name||'—')}</div>
+          <div class="consult-date">${fmtD(c.date)} · ${esc((c.services||'').split(',')[0]||'—')}</div>
+        </div>
+        <div class="status-pill ${c.status==='Confirmed'?'s-confirmed':'s-pending'}">${c.status||'Pending'}</div>
+      </div>
+      <div class="consult-tags">${tags.map(t=>`<span class="consult-tag">${esc(t)}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function openConsultPanel(id) {
+  const c = allConsults.find(x => x.bookingId === id);
+  if (!c) return;
+  document.getElementById('panel-name').textContent = c.name || '—';
+  document.getElementById('panel-ref').textContent  = id + (c.clientType ? ' · ' + c.clientType : '');
+  document.getElementById('panel-status').textContent = c.status || '—';
+  document.getElementById('panel-status').className = 'status-pill s-pending';
+  document.getElementById('panel-date').textContent = fmtD(c.date);
+  document.getElementById('panel-time').textContent = c.time || '—';
+  document.getElementById('panel-services').textContent = c.services || '—';
+  document.getElementById('panel-address').textContent  = '—';
+  document.getElementById('panel-client-name').textContent = c.name || '—';
+  document.getElementById('panel-phone').textContent = c.phone || '—';
+  document.getElementById('panel-email').textContent = c.email || '—';
+  document.getElementById('panel-total').textContent   = '—';
+  document.getElementById('panel-deposit').textContent = '—';
+  document.getElementById('panel-balance').textContent = '—';
+  document.getElementById('panel-bal-status').textContent = [
+    c.skinConditions ? 'Skin: '+c.skinConditions : '',
+    c.allergies && c.allergies!=='None' ? 'Allergies: '+c.allergies : '',
+    c.pregnancy==='Yes' ? '⚠ Pregnant' : '',
+    c.medications && c.medications!=='None' ? 'Meds: '+c.medications : ''
+  ].filter(Boolean).join(' · ') || '—';
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+// ── LOYALTY TRACKER ──────────────────────────────────
+async function loadLoyalty() {
+  const el = document.getElementById('loyalty-body');
+  el.innerHTML = '<tr><td colspan="8"><div class="data-note">Loading loyalty data…</div></td></tr>';
+  try {
+    const r = await apiCall('/api/admin/loyalty');
+    const d = await r.json();
+    allLoyalty = Array.isArray(d) ? d : [];
+    loyaltyLoaded = true;
+    updateLoyaltyStrip();
+    updateBadges();
+    renderLoyalty();
+  } catch(e) {
+    el.innerHTML = `<tr><td colspan="8"><div class="data-note">Error: ${esc(e.message)}</div></td></tr>`;
+  }
+}
+
+function updateLoyaltyStrip() {
+  const total   = allLoyalty.length;
+  const ontrack = allLoyalty.filter(l => /on.?track/i.test(l.status)).length;
+  const ttbook  = allLoyalty.filter(l => /time.?to.?book/i.test(l.status)).length;
+  const overdue = allLoyalty.filter(l => /overdue/i.test(l.status)).length;
+  const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  setEl('ls-total',   total);
+  setEl('ls-ontrack', ontrack);
+  setEl('ls-ttbook',  ttbook);
+  setEl('ls-overdue', overdue);
+}
+
+function filterLoyalty(f) {
+  currentLoyaltyFilter = f;
+  // sync chips if called from strip card click
+  const row = document.querySelector('.loyalty-filter');
+  if (row) {
+    row.querySelectorAll('.chip').forEach(c => {
+      const t = c.textContent.trim().toUpperCase();
+      c.classList.toggle('on', (f==='All'&&t==='ALL')||(f===t));
+    });
+  }
+  renderLoyalty();
+}
+
+function renderLoyalty() {
+  const el = document.getElementById('loyalty-body');
+  let list = allLoyalty;
+  if (currentLoyaltyFilter !== 'All') list = list.filter(l => (l.status||'').toUpperCase().includes(currentLoyaltyFilter));
+  if (!list.length) { el.innerHTML = '<tr><td colspan="8"><div class="data-note">No clients found.</div></td></tr>'; return; }
+  el.innerHTML = list.map(l => {
+    const sc = /on.?track/i.test(l.status) ? 'l-ontrack' : /overdue/i.test(l.status) ? 'l-overdue' : /time.?to.?book/i.test(l.status) ? 'l-ttbook' : '';
+    const label = /on.?track/i.test(l.status) ? 'On Track' : /overdue/i.test(l.status) ? 'Overdue' : /time.?to.?book/i.test(l.status) ? 'Time to Book' : (l.status||'—');
+    return `<tr>
+      <td><strong>${esc(l.clientName||'—')}</strong>${l.location?`<div style="font-size:10px;color:var(--t40);">${esc(l.location)}</div>`:''}</td>
+      <td>${esc(l.phone||'—')}</td>
+      <td><span class="l-pill ${sc}">${esc(label)}</span></td>
+      <td>${esc(l.lastWaxDate||'—')}</td>
+      <td style="${/overdue/i.test(l.status)?'color:var(--red);':''}">${esc(l.nextDueDate||'—')}</td>
+      <td>${esc(l.packProgress||'—')}</td>
+      <td style="font-size:11px;color:var(--t40);max-width:130px;">${esc(l.notes||'')}</td>
+      <td>${l.whatsappLink?`<a href="${esc(l.whatsappLink)}" target="_blank" rel="noopener" class="wa-link">💬 Chat</a>`:'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── STOCK ────────────────────────────────────────────
+async function loadStock() {
+  const el = document.getElementById('stock-body');
+  el.innerHTML = '<tr><td colspan="5"><div class="data-note">Loading stock…</div></td></tr>';
+  try {
+    const r = await apiCall('/api/admin/stock');
+    const d = await r.json();
+    allStock = Array.isArray(d) ? d : [];
+    stockLoaded = true;
+    updateBadges();
+    renderStock();
+  } catch(e) {
+    el.innerHTML = `<tr><td colspan="5"><div class="data-note">Error: ${esc(e.message)}</div></td></tr>`;
+  }
+}
+
+function renderStock() {
+  const tbody = document.getElementById('stock-body');
+  if (!allStock.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="data-note">No stock data found.</div></td></tr>'; return; }
+  tbody.innerHTML = allStock.map((item,i) => {
+    const qty = parseInt(item.quantity||0);
+    const min = parseInt(item.minStock||0);
+    const low = min > 0 && qty <= min;
+    return `<tr>
+      <td><div class="stock-name">${esc(item.name)}</div><div style="font-size:11px;color:var(--t40);">${esc(item.category||'')} ${item.unit?'· '+item.unit:''}</div></td>
+      <td style="color:var(--t40);">${esc(item.category||'—')}</td>
+      <td><span class="stock-qty ${low?'low':'ok'}" id="sq-${i}">${qty}</span></td>
+      <td style="color:var(--t40);">${min||'—'}</td>
+      <td><span style="font-size:11.5px;color:var(--t40);">${esc(item.notes||'')}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── DASHBOARD ────────────────────────────────────────
 async function loadDashboard() {
-  if (!allBookings.length) allBookings = demoBookings();
+  if (!allBookings.length) await loadBookings();
 
   const now    = new Date();
   const month  = now.getMonth();
@@ -1030,58 +1402,53 @@ async function loadDashboard() {
   const today  = now.toISOString().slice(0,10);
 
   const thisMonth = allBookings.filter(b => {
-    const d = new Date(b.date || b['Date'] || '');
-    return d.getMonth() === month && d.getFullYear() === year && (b.depositStatus || b['Deposit Status']) === 'Confirmed';
+    const d = new Date(b.date || '');
+    return d.getMonth()===month && d.getFullYear()===year && ['Confirmed','Service Complete'].includes(b.status);
   });
-
   const lastMonth = allBookings.filter(b => {
-    const d = new Date(b.date || b['Date'] || '');
-    return d.getMonth() === (month - 1 + 12) % 12 && (b.depositStatus || b['Deposit Status']) === 'Confirmed';
+    const d = new Date(b.date || '');
+    return d.getMonth()===(month-1+12)%12 && ['Confirmed','Service Complete'].includes(b.status);
   });
 
-  const revenue = thisMonth.reduce((s,b) => s + Number(b.depositAmount || b['Deposit Amount (R)'] || 0), 0);
-  const lastRev = lastMonth.reduce((s,b) => s + Number(b.depositAmount || b['Deposit Amount (R)'] || 0), 0);
+  const revenue = thisMonth.reduce((s,b) => s + Number(b.deposit||0), 0);
+  const lastRev = lastMonth.reduce((s,b) => s + Number(b.deposit||0), 0);
   const delta   = lastRev > 0 ? Math.round(((revenue - lastRev) / lastRev) * 100) : 0;
 
-  const todayB  = allBookings.filter(b => (b.date || b['Date'] || '') === today);
-  const todayRev = todayB.filter(b => (b.depositStatus||b['Deposit Status']) === 'Confirmed').reduce((s,b) => s + Number(b.depositAmount||b['Deposit Amount (R)']||0), 0);
-  const remaining = todayB.filter(b => (b.depositStatus||b['Deposit Status']) === 'Confirmed').length;
-
-  const cancelled = allBookings.filter(b => (b.depositStatus||b['Deposit Status']) === 'Cancelled').length;
+  const todayB   = allBookings.filter(b => b.date === today);
+  const todayRev = todayB.filter(b => ['Confirmed','Service Complete'].includes(b.status)).reduce((s,b) => s+Number(b.deposit||0), 0);
+  const remaining = todayB.filter(b => b.status === 'Confirmed').length;
+  const nextB     = todayB.find(b => b.status === 'Confirmed');
+  const cancelled = allBookings.filter(b => b.status === 'Cancelled').length;
   const cancelRate = allBookings.length > 0 ? Math.round((cancelled / allBookings.length) * 100) : 0;
 
-  // Services count
   const svcMap = {};
   allBookings.forEach(b => {
-    const svcs = (b.serviceNames || b['Service Names'] || '').split(/[,+&]/).map(s => s.trim()).filter(Boolean);
-    svcs.forEach(s => { svcMap[s] = (svcMap[s] || 0) + 1; });
+    (b.services||'').split(/[,+&]/).map(s=>s.trim()).filter(Boolean).forEach(s => { svcMap[s] = (svcMap[s]||0)+1; });
   });
-  const topSvcs = Object.entries(svcMap).sort((a,b) => b[1]-a[1]).slice(0,3);
+  const topSvcs = Object.entries(svcMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const maxSvc  = topSvcs[0]?.[1] || 1;
 
   // Update DOM
   document.getElementById('hero-revenue').innerHTML = `R ${revenue.toLocaleString()}`;
-
   const deltaEl = document.getElementById('hero-delta');
   deltaEl.style.opacity = '1';
   deltaEl.textContent = (delta >= 0 ? '↑ ' : '↓ ') + Math.abs(delta) + '% vs last month';
   deltaEl.className = 'hero-delta' + (delta < 0 ? ' down' : '');
 
-  document.getElementById('d-rev-today').textContent = `R ${todayRev.toLocaleString()}`;
-  document.getElementById('d-appts-today').textContent = todayB.length;
-  document.getElementById('d-remaining').textContent = remaining;
-  document.getElementById('d-next').textContent = todayB.length ? `${todayB[0].time||'—'} · ${(todayB[0].clientName||'').split(' ')[0]}` : 'None today';
-  document.getElementById('d-rebook').textContent = '68%';
-  document.getElementById('d-cancel').textContent = cancelRate + '%';
-  document.getElementById('d-hours').textContent = (thisMonth.length * 2) + ' hrs';
-  document.getElementById('d-fill').textContent = Math.min(Math.round((thisMonth.length / 20) * 100), 100) + '%';
-  document.getElementById('d-basket').textContent = thisMonth.length ? 'R ' + Math.round(revenue / thisMonth.length).toLocaleString() : '—';
-  document.getElementById('d-total-appts').textContent = thisMonth.length;
-  document.getElementById('d-new-clients').textContent = Math.round(thisMonth.length * 0.3);
-  document.getElementById('d-returning').textContent = Math.round(thisMonth.length * 0.7);
-  document.getElementById('d-retention').textContent = '70%';
+  document.getElementById('d-rev-today').textContent     = `R ${todayRev.toLocaleString()}`;
+  document.getElementById('d-appts-today').textContent   = todayB.length;
+  document.getElementById('d-remaining').textContent     = remaining;
+  document.getElementById('d-next').textContent          = nextB ? `${nextB.time||'—'} · ${(nextB.name||'').split(' ')[0]}` : 'None today';
+  document.getElementById('d-cancel').textContent        = cancelRate + '%';
+  document.getElementById('d-rebook').textContent        = '68%';
+  document.getElementById('d-hours').textContent         = (thisMonth.length * 2) + ' hrs';
+  document.getElementById('d-fill').textContent          = Math.min(Math.round((thisMonth.length/20)*100),100) + '%';
+  document.getElementById('d-basket').textContent        = thisMonth.length ? 'R '+Math.round(revenue/thisMonth.length).toLocaleString() : '—';
+  document.getElementById('d-total-appts').textContent   = thisMonth.length;
+  document.getElementById('d-new-clients').textContent   = Math.round(thisMonth.length * 0.3);
+  document.getElementById('d-returning').textContent     = Math.round(thisMonth.length * 0.7);
+  document.getElementById('d-retention').textContent     = '70%';
 
-  // Top services
   const tsEl = document.getElementById('top-services');
   tsEl.innerHTML = topSvcs.length ? topSvcs.map(([name,cnt],i) => `
     <div class="service-rank">
@@ -1091,87 +1458,105 @@ async function loadDashboard() {
       <div class="rank-val">${cnt}x</div>
     </div>`).join('') : '<div class="data-note">No data yet</div>';
 
-  // Alerts
-  const unrebooked = allBookings.filter(b => {
-    const d = new Date(b.date || b['Date'] || 0);
-    const diff = (now - d) / (1000*60*60*24);
-    return diff > 30 && (b.depositStatus||b['Deposit Status']) === 'Service Complete';
-  }).length;
-
-  const pendingDeps = allBookings.filter(b => (b.depositStatus||b['Deposit Status']) === 'Pending Payment').length;
-
-  const alertsEl = document.getElementById('alerts-list');
+  // Alerts — mix real booking data + real loyalty data
+  const pendingDeps = allBookings.filter(b => b.status === 'Pending Payment').length;
   const alerts = [];
-  if (unrebooked > 0) alerts.push({ dot:'red', text:`<strong>${unrebooked} client${unrebooked>1?'s':''}</strong> haven't rebooked in 30+ days` });
+
   if (pendingDeps > 0) alerts.push({ dot:'amber', text:`<strong>${pendingDeps} deposit${pendingDeps>1?'s':''}</strong> still pending payment` });
   if (delta > 0) alerts.push({ dot:'green', text:`Revenue is <strong>↑ ${delta}%</strong> vs last month` });
   else if (delta < 0) alerts.push({ dot:'red', text:`Revenue is <strong>↓ ${Math.abs(delta)}%</strong> vs last month` });
-  alerts.push({ dot:'amber', text:`<strong>Glue adhesive</strong> stock is low — reorder soon` });
 
-  alertsEl.innerHTML = alerts.map(a => `
+  if (loyaltyLoaded) {
+    const overdue = allLoyalty.filter(l => /overdue/i.test(l.status)).length;
+    const ttbook  = allLoyalty.filter(l => /time.?to.?book/i.test(l.status)).length;
+    if (overdue > 0) alerts.push({ dot:'red',   text:`<strong>${overdue} client${overdue>1?'s':''}</strong> overdue on loyalty tracker` });
+    if (ttbook > 0)  alerts.push({ dot:'amber', text:`<strong>${ttbook} client${ttbook>1?'s':''}</strong> haven't rebooked — time to reach out` });
+  } else {
+    alerts.push({ dot:'amber', text:'Load <strong>Loyalty Tracker</strong> to see client alerts' });
+  }
+
+  if (stockLoaded) {
+    const lowStock = allStock.filter(s => parseInt(s.minStock||0)>0 && parseInt(s.quantity||0)<=parseInt(s.minStock||0));
+    lowStock.forEach(s => alerts.push({ dot:'red', text:`<strong>${esc(s.name)}</strong> — stock low (${s.quantity} remaining)` }));
+  }
+
+  document.getElementById('alerts-list').innerHTML = alerts.length ? alerts.map(a => `
     <div class="alert-item">
       <div class="alert-dot ${a.dot}"></div>
       <div class="alert-text">${a.text}</div>
-    </div>`).join('');
+    </div>`).join('') : '<div class="data-note">No alerts</div>';
 
   // Heatmap
   const hmEl = document.getElementById('heatmap');
-  const monthName = now.toLocaleString('default',{month:'long',year:'numeric'});
-  document.getElementById('hm-month').textContent = monthName;
+  document.getElementById('hm-month').textContent = now.toLocaleString('default',{month:'long',year:'numeric'});
   const daysInMonth = new Date(year, month+1, 0).getDate();
   hmEl.innerHTML = '';
-  for (let d = 1; d <= Math.min(daysInMonth, 28); d++) {
-    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const cnt = allBookings.filter(b => (b.date||b['Date']||'') === ds).length;
+  for (let day = 1; day <= Math.min(daysInMonth, 28); day++) {
+    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const cnt = allBookings.filter(b => b.date === ds).length;
     const cell = document.createElement('div');
-    cell.className = 'hm-cell' + (cnt === 0 ? '' : cnt === 1 ? ' l2' : cnt === 2 ? ' l3' : ' l4');
+    cell.className = 'hm-cell' + (cnt===0?'': cnt===1?' l2': cnt===2?' l3':' l4');
     hmEl.appendChild(cell);
   }
-
   buildChart();
 }
 
 function buildChart() {
   const W = 400, H = 150, pad = 10;
-  const vals = Array.from({length:30}, (_,i) => Math.round(200 + Math.random()*800 * (1 + i/60)));
+  const vals = Array.from({length:30}, (_,i) => Math.round(200 + Math.random()*800*(1+i/60)));
   const max  = Math.max(...vals);
-  const pts  = vals.map((v,i) => [pad + (i/(vals.length-1))*(W-pad*2), H - pad - ((v/max)*(H-pad*2))]);
-
-  const lineD  = 'M' + pts.map(p => p.join(',')).join(' L');
-  const areaD  = lineD + ` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
-
-  const avg  = Math.round(vals.reduce((s,v)=>s+v,0)/vals.length);
-  const avgY = H - pad - ((avg/max)*(H-pad*2));
-  const avgD = `M${pad},${avgY} L${W-pad},${avgY}`;
-
+  const pts  = vals.map((v,i) => [pad + (i/(vals.length-1))*(W-pad*2), H-pad-((v/max)*(H-pad*2))]);
+  const lineD = 'M' + pts.map(p=>p.join(',')).join(' L');
+  const areaD = lineD + ` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
+  const avg   = Math.round(vals.reduce((s,v)=>s+v,0)/vals.length);
+  const avgY  = H-pad-((avg/max)*(H-pad*2));
   document.getElementById('chart-line').setAttribute('d', lineD);
   document.getElementById('chart-area').setAttribute('d', areaD);
-  document.getElementById('chart-avg').setAttribute('d', avgD);
+  document.getElementById('chart-avg').setAttribute('d', `M${pad},${avgY} L${W-pad},${avgY}`);
 }
 
-// ── AVAILABILITY ─────────────────────────────────────────────
+// ── BADGES ───────────────────────────────────────────
+function updateBadges() {
+  const pend   = allBookings.filter(b => b.status === 'Pending Payment').length;
+  const consuls = allConsults.length;
+  const overdue = allLoyalty.filter(l => /overdue/i.test(l.status)).length;
+  const ttbook  = allLoyalty.filter(l => /time.?to.?book/i.test(l.status)).length;
+  const loyUrgent = overdue + ttbook;
+  const lowStock  = allStock.filter(s => parseInt(s.minStock||0)>0 && parseInt(s.quantity||0)<=parseInt(s.minStock||0)).length;
+
+  const setBadge = (id, n) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (n > 0) { el.textContent = n; el.style.display = 'inline-block'; }
+    else el.style.display = 'none';
+  };
+  setBadge('badge-bookings', pend);
+  setBadge('badge-consults',  consuls);
+  setBadge('badge-loyalty',   loyUrgent);
+  setBadge('badge-stock',     lowStock);
+}
+
+// ── AVAILABILITY ─────────────────────────────────────
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
-const avail = { Monday:true, Tuesday:true, Wednesday:false, Thursday:true, Friday:true, Saturday:true, Sunday:false };
-const blocked = { Monday:['11:00'], Friday:['15:00','16:00'], Thursday:['10:00'] };
+const avail = { Monday:true,Tuesday:true,Wednesday:false,Thursday:true,Friday:true,Saturday:true,Sunday:false };
+const blocked = { Monday:['11:00'],Friday:['15:00','16:00'],Thursday:['10:00'] };
 
 function renderAvailability() {
   const grid = document.getElementById('avail-grid');
   grid.innerHTML = DAYS.map(day => {
-    const on = avail[day];
-    const bl = blocked[day] || [];
+    const on = avail[day], bl = blocked[day]||[];
     return `<div class="card card-grad-${on?'1':'2'} day-card">
       <div class="day-header">
         <div class="day-name">${day}</div>
         <label class="toggle">
           <input type="checkbox" ${on?'checked':''} onchange="toggleDay('${day}',this)">
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
+          <div class="toggle-track"></div><div class="toggle-thumb"></div>
         </label>
       </div>
       <div class="time-slot-grid" style="${!on?'opacity:0.3;pointer-events:none':''}">
         ${SLOTS.map(t => {
-          const cls = !on ? '' : bl.includes(t) ? 'blocked' : 'available';
+          const cls = !on?'': bl.includes(t)?'blocked':'available';
           return `<div class="slot-chip ${cls}" onclick="toggleSlot('${day}','${t}',this)">${t}</div>`;
         }).join('')}
       </div>
@@ -1188,77 +1573,39 @@ function toggleDay(day, input) {
 }
 
 function toggleSlot(day, time, el) {
-  blocked[day] = blocked[day] || [];
+  blocked[day] = blocked[day]||[];
   if (el.classList.contains('blocked')) {
-    blocked[day] = blocked[day].filter(t => t !== time);
+    blocked[day] = blocked[day].filter(t=>t!==time);
     el.classList.remove('blocked'); el.classList.add('available');
   } else {
     blocked[day].push(time);
     el.classList.remove('available'); el.classList.add('blocked');
   }
-  showToast(day + ' ' + time + (blocked[day].includes(time) ? ' — Blocked' : ' — Available'));
+  showToast(day+' '+time+(blocked[day].includes(time)?' — Blocked':' — Available'));
 }
 
-// ── STOCK ────────────────────────────────────────────────────
-const stockData = [
-  { name:'Glue Adhesive — Strong Bond', cat:'Lash Supplies', qty:2, min:5, unit:'5ml' },
-  { name:'Lash Extensions — C Curl 0.15', cat:'Lash Supplies', qty:8, min:3, unit:'Tray' },
-  { name:'Gel Top Coat', cat:'Nail Supplies', qty:6, min:4, unit:'15ml' },
-  { name:'Brow Tint — Dark Brown', cat:'Brow Supplies', qty:1, min:3, unit:'15ml' },
-  { name:'Acrylic Powder — Clear', cat:'Nail Supplies', qty:12, min:5, unit:'100g' },
-];
-
-function renderStock() {
-  const tbody = document.getElementById('stock-body');
-  tbody.innerHTML = stockData.map((item,i) => `
-    <tr>
-      <td><div class="stock-name">${esc(item.name)}</div><div style="font-size:11px;color:var(--t40);">${esc(item.cat)} · ${item.unit}</div></td>
-      <td style="color:var(--t40);">${esc(item.cat)}</td>
-      <td><span class="stock-qty ${item.qty <= item.min ? 'low' : 'ok'}" id="sq-${i}">${item.qty}</span></td>
-      <td style="color:var(--t40);">${item.min}</td>
-      <td>
-        <button class="sact" onclick="adjStock(${i},1)">+</button>
-        <button class="sact" onclick="adjStock(${i},-1)" style="margin-left:4px;">−</button>
-      </td>
-    </tr>`).join('');
-}
-
-function adjStock(i, delta) {
-  stockData[i].qty = Math.max(0, stockData[i].qty + delta);
-  const el = document.getElementById('sq-' + i);
-  if (el) {
-    el.textContent = stockData[i].qty;
-    el.className = 'stock-qty ' + (stockData[i].qty <= stockData[i].min ? 'low' : 'ok');
-  }
-  showToast(stockData[i].name.split('—')[0].trim() + ' → ' + stockData[i].qty + ' units');
-}
-
-// ── SETTINGS ─────────────────────────────────────────────────
+// ── SETTINGS ─────────────────────────────────────────
 async function loadSettings() {
   try {
     const r = await apiCall('/api?action=getConfig');
     const d = await r.json();
-    const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
-    set('s-app-url',     d.app_base_url || '');
-    set('s-deposit',     d.deposit_percent || '50');
-    set('s-yoco-slug',   d.yoco_payment_page_slug || '');
-    set('s-review-url',  d.googlereviewurl || '');
-    set('s-maps-key',    d.google_maps_api_key ? '••••••••' : '');
+    const setv = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+    setv('s-app-url',   d.app_base_url||'');
+    setv('s-deposit',   d.deposit_percent||'50');
+    setv('s-yoco-slug', d.yoco_payment_page_slug||'');
+    setv('s-review-url',d.googlereviewurl||'');
+    setv('s-maps-key',  d.google_maps_api_key ? '••••••••' : '');
   } catch(e) {}
 }
 
-function saveSettings(section) {
-  showToast('Settings saved ✓ — ' + section);
-}
-
-// ── INTEGRATIONS ─────────────────────────────────────────────
+function saveSettings(section) { showToast('Settings saved ✓ — ' + section); }
 function toggleInt(name, input) {
-  const label = { yoco:'Yoco Payments', gcal:'Google Calendar', gmaps:'Google Maps', smtp:'Gmail / SMTP' }[name] || name;
-  showToast(label + (input.checked ? ' — Enabled ✓' : ' — Disabled'));
+  const label = {yoco:'Yoco Payments',gcal:'Google Calendar',gmaps:'Google Maps',smtp:'Gmail / SMTP'}[name]||name;
+  showToast(label + (input.checked?' — Enabled ✓':' — Disabled'));
 }
 
-// ── UTILS ────────────────────────────────────────────────────
-function refresh() { loadDashboard(); loadBookings(); showToast('Refreshed ✓'); }
+// ── UTILS ─────────────────────────────────────────────
+function refresh() { loadDashboard(); loadBookings(); loadConsults(); showToast('Refreshed ✓'); }
 
 function fmtD(ds) {
   if (!ds) return '—';
@@ -1273,17 +1620,16 @@ function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove('show'), 2500);
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── INIT ─────────────────────────────────────────────────────
-loadDashboard();
-loadBookings();
-renderAvailability();
-renderStock();
+// ── INIT ─────────────────────────────────────────────
+async function init() {
+  await Promise.all([loadBookings(), loadConsults()]);
+  loadDashboard();
+}
 </script>
+
 </body>
 </html>
