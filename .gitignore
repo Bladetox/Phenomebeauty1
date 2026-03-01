@@ -28,3 +28,5 @@ dist-ssr
 .env
 .env
 project-994debdf-7f40-4b55-ab9-dc87ccd6e067.json
+.env.prod
+.env.production
