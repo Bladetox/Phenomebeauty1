@@ -2,11 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#050508">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PhenomeBeauty — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,18 +10,14 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
-/* All inputs MUST be ≥16px to prevent iOS zoom-on-focus */
-input,select,textarea { font-size:16px !important; touch-action:manipulation; }
-button { touch-action:manipulation; }
-
 :root {
   --black:  #000000;
   --bg:     #050508;
   --t100: rgba(255,255,255,0.96);
-  --t80:  rgba(255,255,255,0.80);
-  --t60:  rgba(255,255,255,0.58);
-  --t40:  rgba(255,255,255,0.40);
-  --t20:  rgba(255,255,255,0.20);
+  --t80:  rgba(255,255,255,0.75);
+  --t60:  rgba(255,255,255,0.55);
+  --t40:  rgba(255,255,255,0.38);
+  --t20:  rgba(255,255,255,0.18);
   --t10:  rgba(255,255,255,0.09);
   --t06:  rgba(255,255,255,0.06);
   --t03:  rgba(255,255,255,0.03);
@@ -39,11 +31,7 @@ button { touch-action:manipulation; }
   --font-b: 'Jost', system-ui, sans-serif;
 }
 
-html,body {
-  height:100%; background:var(--bg); color:var(--t100); font-family:var(--font-b);
-  -webkit-font-smoothing:antialiased; overscroll-behavior:none;
-  -webkit-overflow-scrolling:touch;
-}
+html,body { height:100%; background:var(--bg); color:var(--t100); font-family:var(--font-b); -webkit-font-smoothing:antialiased; }
 @media(min-width:641px){ html,body{ overflow:hidden; } }
 
 .app { display:flex; height:100vh; }
@@ -148,11 +136,10 @@ html,body {
 .wa-link:hover { background:rgba(37,211,102,0.20); }
 .loyalty-filter { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px; }
 .loyalty-table { width:100%; border-collapse:collapse; min-width:540px; }
-.loyalty-table th { text-align:left; padding:9px 12px; font-size:9px; font-weight:800; letter-spacing:0.20em; text-transform:uppercase; color:var(--t40); border-bottom:0.5px solid var(--border); white-space:nowrap; }
-.loyalty-table td { padding:12px 12px; font-size:12.5px; color:var(--t80); border-bottom:0.5px solid var(--t06); vertical-align:middle; font-weight:500; }
+.loyalty-table th { text-align:left; padding:9px 12px; font-size:9px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--t40); border-bottom:0.5px solid var(--border); white-space:nowrap; }
+.loyalty-table td { padding:11px 12px; font-size:12px; color:var(--t80); border-bottom:0.5px solid var(--t06); vertical-align:middle; }
 .loyalty-table tr:last-child td { border-bottom:none; }
 .loyalty-table tr:hover td { background:rgba(255,255,255,0.02); }
-.loyalty-table td:first-child { color:var(--t100); font-weight:700; font-size:13px; }
 .l-ontrack { background:rgba(74,222,128,0.10); color:var(--green); border:0.5px solid rgba(74,222,128,0.22); }
 .l-overdue { background:rgba(248,113,113,0.10); color:var(--red); border:0.5px solid rgba(248,113,113,0.22); }
 .l-ttbook  { background:rgba(251,191,36,0.10); color:var(--amber); border:0.5px solid rgba(251,191,36,0.22); }
@@ -173,12 +160,12 @@ html,body {
 .nav-item {
   display:flex; align-items:center; justify-content:center; gap:10px;
   padding:11px; border-radius:13px; cursor:pointer; color:var(--t40);
-  font-size:13px; font-weight:600; transition:all 0.15s ease;
+  font-size:13px; font-weight:500; transition:all 0.15s ease;
   white-space:nowrap; position:relative; width:100%;
 }
 @media(min-width:1024px){ .nav-item{justify-content:flex-start;padding:11px 12px;} }
 .nav-item:hover { background:var(--t06); color:var(--t80); }
-.nav-item.active { background:var(--t10); color:var(--t100); font-weight:700; }
+.nav-item.active { background:var(--t10); color:var(--t100); }
 .nav-item.active::before {
   content:''; position:absolute; left:0; top:20%; bottom:20%;
   width:2px; border-radius:99px; background:var(--t100);
@@ -205,19 +192,19 @@ html,body {
   backdrop-filter:blur(24px); display:flex; align-items:center;
   padding:0 20px; gap:10px;
 }
-.topbar-title { font-family:var(--font-d); font-size:22px; font-weight:500; color:var(--t100); flex:1; letter-spacing:0.01em; }
+.topbar-title { font-family:var(--font-d); font-size:20px; font-weight:400; color:var(--t100); flex:1; }
 .search-bar {
   height:34px; padding:0 14px; background:var(--t06);
   border:0.5px solid var(--border); border-radius:99px;
-  color:var(--t80); font-family:var(--font-b); font-size:13px;
-  outline:none; width:180px; font-weight:500;
+  color:var(--t80); font-family:var(--font-b); font-size:12px;
+  outline:none; width:180px;
 }
 .search-bar::placeholder{color:var(--t40);}
 .tbtn {
   height:34px; padding:0 14px; background:var(--t06);
   border:0.5px solid var(--border); border-radius:99px;
   color:var(--t60); font-family:var(--font-b); font-size:12px;
-  font-weight:600; cursor:pointer; transition:all 0.15s ease; white-space:nowrap;
+  font-weight:500; cursor:pointer; transition:all 0.15s ease; white-space:nowrap;
 }
 .tbtn:hover{color:var(--t100);border-color:var(--t40);}
 
@@ -252,7 +239,7 @@ html,body {
   background:linear-gradient(135deg, rgba(251,191,36,0.06) 0%, rgba(255,255,255,0.04) 60%);
 }
 
-.label-caps { font-size:9.5px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase; color:var(--t40); }
+.label-caps { font-size:9.5px; font-weight:700; letter-spacing:0.20em; text-transform:uppercase; color:var(--t40); }
 
 /* ═══════════════════════════════
    DASHBOARD
@@ -320,20 +307,20 @@ html,body {
 
 .metric-card{padding:18px 20px;}
 .metric-title {
-  font-family:var(--font-d); font-size:18px; font-weight:500;
-  color:var(--t100); margin-bottom:14px; letter-spacing:0.01em;
+  font-family:var(--font-d); font-size:17px; font-weight:400;
+  color:var(--t80); margin-bottom:14px;
 }
 .metric-row {
   display:flex; align-items:center; justify-content:space-between;
   padding:8px 0; border-bottom:0.5px solid var(--t06);
 }
 .metric-row:last-child{border-bottom:none;padding-bottom:0;}
-.metric-key{font-size:11.5px;color:var(--t60);font-weight:600;letter-spacing:0.02em;}
-.metric-val{font-family:var(--font-d);font-size:19px;font-weight:400;color:var(--t100);}
+.metric-key{font-size:11.5px;color:var(--t40);font-weight:500;}
+.metric-val{font-family:var(--font-d);font-size:17px;font-weight:400;color:var(--t100);}
 .metric-val.green{color:var(--green);}
 .metric-val.red{color:var(--red);}
 .metric-val.amber{color:var(--amber);}
-.metric-val.sm{font-family:var(--font-b);font-size:13px;font-weight:700;}
+.metric-val.sm{font-family:var(--font-b);font-size:13px;font-weight:500;}
 
 /* Chart */
 .chart-card{padding:22px;}
@@ -360,8 +347,8 @@ html,body {
 .alert-dot.red{background:var(--red);box-shadow:0 0 6px var(--red);}
 .alert-dot.amber{background:var(--amber);box-shadow:0 0 6px var(--amber);}
 .alert-dot.green{background:var(--green);box-shadow:0 0 5px var(--green);}
-.alert-text{font-size:12px;color:var(--t80);line-height:1.6;font-weight:500;}
-.alert-text strong{color:var(--t100);font-weight:700;}
+.alert-text{font-size:11.5px;color:var(--t60);line-height:1.55;}
+.alert-text strong{color:var(--t100);font-weight:600;}
 
 /* ═══════════════════════════════
    BOOKINGS
@@ -378,10 +365,10 @@ html,body {
 }
 .booking-row:hover{background:var(--t06);border-color:var(--border-hi);}
 .booking-avatar{width:38px;height:38px;border-radius:12px;background:var(--t10);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:18px;color:var(--t60);}
-.booking-name{font-size:14px;font-weight:700;color:var(--t100);margin-bottom:3px;letter-spacing:0.01em;}
-.booking-meta{font-size:11.5px;color:var(--t60);font-weight:500;}
-.booking-amount{font-family:var(--font-d);font-size:18px;font-weight:400;color:var(--t100);text-align:right;white-space:nowrap;}
-.status-pill{font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap;}
+.booking-name{font-size:13.5px;font-weight:600;color:var(--t100);margin-bottom:2px;}
+.booking-meta{font-size:11px;color:var(--t40);}
+.booking-amount{font-family:var(--font-d);font-size:16px;font-weight:400;color:var(--t80);text-align:right;white-space:nowrap;}
+.status-pill{font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap;}
 .s-pending{background:rgba(251,191,36,0.12);color:var(--amber);border:0.5px solid rgba(251,191,36,0.25);}
 .s-confirmed{background:rgba(74,222,128,0.10);color:var(--green);border:0.5px solid rgba(74,222,128,0.22);}
 .s-complete{background:rgba(255,255,255,0.07);color:var(--t60);border:0.5px solid var(--border);}
@@ -397,14 +384,14 @@ html,body {
 }
 .detail-panel.open{transform:translateX(0);}
 .panel-close{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:50%;background:var(--t06);border:0.5px solid var(--border);color:var(--t60);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
-.panel-title{font-family:var(--font-d);font-size:26px;font-weight:500;color:var(--t100);margin-bottom:4px;}
-.panel-sub{font-size:11.5px;color:var(--t40);font-weight:600;letter-spacing:0.04em;margin-bottom:22px;}
+.panel-title{font-family:var(--font-d);font-size:24px;font-weight:400;color:var(--t100);margin-bottom:4px;}
+.panel-sub{font-size:11.5px;color:var(--t40);margin-bottom:22px;}
 .panel-section{margin-bottom:18px;}
-.panel-section-title{font-size:9.5px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;color:var(--t40);margin-bottom:10px;}
-.panel-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--t06);}
+.panel-section-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--t40);margin-bottom:10px;}
+.panel-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--t06);}
 .panel-row:last-child{border-bottom:none;}
-.panel-key{font-size:11.5px;color:var(--t60);font-weight:600;}
-.panel-val{font-size:13.5px;color:var(--t100);font-weight:700;text-align:right;}
+.panel-key{font-size:11.5px;color:var(--t40);}
+.panel-val{font-size:13px;color:var(--t100);font-weight:500;text-align:right;}
 .action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px;}
 .action-btn{height:40px;border-radius:12px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid var(--border);background:var(--t06);color:var(--t80);transition:all 0.15s ease;}
 .action-btn:hover{background:var(--t10);color:var(--t100);}
@@ -436,12 +423,12 @@ html,body {
 .stock-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .add-btn{height:36px;padding:0 18px;background:var(--t100);color:var(--black);border:none;border-radius:99px;font-family:var(--font-b);font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.04em;}
 .stock-table{width:100%;border-collapse:collapse;}
-.stock-table th{text-align:left;padding:10px 14px;font-size:9.5px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;color:var(--t40);border-bottom:0.5px solid var(--border);}
-.stock-table td{padding:13px 14px;font-size:13px;color:var(--t80);border-bottom:0.5px solid var(--t06);vertical-align:middle;}
+.stock-table th{text-align:left;padding:10px 14px;font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--t40);border-bottom:0.5px solid var(--border);}
+.stock-table td{padding:12px 14px;font-size:13px;color:var(--t80);border-bottom:0.5px solid var(--t06);vertical-align:middle;}
 .stock-table tr:last-child td{border-bottom:none;}
 .stock-table tr:hover td{background:rgba(255,255,255,0.02);}
-.stock-name{font-weight:700;color:var(--t100);font-size:13.5px;}
-.stock-qty{font-family:var(--font-d);font-size:22px;font-weight:400;}
+.stock-name{font-weight:600;color:var(--t100);}
+.stock-qty{font-family:var(--font-d);font-size:19px;font-weight:400;}
 .stock-qty.low{color:var(--red);}
 .stock-qty.ok{color:var(--green);}
 .sact{width:28px;height:28px;border-radius:8px;background:var(--t06);border:0.5px solid var(--border);color:var(--t60);cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;}
@@ -453,10 +440,10 @@ html,body {
 .settings-grid{display:grid;grid-template-columns:1fr;gap:14px;}
 @media(min-width:768px){.settings-grid{grid-template-columns:1fr 1fr;}}
 .settings-card{padding:22px;}
-.settings-title{font-family:var(--font-d);font-size:20px;font-weight:500;color:var(--t100);margin-bottom:16px;padding-bottom:12px;border-bottom:0.5px solid var(--t06);}
+.settings-title{font-family:var(--font-d);font-size:18px;font-weight:400;color:var(--t80);margin-bottom:16px;padding-bottom:12px;border-bottom:0.5px solid var(--t06);}
 .setting-row{margin-bottom:13px;}
-.setting-label{display:block;font-size:9.5px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--t60);margin-bottom:6px;}
-.setting-input{width:100%;height:46px;padding:0 14px;background:var(--t06);border:0.5px solid var(--border);border-radius:11px;color:var(--t100);font-family:var(--font-b);font-size:16px;font-weight:500;outline:none;transition:border-color 0.15s;}
+.setting-label{display:block;font-size:9.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--t40);margin-bottom:6px;}
+.setting-input{width:100%;height:42px;padding:0 13px;background:var(--t06);border:0.5px solid var(--border);border-radius:11px;color:var(--t100);font-family:var(--font-b);font-size:13px;outline:none;transition:border-color 0.15s;}
 .setting-input:focus{border-color:var(--t40);}
 .setting-input::placeholder{color:var(--t20);}
 .save-btn{height:40px;padding:0 22px;background:var(--t100);color:var(--black);border:none;border-radius:99px;font-family:var(--font-b);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;margin-top:4px;}
@@ -510,13 +497,13 @@ html,body {
 .consult-card{padding:18px 20px;margin-bottom:9px;cursor:pointer;transition:all 0.15s ease;}
 .consult-card:hover{border-color:var(--border-hi);}
 .consult-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
-.consult-name{font-family:var(--font-d);font-size:22px;font-weight:500;color:var(--t100);margin-bottom:4px;}
-.consult-date{font-size:11.5px;color:var(--t60);font-weight:600;}
+.consult-name{font-family:var(--font-d);font-size:20px;font-weight:400;color:var(--t100);margin-bottom:3px;}
+.consult-date{font-size:11px;color:var(--t40);}
 .consult-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
-.consult-tag{font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:0.5px solid var(--border);background:var(--t06);color:var(--t60);}
+.consult-tag{font-size:9.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:0.5px solid var(--border);background:var(--t06);color:var(--t40);}
 
 /* ── DATA LOADING STATES ── */
-.data-note{font-size:12px;color:var(--t60);text-align:center;padding:36px 0;font-weight:500;}
+.data-note{font-size:11px;color:var(--t40);text-align:center;padding:32px 0;font-style:italic;}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--t100);color:var(--black);padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);z-index:999;white-space:nowrap;}
@@ -1027,67 +1014,15 @@ html,body {
 
 <script>
 // ══════════════════════════════════════════════════════
-// PHENOMEBEAUTY ADMIN v3 — Cached · Rate-limited · Native
+// PHENOMEBEAUTY ADMIN — FIXED v2
 // ══════════════════════════════════════════════════════
 const API = '';
 let token = sessionStorage.getItem('pbAdminToken') || '';
-
-// ── DATA STORE ───────────────────────────────────────
 let allBookings = [], allConsults = [], allLoyalty = [], allStock = [];
 let currentFilter = 'All', currentLoyaltyFilter = 'All', currentBookingId = '';
 let loyaltyLoaded = false, stockLoaded = false;
-let currentView = 'dashboard';
 
-// ── CACHE (prevents hammering the API) ───────────────
-const CACHE_TTL = 60000; // 60 seconds
-const _cache = {};
-function cacheGet(key) {
-  const c = _cache[key];
-  return (c && Date.now() - c.ts < CACHE_TTL) ? c.data : null;
-}
-function cacheSet(key, data) { _cache[key] = { data, ts: Date.now() }; }
-function cacheInvalidate(key) { delete _cache[key]; }
-
-// ── REQUEST DEDUP (prevents parallel identical calls) ─
-const _inflight = {};
-async function apiFetch(url, opts = {}) {
-  const isGet = !opts.method || opts.method === 'GET';
-  const key = url + (opts.body || '');
-
-  // For GETs: check cache first
-  if (isGet && opts.method !== 'FORCE') {
-    const cached = cacheGet(key);
-    if (cached) return cached;
-    // Dedup in-flight
-    if (_inflight[key]) return _inflight[key];
-  }
-
-  const headers = { 'x-admin-token': token, 'Content-Type': 'application/json', ...(opts.headers || {}) };
-  const promise = fetch(API + url, { ...opts, headers })
-    .then(async r => {
-      if (r.status === 401) { doLogout(); throw new Error('Session expired'); }
-      const ct = r.headers.get('content-type') || '';
-      if (!ct.includes('application/json')) throw new Error(`Server error (${r.status})`);
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || `Error ${r.status}`);
-      if (isGet) cacheSet(key, d);
-      return d;
-    })
-    .finally(() => { if (isGet) delete _inflight[key]; });
-
-  if (isGet) _inflight[key] = promise;
-  return promise;
-}
-
-// Backwards-compat alias
-function apiCall(url, opts = {}) { return apiFetch(url, opts); }
-
-// ── REFRESH THROTTLE ─────────────────────────────────
-let _lastRefresh = 0;
-const REFRESH_MIN = 30000; // don't full-refresh more than once per 30s
-let _refreshTimer = null;
-
-// ── LOGIN ────────────────────────────────────────────
+// ── LOGIN / LOGOUT ──────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   if (token) { showApp(); } else { showLoginPage(); }
 });
@@ -1096,6 +1031,7 @@ function showLoginPage() {
   document.getElementById('pg-login').classList.remove('hidden');
   document.getElementById('pg-app').style.display = 'none';
 }
+
 function showApp() {
   document.getElementById('pg-login').classList.add('hidden');
   document.getElementById('pg-app').style.display = 'flex';
@@ -1103,9 +1039,9 @@ function showApp() {
 }
 
 async function doLogin() {
-  const btn  = document.getElementById('l-btn');
-  const pass = document.getElementById('l-pass').value.trim();
-  const err  = document.getElementById('l-err');
+  const btn = document.getElementById('l-btn');
+  const pass = document.getElementById('l-pass').value;
+  const err = document.getElementById('l-err');
   if (!pass) return;
   btn.disabled = true;
   btn.innerHTML = '<span class="login-spinner"></span>';
@@ -1117,7 +1053,7 @@ async function doLogin() {
       body: JSON.stringify({ password: pass })
     });
     const ct = r.headers.get('content-type') || '';
-    if (!ct.includes('application/json')) throw new Error('Server error — check deployment logs');
+    if (!ct.includes('application/json')) throw new Error('Server error — is the app deployed?');
     const d = await r.json();
     if (!r.ok || !d.token) throw new Error(d.error || 'Incorrect password');
     token = d.token;
@@ -1136,8 +1072,6 @@ function doLogout() {
   token = '';
   allBookings = []; allConsults = []; allLoyalty = []; allStock = [];
   loyaltyLoaded = false; stockLoaded = false;
-  Object.keys(_cache).forEach(k => delete _cache[k]);
-  clearTimeout(_refreshTimer);
   closeSidebar();
   document.getElementById('l-pass').value = '';
   document.getElementById('l-btn').textContent = 'Sign In';
@@ -1147,7 +1081,7 @@ function doLogout() {
   showToast('Signed out');
 }
 
-// ── MOBILE SIDEBAR ───────────────────────────────────
+// ── MOBILE SIDEBAR ──────────────────────────────────
 function openSidebar() {
   document.querySelector('.sidebar').classList.add('mobile-open');
   document.getElementById('sb-overlay').classList.add('show');
@@ -1157,7 +1091,16 @@ function closeSidebar() {
   document.getElementById('sb-overlay').classList.remove('show');
 }
 
-// ── NAV ──────────────────────────────────────────────
+// ── API CALL ────────────────────────────────────────
+function apiCall(url, opts = {}) {
+  opts.headers = { ...(opts.headers || {}), 'x-admin-token': token, 'Content-Type': 'application/json' };
+  return fetch(API + url, opts).then(r => {
+    if (r.status === 401) { doLogout(); throw new Error('Session expired'); }
+    return r;
+  });
+}
+
+// ── NAV ─────────────────────────────────────────────
 const viewTitles = {
   dashboard:'Dashboard', bookings:'Bookings', consults:'New Divas',
   loyalty:'Loyalty Tracker', availability:'Availability', stock:'Stock',
@@ -1165,7 +1108,6 @@ const viewTitles = {
 };
 
 function show(view, el) {
-  currentView = view;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
@@ -1173,18 +1115,16 @@ function show(view, el) {
   document.getElementById('topbar-title').textContent = viewTitles[view] || view;
   closePanel();
   closeSidebar();
-  // Views that use already-loaded data render instantly
+  if (view === 'dashboard')    loadDashboard();
   if (view === 'bookings')     renderBookings();
   if (view === 'consults')     renderConsults();
-  if (view === 'availability') renderAvailability();
-  // Views with lazy-loaded data
-  if (view === 'dashboard')    renderDashboard();
   if (view === 'loyalty')      { if (!loyaltyLoaded) loadLoyalty(); else renderLoyalty(); }
+  if (view === 'availability') renderAvailability();
   if (view === 'stock')        { if (!stockLoaded) loadStock(); else renderStock(); }
   if (view === 'settings')     loadSettings();
 }
 
-// ── FILTER CHIPS ─────────────────────────────────────
+// ── FILTER CHIPS ────────────────────────────────────
 function fc(chip) {
   chip.closest('.filter-row').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
   chip.classList.add('on');
@@ -1193,86 +1133,85 @@ function fc(chip) {
 // ── BOOKINGS ─────────────────────────────────────────
 async function loadBookings() {
   try {
-    const d = await apiFetch('/api/admin/bookings');
+    const r = await apiCall('/api/admin/bookings');
+    const d = await r.json();
+    // API returns array directly; field names: name, services, date, time, status, total, deposit, balanceDue, phone, email, address, bookingId, balanceStatus, checkoutId, calEventId
     allBookings = Array.isArray(d) ? d : (d.bookings || []);
     updateBadges();
-  } catch(e) { console.error('bookings:', e.message); }
+    renderBookings();
+  } catch(e) { showToast('Bookings error: ' + e.message); }
 }
 
 function filterBookings(f) { currentFilter = f; renderBookings(); }
 
 function renderBookings() {
   const list = document.getElementById('booking-list');
-  if (!list) return;
-  const today = todayStr();
+  const today = new Date().toISOString().slice(0,10);
   let items = allBookings;
   if (currentFilter !== 'All') {
     if (currentFilter === 'Today') items = items.filter(b => b.date === today);
     else items = items.filter(b => b.status === currentFilter);
   }
   if (!items.length) { list.innerHTML = '<div class="data-note">No bookings found.</div>'; return; }
+
   list.innerHTML = items.map(b => {
-    const name  = b.name || '—';
-    const svc   = (b.services || '—').split(',')[0].trim();
-    const stat  = b.status || 'Pending Payment';
+    const name = b.name || '—';
+    const svc  = b.services || '—';
+    const stat = b.status || 'Pending Payment';
     const total = b.total || '0';
-    const id    = b.bookingId || '';
-    const sc    = statusClass(stat);
+    const id   = b.bookingId || '';
+    const sc   = stat === 'Pending Payment' ? 's-pending' : stat === 'Confirmed' ? 's-confirmed' : stat === 'Service Complete' ? 's-complete' : stat === 'Cancelled' ? 's-cancelled' : 's-pending';
     return `<div class="card booking-row" onclick="openPanel('${esc(id)}')">
-      <div class="booking-avatar">${initials(name)}</div>
-      <div style="flex:1;min-width:0;">
+      <div class="booking-avatar">${(name[0]||'?').toUpperCase()}</div>
+      <div>
         <div class="booking-name">${esc(name)}</div>
-        <div class="booking-meta">${esc(svc)} · ${fmtD(b.date)} · ${b.time||''}</div>
+        <div class="booking-meta">${esc(svc.split(',')[0])} · ${fmtD(b.date)} · ${b.time||''}</div>
       </div>
       <div class="booking-amount">R ${Number(total).toLocaleString()}</div>
-      <div class="status-pill ${sc}">${pillLabel(stat)}</div>
+      <div class="status-pill ${sc}">${stat === 'Pending Payment' ? 'Pending' : stat}</div>
     </div>`;
   }).join('');
 }
 
-// ── SEARCH (debounced — no extra API calls) ───────────
-let _searchTimer = null;
 function searchBookings(q) {
-  clearTimeout(_searchTimer);
-  _searchTimer = setTimeout(() => {
-    if (!q.trim()) { renderBookings(); return; }
-    const ql = q.toLowerCase();
-    const saved = allBookings;
-    const hits = allBookings.filter(b =>
-      (b.name||'').toLowerCase().includes(ql) ||
-      (b.services||'').toLowerCase().includes(ql) ||
-      (b.bookingId||'').toLowerCase().includes(ql) ||
-      (b.phone||'').toLowerCase().includes(ql) ||
-      (b.email||'').toLowerCase().includes(ql)
-    );
-    const list = document.getElementById('booking-list');
-    if (!hits.length) { list.innerHTML = `<div class="data-note">No results for "${esc(q)}"</div>`; return; }
-    allBookings = hits; renderBookings(); allBookings = saved;
-  }, 180);
+  if (!q) { renderBookings(); return; }
+  const ql = q.toLowerCase();
+  const items = allBookings.filter(b =>
+    (b.name||'').toLowerCase().includes(ql) ||
+    (b.services||'').toLowerCase().includes(ql) ||
+    (b.bookingId||'').toLowerCase().includes(ql) ||
+    (b.phone||'').toLowerCase().includes(ql)
+  );
+  const list = document.getElementById('booking-list');
+  if (!items.length) { list.innerHTML = '<div class="data-note">No results for "' + esc(q) + '"</div>'; return; }
+  const saved = allBookings; allBookings = items; renderBookings(); allBookings = saved;
 }
 
-// ── DETAIL PANEL (BOOKING) ────────────────────────────
+// ── DETAIL PANEL ────────────────────────────────────
 function openPanel(id) {
   const b = allBookings.find(x => x.bookingId === id);
   if (!b) return;
   currentBookingId = id;
+
   const stat = b.status || '—';
-  const sc   = statusClass(stat);
-  document.getElementById('panel-name').textContent    = b.name || '—';
-  document.getElementById('panel-ref').textContent     = id;
-  document.getElementById('panel-status').textContent  = pillLabel(stat);
-  document.getElementById('panel-status').className    = 'status-pill ' + sc;
-  document.getElementById('panel-date').textContent    = fmtD(b.date);
-  document.getElementById('panel-time').textContent    = b.time || '—';
+  const sc   = stat === 'Pending Payment' ? 's-pending' : stat === 'Confirmed' ? 's-confirmed' : stat === 'Service Complete' ? 's-complete' : stat === 'Cancelled' ? 's-cancelled' : 's-pending';
+
+  document.getElementById('panel-name').textContent   = b.name || '—';
+  document.getElementById('panel-ref').textContent    = id;
+  document.getElementById('panel-status').textContent = stat;
+  document.getElementById('panel-status').className   = 'status-pill ' + sc;
+  document.getElementById('panel-date').textContent   = fmtD(b.date);
+  document.getElementById('panel-time').textContent   = b.time || '—';
   document.getElementById('panel-services').textContent = b.services || '—';
   document.getElementById('panel-address').textContent  = b.address || '—';
   document.getElementById('panel-client-name').textContent = b.name || '—';
-  document.getElementById('panel-phone').textContent   = b.phone || '—';
-  document.getElementById('panel-email').textContent   = b.email || '—';
-  document.getElementById('panel-total').textContent   = 'R ' + Number(b.total   || 0).toLocaleString();
+  document.getElementById('panel-phone').textContent  = b.phone || '—';
+  document.getElementById('panel-email').textContent  = b.email || '—';
+  document.getElementById('panel-total').textContent  = 'R ' + Number(b.total || 0).toLocaleString();
   document.getElementById('panel-deposit').textContent = 'R ' + Number(b.deposit || 0).toLocaleString();
   document.getElementById('panel-balance').textContent = 'R ' + Number(b.balanceDue || 0).toLocaleString();
   document.getElementById('panel-bal-status').textContent = b.balanceStatus || '—';
+
   document.getElementById('detail-panel').classList.add('open');
 }
 
@@ -1282,44 +1221,41 @@ async function panelAction(action) {
   if (!currentBookingId) return;
   if (action === 'requestBalance') {
     try {
-      await apiFetch('/api/admin/request-balance', { method:'POST', body: JSON.stringify({ bookingId: currentBookingId }) });
-      cacheInvalidate('/api/admin/bookings');
+      await apiCall('/api/admin/request-balance', { method:'POST', body: JSON.stringify({ bookingId: currentBookingId }) });
       showToast('Balance request sent ✓');
-      await loadBookings();
     } catch(e) { showToast('Error: ' + e.message); }
     closePanel(); return;
   }
   if (action === 'reschedule') { showToast('Reschedule — coming soon'); return; }
+  // Update status
   try {
-    await apiFetch('/api/admin/update-status', { method:'POST', body: JSON.stringify({ bookingId: currentBookingId, status: action }) });
-    cacheInvalidate('/api/admin/bookings');
+    await apiCall('/api/admin/update-status', { method:'POST', body: JSON.stringify({ bookingId: currentBookingId, status: action }) });
     showToast('Status → ' + action + ' ✓');
     await loadBookings();
-    renderBookings();
-    renderDashboard();
   } catch(e) { showToast('Error: ' + e.message); }
   closePanel();
 }
 
-// ── CONSULTATIONS ─────────────────────────────────────
+// ── CONSULTATIONS ────────────────────────────────────
 async function loadConsults() {
   try {
-    const d = await apiFetch('/api/admin/consultations');
+    const r = await apiCall('/api/admin/consultations');
+    const d = await r.json();
     allConsults = Array.isArray(d) ? d : [];
     updateBadges();
-  } catch(e) { console.error('consults:', e.message); }
+    renderConsults();
+  } catch(e) { showToast('Consultations error: ' + e.message); }
 }
 
 function renderConsults() {
   const el = document.getElementById('consults-list');
-  if (!el) return;
   if (!allConsults.length) { el.innerHTML = '<div class="data-note">No consultations yet.</div>'; return; }
   el.innerHTML = allConsults.map(c => {
     const tags = [];
-    if ((c.clientType||'').toLowerCase() === 'new')    tags.push('New Diva');
-    if ((c.pregnancy||'').toLowerCase()  === 'yes')    tags.push('⚠ Pregnant');
-    if (c.allergies && !/^none$/i.test(c.allergies.trim())) tags.push('Allergies');
-    if (c.medications && !/^none$/i.test(c.medications.trim())) tags.push('Meds');
+    if ((c.clientType||'').toLowerCase()==='new') tags.push('New Diva');
+    if ((c.pregnancy||'').toLowerCase()==='yes') tags.push('Pregnant');
+    if (c.allergies && c.allergies!=='None' && c.allergies.trim()) tags.push('Allergies');
+    if (c.medications && c.medications!=='None' && c.medications.trim()) tags.push('Meds');
     if (c.leadSource && c.leadSource.trim()) tags.push(c.leadSource);
     return `<div class="card consult-card" onclick="openConsultPanel('${esc(c.bookingId)}')">
       <div class="consult-header">
@@ -1327,7 +1263,7 @@ function renderConsults() {
           <div class="consult-name">${esc(c.name||'—')}</div>
           <div class="consult-date">${fmtD(c.date)} · ${esc((c.services||'').split(',')[0]||'—')}</div>
         </div>
-        <div class="status-pill ${statusClass(c.status)}">${pillLabel(c.status)}</div>
+        <div class="status-pill ${c.status==='Confirmed'?'s-confirmed':'s-pending'}">${c.status||'Pending'}</div>
       </div>
       <div class="consult-tags">${tags.map(t=>`<span class="consult-tag">${esc(t)}</span>`).join('')}</div>
     </div>`;
@@ -1337,283 +1273,279 @@ function renderConsults() {
 function openConsultPanel(id) {
   const c = allConsults.find(x => x.bookingId === id);
   if (!c) return;
-  currentBookingId = id;
-  document.getElementById('panel-name').textContent    = c.name || '—';
-  document.getElementById('panel-ref').textContent     = id + (c.clientType ? ' · ' + c.clientType : '');
-  document.getElementById('panel-status').textContent  = c.status || 'Consultation';
-  document.getElementById('panel-status').className    = 'status-pill ' + statusClass(c.status);
-  document.getElementById('panel-date').textContent    = fmtD(c.date);
-  document.getElementById('panel-time').textContent    = c.time || '—';
+  document.getElementById('panel-name').textContent = c.name || '—';
+  document.getElementById('panel-ref').textContent  = id + (c.clientType ? ' · ' + c.clientType : '');
+  document.getElementById('panel-status').textContent = c.status || '—';
+  document.getElementById('panel-status').className = 'status-pill s-pending';
+  document.getElementById('panel-date').textContent = fmtD(c.date);
+  document.getElementById('panel-time').textContent = c.time || '—';
   document.getElementById('panel-services').textContent = c.services || '—';
   document.getElementById('panel-address').textContent  = '—';
   document.getElementById('panel-client-name').textContent = c.name || '—';
-  document.getElementById('panel-phone').textContent   = c.phone || '—';
-  document.getElementById('panel-email').textContent   = c.email || '—';
+  document.getElementById('panel-phone').textContent = c.phone || '—';
+  document.getElementById('panel-email').textContent = c.email || '—';
   document.getElementById('panel-total').textContent   = '—';
   document.getElementById('panel-deposit').textContent = '—';
   document.getElementById('panel-balance').textContent = '—';
-  const notes = [
-    c.skinConditions && !/^none$/i.test(c.skinConditions) ? 'Skin: '+c.skinConditions : '',
-    c.allergies      && !/^none$/i.test(c.allergies)      ? 'Allergies: '+c.allergies : '',
-    c.pregnancy === 'Yes' ? '⚠ Pregnant' : '',
-    c.medications    && !/^none$/i.test(c.medications)    ? 'Meds: '+c.medications : '',
-    c.healthConditions && !/^none$/i.test(c.healthConditions||'none') ? c.healthConditions : '',
-    c.additionalNotes && c.additionalNotes.trim() ? c.additionalNotes : ''
+  document.getElementById('panel-bal-status').textContent = [
+    c.skinConditions ? 'Skin: '+c.skinConditions : '',
+    c.allergies && c.allergies!=='None' ? 'Allergies: '+c.allergies : '',
+    c.pregnancy==='Yes' ? '⚠ Pregnant' : '',
+    c.medications && c.medications!=='None' ? 'Meds: '+c.medications : ''
   ].filter(Boolean).join(' · ') || '—';
-  document.getElementById('panel-bal-status').textContent = notes;
   document.getElementById('detail-panel').classList.add('open');
 }
 
-// ── LOYALTY ───────────────────────────────────────────
+// ── LOYALTY TRACKER ──────────────────────────────────
 async function loadLoyalty() {
   const el = document.getElementById('loyalty-body');
-  if (el) el.innerHTML = '<tr><td colspan="8"><div class="data-note">Loading…</div></td></tr>';
+  el.innerHTML = '<tr><td colspan="8"><div class="data-note">Loading loyalty data…</div></td></tr>';
   try {
-    const d = await apiFetch('/api/admin/loyalty');
+    const r = await apiCall('/api/admin/loyalty');
+    const d = await r.json();
     allLoyalty = Array.isArray(d) ? d : [];
     loyaltyLoaded = true;
     updateLoyaltyStrip();
     updateBadges();
     renderLoyalty();
   } catch(e) {
-    if (el) el.innerHTML = `<tr><td colspan="8"><div class="data-note">Error: ${esc(e.message)}</div></td></tr>`;
+    el.innerHTML = `<tr><td colspan="8"><div class="data-note">Error: ${esc(e.message)}</div></td></tr>`;
   }
 }
 
 function updateLoyaltyStrip() {
   const total   = allLoyalty.length;
-  const ontrack = allLoyalty.filter(l => /on.?track/i.test(l.status||'')).length;
-  const ttbook  = allLoyalty.filter(l => /time.?to.?book/i.test(l.status||'')).length;
-  const overdue = allLoyalty.filter(l => /overdue/i.test(l.status||'')).length;
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  set('ls-total', total); set('ls-ontrack', ontrack); set('ls-ttbook', ttbook); set('ls-overdue', overdue);
+  const ontrack = allLoyalty.filter(l => /on.?track/i.test(l.status)).length;
+  const ttbook  = allLoyalty.filter(l => /time.?to.?book/i.test(l.status)).length;
+  const overdue = allLoyalty.filter(l => /overdue/i.test(l.status)).length;
+  const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  setEl('ls-total',   total);
+  setEl('ls-ontrack', ontrack);
+  setEl('ls-ttbook',  ttbook);
+  setEl('ls-overdue', overdue);
 }
 
 function filterLoyalty(f) {
   currentLoyaltyFilter = f;
-  document.querySelectorAll('.loyalty-filter .chip').forEach(c => {
-    const t = c.textContent.trim();
-    const match = (f==='All'&&t==='All') || (f==='ON TRACK'&&t==='On Track') ||
-                  (f==='TIME TO BOOK'&&t==='Time to Book') || (f==='OVERDUE'&&t==='Overdue');
-    c.classList.toggle('on', match);
-  });
+  // sync chips if called from strip card click
+  const row = document.querySelector('.loyalty-filter');
+  if (row) {
+    row.querySelectorAll('.chip').forEach(c => {
+      const t = c.textContent.trim().toUpperCase();
+      c.classList.toggle('on', (f==='All'&&t==='ALL')||(f===t));
+    });
+  }
   renderLoyalty();
 }
 
 function renderLoyalty() {
   const el = document.getElementById('loyalty-body');
-  if (!el) return;
   let list = allLoyalty;
-  if (currentLoyaltyFilter !== 'All') {
-    list = list.filter(l => (l.status||'').toUpperCase().includes(currentLoyaltyFilter));
-  }
+  if (currentLoyaltyFilter !== 'All') list = list.filter(l => (l.status||'').toUpperCase().includes(currentLoyaltyFilter));
   if (!list.length) { el.innerHTML = '<tr><td colspan="8"><div class="data-note">No clients found.</div></td></tr>'; return; }
   el.innerHTML = list.map(l => {
-    const sc   = /on.?track/i.test(l.status||'') ? 'l-ontrack' : /overdue/i.test(l.status||'') ? 'l-overdue' : /time.?to.?book/i.test(l.status||'') ? 'l-ttbook' : '';
-    const lbl  = /on.?track/i.test(l.status||'') ? 'On Track' : /overdue/i.test(l.status||'') ? 'Overdue' : /time.?to.?book/i.test(l.status||'') ? 'Time to Book' : (l.status||'—');
-    const overdueDate = /overdue/i.test(l.status||'');
+    const sc = /on.?track/i.test(l.status) ? 'l-ontrack' : /overdue/i.test(l.status) ? 'l-overdue' : /time.?to.?book/i.test(l.status) ? 'l-ttbook' : '';
+    const label = /on.?track/i.test(l.status) ? 'On Track' : /overdue/i.test(l.status) ? 'Overdue' : /time.?to.?book/i.test(l.status) ? 'Time to Book' : (l.status||'—');
     return `<tr>
-      <td><span style="font-weight:700;color:var(--t100);">${esc(l.clientName||'—')}</span>${l.location?`<div style="font-size:10px;color:var(--t40);margin-top:2px;">${esc(l.location)}</div>`:''}</td>
-      <td><span style="font-weight:500;">${esc(l.phone||'—')}</span></td>
-      <td><span class="l-pill ${sc}">${esc(lbl)}</span></td>
-      <td style="font-weight:500;">${esc(l.lastWaxDate||'—')}</td>
-      <td style="font-weight:${overdueDate?'700':'500'};color:${overdueDate?'var(--red)':'inherit'};">${esc(l.nextDueDate||'—')}</td>
-      <td style="font-weight:600;color:var(--t100);">${esc(l.packProgress||'—')}</td>
-      <td style="font-size:11.5px;color:var(--t60);max-width:130px;">${esc(l.notes||'')}</td>
+      <td><strong>${esc(l.clientName||'—')}</strong>${l.location?`<div style="font-size:10px;color:var(--t40);">${esc(l.location)}</div>`:''}</td>
+      <td>${esc(l.phone||'—')}</td>
+      <td><span class="l-pill ${sc}">${esc(label)}</span></td>
+      <td>${esc(l.lastWaxDate||'—')}</td>
+      <td style="${/overdue/i.test(l.status)?'color:var(--red);':''}">${esc(l.nextDueDate||'—')}</td>
+      <td>${esc(l.packProgress||'—')}</td>
+      <td style="font-size:11px;color:var(--t40);max-width:130px;">${esc(l.notes||'')}</td>
       <td>${l.whatsappLink?`<a href="${esc(l.whatsappLink)}" target="_blank" rel="noopener" class="wa-link">💬 Chat</a>`:'—'}</td>
     </tr>`;
   }).join('');
 }
 
-// ── STOCK ─────────────────────────────────────────────
+// ── STOCK ────────────────────────────────────────────
 async function loadStock() {
   const el = document.getElementById('stock-body');
-  if (el) el.innerHTML = '<tr><td colspan="5"><div class="data-note">Loading…</div></td></tr>';
+  el.innerHTML = '<tr><td colspan="5"><div class="data-note">Loading stock…</div></td></tr>';
   try {
-    const d = await apiFetch('/api/admin/stock');
+    const r = await apiCall('/api/admin/stock');
+    const d = await r.json();
     allStock = Array.isArray(d) ? d : [];
     stockLoaded = true;
     updateBadges();
     renderStock();
   } catch(e) {
-    if (el) el.innerHTML = `<tr><td colspan="5"><div class="data-note">Error: ${esc(e.message)}</div></td></tr>`;
+    el.innerHTML = `<tr><td colspan="5"><div class="data-note">Error: ${esc(e.message)}</div></td></tr>`;
   }
 }
 
 function renderStock() {
   const tbody = document.getElementById('stock-body');
-  if (!tbody) return;
-  if (!allStock.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="data-note">No stock data.</div></td></tr>'; return; }
+  if (!allStock.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="data-note">No stock data found.</div></td></tr>'; return; }
   tbody.innerHTML = allStock.map((item,i) => {
-    const qty = parseInt(item.quantity || 0);
-    const min = parseInt(item.minStock  || 0);
+    const qty = parseInt(item.quantity||0);
+    const min = parseInt(item.minStock||0);
     const low = min > 0 && qty <= min;
     return `<tr>
-      <td>
-        <div class="stock-name">${esc(item.name)}</div>
-        <div style="font-size:11.5px;color:var(--t60);margin-top:2px;font-weight:500;">${esc(item.category||'')}${item.unit?' · '+item.unit:''}</div>
-      </td>
-      <td style="color:var(--t60);font-weight:500;">${esc(item.category||'—')}</td>
-      <td><span class="stock-qty ${low?'low':'ok'}">${qty}</span></td>
-      <td style="color:var(--t60);font-weight:600;">${min||'—'}</td>
-      <td style="font-size:11.5px;color:var(--t60);">${esc(item.notes||'')}</td>
+      <td><div class="stock-name">${esc(item.name)}</div><div style="font-size:11px;color:var(--t40);">${esc(item.category||'')} ${item.unit?'· '+item.unit:''}</div></td>
+      <td style="color:var(--t40);">${esc(item.category||'—')}</td>
+      <td><span class="stock-qty ${low?'low':'ok'}" id="sq-${i}">${qty}</span></td>
+      <td style="color:var(--t40);">${min||'—'}</td>
+      <td><span style="font-size:11.5px;color:var(--t40);">${esc(item.notes||'')}</span></td>
     </tr>`;
   }).join('');
 }
 
-// ── DASHBOARD ─────────────────────────────────────────
-function renderDashboard() {
-  if (!allBookings.length) return; // data not ready yet — init() will call this after load
-  const now   = new Date();
-  const month = now.getMonth(), year = now.getFullYear();
-  const today = todayStr();
+// ── DASHBOARD ────────────────────────────────────────
+async function loadDashboard() {
+  if (!allBookings.length) await loadBookings();
 
-  const isConfirmed = s => ['Confirmed','Service Complete'].includes(s);
+  const now    = new Date();
+  const month  = now.getMonth();
+  const year   = now.getFullYear();
+  const today  = now.toISOString().slice(0,10);
+
   const thisMonth = allBookings.filter(b => {
-    const d = new Date(b.date||'');
-    return d.getMonth()===month && d.getFullYear()===year && isConfirmed(b.status);
+    const d = new Date(b.date || '');
+    return d.getMonth()===month && d.getFullYear()===year && ['Confirmed','Service Complete'].includes(b.status);
   });
   const lastMonth = allBookings.filter(b => {
-    const d = new Date(b.date||'');
-    return d.getMonth()===(month-1+12)%12 && d.getFullYear()===(month===0?year-1:year) && isConfirmed(b.status);
+    const d = new Date(b.date || '');
+    return d.getMonth()===(month-1+12)%12 && ['Confirmed','Service Complete'].includes(b.status);
   });
 
   const revenue = thisMonth.reduce((s,b) => s + Number(b.deposit||0), 0);
   const lastRev = lastMonth.reduce((s,b) => s + Number(b.deposit||0), 0);
-  const delta   = lastRev > 0 ? Math.round(((revenue-lastRev)/lastRev)*100) : 0;
+  const delta   = lastRev > 0 ? Math.round(((revenue - lastRev) / lastRev) * 100) : 0;
 
   const todayB   = allBookings.filter(b => b.date === today);
-  const todayRev = todayB.filter(b => isConfirmed(b.status)).reduce((s,b) => s+Number(b.deposit||0), 0);
+  const todayRev = todayB.filter(b => ['Confirmed','Service Complete'].includes(b.status)).reduce((s,b) => s+Number(b.deposit||0), 0);
   const remaining = todayB.filter(b => b.status === 'Confirmed').length;
-  const nextB   = todayB.find(b => b.status === 'Confirmed');
+  const nextB     = todayB.find(b => b.status === 'Confirmed');
   const cancelled = allBookings.filter(b => b.status === 'Cancelled').length;
-  const cancelRate = allBookings.length > 0 ? Math.round((cancelled/allBookings.length)*100) : 0;
+  const cancelRate = allBookings.length > 0 ? Math.round((cancelled / allBookings.length) * 100) : 0;
 
-  // Service popularity from real data
   const svcMap = {};
   allBookings.forEach(b => {
-    (b.services||'').split(/[,+&]/).map(s=>s.trim()).filter(Boolean)
-      .forEach(s => { svcMap[s] = (svcMap[s]||0)+1; });
+    (b.services||'').split(/[,+&]/).map(s=>s.trim()).filter(Boolean).forEach(s => { svcMap[s] = (svcMap[s]||0)+1; });
   });
-  const topSvcs = Object.entries(svcMap).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const topSvcs = Object.entries(svcMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const maxSvc  = topSvcs[0]?.[1] || 1;
 
-  // DOM updates
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  // Update DOM
   document.getElementById('hero-revenue').innerHTML = `R ${revenue.toLocaleString()}`;
   const deltaEl = document.getElementById('hero-delta');
-  if (deltaEl) {
-    deltaEl.style.opacity = '1';
-    deltaEl.textContent = (delta >= 0 ? '↑ ' : '↓ ') + Math.abs(delta) + '% vs last month';
-    deltaEl.className = 'hero-delta' + (delta < 0 ? ' down' : '');
-  }
-  set('d-rev-today',   `R ${todayRev.toLocaleString()}`);
-  set('d-appts-today', todayB.length);
-  set('d-remaining',   remaining);
-  set('d-next',        nextB ? `${nextB.time||'—'} · ${(nextB.name||'').split(' ')[0]}` : 'None today');
-  set('d-cancel',      cancelRate + '%');
-  set('d-rebook',      '—'); // would need historical data
-  set('d-hours',       (thisMonth.length * 2) + ' hrs');
-  set('d-fill',        Math.min(Math.round((thisMonth.length/20)*100),100) + '%');
-  set('d-basket',      thisMonth.length ? 'R '+Math.round(revenue/thisMonth.length).toLocaleString() : '—');
-  set('d-total-appts', thisMonth.length);
-  set('d-new-clients', allConsults.length);
-  set('d-returning',   Math.max(0, thisMonth.length - allConsults.length));
-  set('d-retention',   thisMonth.length > 0 ? Math.round((Math.max(0,thisMonth.length-allConsults.length)/thisMonth.length)*100)+'%' : '—');
+  deltaEl.style.opacity = '1';
+  deltaEl.textContent = (delta >= 0 ? '↑ ' : '↓ ') + Math.abs(delta) + '% vs last month';
+  deltaEl.className = 'hero-delta' + (delta < 0 ? ' down' : '');
+
+  document.getElementById('d-rev-today').textContent     = `R ${todayRev.toLocaleString()}`;
+  document.getElementById('d-appts-today').textContent   = todayB.length;
+  document.getElementById('d-remaining').textContent     = remaining;
+  document.getElementById('d-next').textContent          = nextB ? `${nextB.time||'—'} · ${(nextB.name||'').split(' ')[0]}` : 'None today';
+  document.getElementById('d-cancel').textContent        = cancelRate + '%';
+  document.getElementById('d-rebook').textContent        = '68%';
+  document.getElementById('d-hours').textContent         = (thisMonth.length * 2) + ' hrs';
+  document.getElementById('d-fill').textContent          = Math.min(Math.round((thisMonth.length/20)*100),100) + '%';
+  document.getElementById('d-basket').textContent        = thisMonth.length ? 'R '+Math.round(revenue/thisMonth.length).toLocaleString() : '—';
+  document.getElementById('d-total-appts').textContent   = thisMonth.length;
+  document.getElementById('d-new-clients').textContent   = Math.round(thisMonth.length * 0.3);
+  document.getElementById('d-returning').textContent     = Math.round(thisMonth.length * 0.7);
+  document.getElementById('d-retention').textContent     = '70%';
 
   const tsEl = document.getElementById('top-services');
-  if (tsEl) tsEl.innerHTML = topSvcs.length ? topSvcs.map(([name,cnt],i) => `
+  tsEl.innerHTML = topSvcs.length ? topSvcs.map(([name,cnt],i) => `
     <div class="service-rank">
       <div class="rank-num">${i+1}</div>
       <div class="rank-name">${esc(name)}</div>
       <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round((cnt/maxSvc)*100)}%"></div></div>
-      <div class="rank-val">${cnt}×</div>
+      <div class="rank-val">${cnt}x</div>
     </div>`).join('') : '<div class="data-note">No data yet</div>';
 
-  // Alerts — real data only
+  // Alerts — mix real booking data + real loyalty data
   const pendingDeps = allBookings.filter(b => b.status === 'Pending Payment').length;
   const alerts = [];
+
   if (pendingDeps > 0) alerts.push({ dot:'amber', text:`<strong>${pendingDeps} deposit${pendingDeps>1?'s':''}</strong> still pending payment` });
-  if (delta > 0)      alerts.push({ dot:'green', text:`Revenue <strong>↑ ${delta}%</strong> vs last month` });
-  else if (delta < 0) alerts.push({ dot:'red',   text:`Revenue <strong>↓ ${Math.abs(delta)}%</strong> vs last month` });
+  if (delta > 0) alerts.push({ dot:'green', text:`Revenue is <strong>↑ ${delta}%</strong> vs last month` });
+  else if (delta < 0) alerts.push({ dot:'red', text:`Revenue is <strong>↓ ${Math.abs(delta)}%</strong> vs last month` });
+
   if (loyaltyLoaded) {
-    const ov = allLoyalty.filter(l => /overdue/i.test(l.status||'')).length;
-    const tt = allLoyalty.filter(l => /time.?to.?book/i.test(l.status||'')).length;
-    if (ov > 0) alerts.push({ dot:'red',   text:`<strong>${ov} client${ov>1?'s':''}</strong> overdue — loyalty tracker` });
-    if (tt > 0) alerts.push({ dot:'amber', text:`<strong>${tt} client${tt>1?'s':''}</strong> time to rebook` });
+    const overdue = allLoyalty.filter(l => /overdue/i.test(l.status)).length;
+    const ttbook  = allLoyalty.filter(l => /time.?to.?book/i.test(l.status)).length;
+    if (overdue > 0) alerts.push({ dot:'red',   text:`<strong>${overdue} client${overdue>1?'s':''}</strong> overdue on loyalty tracker` });
+    if (ttbook > 0)  alerts.push({ dot:'amber', text:`<strong>${ttbook} client${ttbook>1?'s':''}</strong> haven't rebooked — time to reach out` });
   } else {
-    alerts.push({ dot:'amber', text:'Open <strong>Loyalty Tracker</strong> to load client alerts' });
+    alerts.push({ dot:'amber', text:'Load <strong>Loyalty Tracker</strong> to see client alerts' });
   }
+
   if (stockLoaded) {
-    allStock.filter(s => parseInt(s.minStock||0)>0 && parseInt(s.quantity||0)<=parseInt(s.minStock||0))
-      .forEach(s => alerts.push({ dot:'red', text:`<strong>${esc(s.name)}</strong> — stock low (${s.quantity} left)` }));
+    const lowStock = allStock.filter(s => parseInt(s.minStock||0)>0 && parseInt(s.quantity||0)<=parseInt(s.minStock||0));
+    lowStock.forEach(s => alerts.push({ dot:'red', text:`<strong>${esc(s.name)}</strong> — stock low (${s.quantity} remaining)` }));
   }
-  const alertsEl = document.getElementById('alerts-list');
-  if (alertsEl) alertsEl.innerHTML = alerts.length ? alerts.map(a => `
+
+  document.getElementById('alerts-list').innerHTML = alerts.length ? alerts.map(a => `
     <div class="alert-item">
       <div class="alert-dot ${a.dot}"></div>
       <div class="alert-text">${a.text}</div>
     </div>`).join('') : '<div class="data-note">No alerts</div>';
 
-  // Heatmap — real booking dates
+  // Heatmap
   const hmEl = document.getElementById('heatmap');
-  if (hmEl) {
-    document.getElementById('hm-month').textContent = now.toLocaleString('default',{month:'long',year:'numeric'});
-    const days = new Date(year, month+1, 0).getDate();
-    hmEl.innerHTML = '';
-    for (let d=1; d<=Math.min(days,28); d++) {
-      const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const cnt = allBookings.filter(b => b.date===ds).length;
-      const cell = document.createElement('div');
-      cell.className = 'hm-cell' + (cnt===0?'': cnt===1?' l2': cnt===2?' l3':' l4');
-      hmEl.appendChild(cell);
-    }
+  document.getElementById('hm-month').textContent = now.toLocaleString('default',{month:'long',year:'numeric'});
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  hmEl.innerHTML = '';
+  for (let day = 1; day <= Math.min(daysInMonth, 28); day++) {
+    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const cnt = allBookings.filter(b => b.date === ds).length;
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell' + (cnt===0?'': cnt===1?' l2': cnt===2?' l3':' l4');
+    hmEl.appendChild(cell);
   }
   buildChart();
 }
 
 function buildChart() {
-  // Build from real booking data grouped by week-day over last 30 days
-  const now = Date.now();
-  const W=400, H=150, pad=10;
-  const vals = Array.from({length:30}, (_,i) => {
-    const ds = new Date(now - (29-i)*86400000).toISOString().slice(0,10);
-    return allBookings.filter(b => b.date === ds).reduce((s,b) => s+Number(b.deposit||0), 0);
-  });
-  const max = Math.max(...vals, 1);
-  const pts = vals.map((v,i) => [pad+(i/(vals.length-1))*(W-pad*2), H-pad-((v/max)*(H-pad*2))]);
-  const lineD = 'M'+pts.map(p=>p.join(',')).join(' L');
-  const areaD = lineD+` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
-  const avg  = Math.round(vals.reduce((s,v)=>s+v,0)/vals.length);
-  const avgY = H-pad-((avg/max)*(H-pad*2));
+  const W = 400, H = 150, pad = 10;
+  const vals = Array.from({length:30}, (_,i) => Math.round(200 + Math.random()*800*(1+i/60)));
+  const max  = Math.max(...vals);
+  const pts  = vals.map((v,i) => [pad + (i/(vals.length-1))*(W-pad*2), H-pad-((v/max)*(H-pad*2))]);
+  const lineD = 'M' + pts.map(p=>p.join(',')).join(' L');
+  const areaD = lineD + ` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
+  const avg   = Math.round(vals.reduce((s,v)=>s+v,0)/vals.length);
+  const avgY  = H-pad-((avg/max)*(H-pad*2));
   document.getElementById('chart-line').setAttribute('d', lineD);
   document.getElementById('chart-area').setAttribute('d', areaD);
-  document.getElementById('chart-avg').setAttribute('d',`M${pad},${avgY} L${W-pad},${avgY}`);
+  document.getElementById('chart-avg').setAttribute('d', `M${pad},${avgY} L${W-pad},${avgY}`);
 }
 
-// ── BADGES ────────────────────────────────────────────
+// ── BADGES ───────────────────────────────────────────
 function updateBadges() {
-  const pend     = allBookings.filter(b => b.status === 'Pending Payment').length;
-  const consuls  = allConsults.length;
-  const ov       = allLoyalty.filter(l => /overdue/i.test(l.status||'')).length;
-  const tt       = allLoyalty.filter(l => /time.?to.?book/i.test(l.status||'')).length;
-  const lowStk   = allStock.filter(s => parseInt(s.minStock||0)>0 && parseInt(s.quantity||0)<=parseInt(s.minStock||0)).length;
-  const setBadge = (id,n) => { const e=document.getElementById(id); if(!e) return; e.textContent=n; e.style.display=n>0?'inline-block':'none'; };
+  const pend   = allBookings.filter(b => b.status === 'Pending Payment').length;
+  const consuls = allConsults.length;
+  const overdue = allLoyalty.filter(l => /overdue/i.test(l.status)).length;
+  const ttbook  = allLoyalty.filter(l => /time.?to.?book/i.test(l.status)).length;
+  const loyUrgent = overdue + ttbook;
+  const lowStock  = allStock.filter(s => parseInt(s.minStock||0)>0 && parseInt(s.quantity||0)<=parseInt(s.minStock||0)).length;
+
+  const setBadge = (id, n) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (n > 0) { el.textContent = n; el.style.display = 'inline-block'; }
+    else el.style.display = 'none';
+  };
   setBadge('badge-bookings', pend);
   setBadge('badge-consults',  consuls);
-  setBadge('badge-loyalty',   ov+tt);
-  setBadge('badge-stock',     lowStk);
+  setBadge('badge-loyalty',   loyUrgent);
+  setBadge('badge-stock',     lowStock);
 }
 
-// ── AVAILABILITY ──────────────────────────────────────
-const DAYS  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+// ── AVAILABILITY ─────────────────────────────────────
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
-const avail   = {Monday:true,Tuesday:true,Wednesday:false,Thursday:true,Friday:true,Saturday:true,Sunday:false};
-const blocked = {Monday:['11:00'],Friday:['15:00','16:00'],Thursday:['10:00']};
+const avail = { Monday:true,Tuesday:true,Wednesday:false,Thursday:true,Friday:true,Saturday:true,Sunday:false };
+const blocked = { Monday:['11:00'],Friday:['15:00','16:00'],Thursday:['10:00'] };
 
 function renderAvailability() {
-  document.getElementById('avail-grid').innerHTML = DAYS.map(day => {
-    const on=avail[day], bl=blocked[day]||[];
+  const grid = document.getElementById('avail-grid');
+  grid.innerHTML = DAYS.map(day => {
+    const on = avail[day], bl = blocked[day]||[];
     return `<div class="card card-grad-${on?'1':'2'} day-card">
       <div class="day-header">
         <div class="day-name">${day}</div>
@@ -1623,104 +1555,79 @@ function renderAvailability() {
         </label>
       </div>
       <div class="time-slot-grid" style="${!on?'opacity:0.3;pointer-events:none':''}">
-        ${SLOTS.map(t=>`<div class="slot-chip ${!on?'': bl.includes(t)?'blocked':'available'}" onclick="toggleSlot('${day}','${t}',this)">${t}</div>`).join('')}
+        ${SLOTS.map(t => {
+          const cls = !on?'': bl.includes(t)?'blocked':'available';
+          return `<div class="slot-chip ${cls}" onclick="toggleSlot('${day}','${t}',this)">${t}</div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
 }
-function toggleDay(day,input) {
-  avail[day]=input.checked;
-  const s=input.closest('.day-card').querySelector('.time-slot-grid');
-  s.style.opacity=input.checked?'1':'0.3'; s.style.pointerEvents=input.checked?'auto':'none';
-  showToast(day+(input.checked?' — Open ✓':' — Closed'));
+
+function toggleDay(day, input) {
+  avail[day] = input.checked;
+  const slots = input.closest('.day-card').querySelector('.time-slot-grid');
+  slots.style.opacity = input.checked ? '1' : '0.3';
+  slots.style.pointerEvents = input.checked ? 'auto' : 'none';
+  showToast(day + (input.checked ? ' — Open ✓' : ' — Closed'));
 }
-function toggleSlot(day,time,el) {
-  blocked[day]=blocked[day]||[];
-  if(el.classList.contains('blocked')){ blocked[day]=blocked[day].filter(t=>t!==time); el.classList.replace('blocked','available'); }
-  else { blocked[day].push(time); el.classList.replace('available','blocked'); }
+
+function toggleSlot(day, time, el) {
+  blocked[day] = blocked[day]||[];
+  if (el.classList.contains('blocked')) {
+    blocked[day] = blocked[day].filter(t=>t!==time);
+    el.classList.remove('blocked'); el.classList.add('available');
+  } else {
+    blocked[day].push(time);
+    el.classList.remove('available'); el.classList.add('blocked');
+  }
   showToast(day+' '+time+(blocked[day].includes(time)?' — Blocked':' — Available'));
 }
 
-// ── SETTINGS ──────────────────────────────────────────
+// ── SETTINGS ─────────────────────────────────────────
 async function loadSettings() {
   try {
-    const d = await apiFetch('/api?action=getConfig');
-    const setv=(id,v)=>{ const e=document.getElementById(id); if(e&&v) e.value=v; };
+    const r = await apiCall('/api?action=getConfig');
+    const d = await r.json();
+    const setv = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
     setv('s-app-url',   d.app_base_url||'');
     setv('s-deposit',   d.deposit_percent||'50');
     setv('s-yoco-slug', d.yoco_payment_page_slug||'');
     setv('s-review-url',d.googlereviewurl||'');
-    setv('s-maps-key',  d.google_maps_api_key?'••••••••':'');
-  } catch(e) { console.error('settings:', e.message); }
-}
-function saveSettings(s) { showToast('Settings saved ✓ — '+s); }
-function toggleInt(name,input) {
-  const l={yoco:'Yoco',gcal:'Google Calendar',gmaps:'Google Maps',smtp:'Gmail/SMTP'}[name]||name;
-  showToast(l+(input.checked?' — Enabled ✓':' — Disabled'));
+    setv('s-maps-key',  d.google_maps_api_key ? '••••••••' : '');
+  } catch(e) {}
 }
 
-// ── REFRESH (throttled) ───────────────────────────────
-async function refresh() {
-  const now = Date.now();
-  if (now - _lastRefresh < REFRESH_MIN) { showToast('Refreshed recently ✓'); return; }
-  _lastRefresh = now;
-  // Bust caches for main data
-  cacheInvalidate('/api/admin/bookings');
-  cacheInvalidate('/api/admin/consultations');
-  showToast('Refreshing…');
-  await Promise.all([loadBookings(), loadConsults()]);
-  if (loyaltyLoaded) { cacheInvalidate('/api/admin/loyalty'); await loadLoyalty(); }
-  if (stockLoaded)   { cacheInvalidate('/api/admin/stock');   await loadStock();   }
-  renderDashboard();
-  if (currentView === 'bookings')  renderBookings();
-  if (currentView === 'consults')  renderConsults();
-  if (currentView === 'loyalty')   renderLoyalty();
-  if (currentView === 'stock')     renderStock();
-  showToast('Up to date ✓');
+function saveSettings(section) { showToast('Settings saved ✓ — ' + section); }
+function toggleInt(name, input) {
+  const label = {yoco:'Yoco Payments',gcal:'Google Calendar',gmaps:'Google Maps',smtp:'Gmail / SMTP'}[name]||name;
+  showToast(label + (input.checked?' — Enabled ✓':' — Disabled'));
 }
 
 // ── UTILS ─────────────────────────────────────────────
-function todayStr() {
-  const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
+function refresh() { loadDashboard(); loadBookings(); loadConsults(); showToast('Refreshed ✓'); }
+
 function fmtD(ds) {
-  if(!ds) return '—';
-  const [y,m,d]=ds.split('-').map(Number);
-  if(!y) return ds;
-  const dt=new Date(y,m-1,d);
-  return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]+' '+d+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1];
-}
-function initials(n) { return (n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'; }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function statusClass(s) {
-  return s==='Pending Payment'?'s-pending': s==='Confirmed'?'s-confirmed': s==='Service Complete'?'s-complete': s==='Cancelled'?'s-cancelled': s==='Refunded'?'s-refunded':'s-pending';
-}
-function pillLabel(s) {
-  return s==='Pending Payment'?'Pending': s==='Service Complete'?'Complete': s||'—';
-}
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2500);
+  if (!ds) return '—';
+  const [y,m,d] = ds.split('-').map(Number);
+  const dt = new Date(y,m-1,d);
+  const D = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${D[dt.getDay()]} ${d} ${M[m-1]}`;
 }
 
-// ── INIT ──────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ─────────────────────────────────────────────
 async function init() {
-  _lastRefresh = Date.now();
-  // Parallel load of primary data — only 2 API calls on init
   await Promise.all([loadBookings(), loadConsults()]);
-  renderDashboard();
-  updateBadges();
-  // Auto-refresh every 5 minutes (not more often to respect API limits)
-  _refreshTimer = setInterval(() => {
-    cacheInvalidate('/api/admin/bookings');
-    cacheInvalidate('/api/admin/consultations');
-    Promise.all([loadBookings(), loadConsults()]).then(() => {
-      if (currentView === 'dashboard')  renderDashboard();
-      if (currentView === 'bookings')   renderBookings();
-      if (currentView === 'consults')   renderConsults();
-    });
-  }, 300000); // 5 minutes
+  loadDashboard();
 }
 </script>
 
