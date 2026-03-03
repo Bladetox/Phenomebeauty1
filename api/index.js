@@ -1,1346 +1,2606 @@
-require('dotenv').config({ override: true });
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PhenomeBeauty Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* ═══════════════════════════════════════════════════════════
+         PHENOMEBEAUTY — OBSIDIAN ATELIER
+         v6.0 — Deep dark canvas. Liquid glass over obsidian.
+         Cormorant Garamond (display) + Jost (UI)
+         ═══════════════════════════════════════════════════════════ */
 
-// api/index.js — PhenomeBeauty Booking Server v5.2
-// Vercel serverless entry point — exports Express app, never calls app.listen()
-'use strict';
+      :root {
+        /* Core obsidian palette */
+        --obsidian:   #04040a;
+        --void:       #070710;
+        --onyx:       #0d0d1a;
+        --graphite:   #181828;
 
-const express = require('express');
-const crypto  = require('crypto');
-const { google } = require('googleapis');
+        /* Glass surfaces — luminous layers over dark */
+        --glass-1:    rgba(255,255,255,0.09);
+        --glass-2:    rgba(255,255,255,0.06);
+        --glass-3:    rgba(255,255,255,0.03);
+        --glass-inv:  rgba(255,255,255,0.96);
 
-const {
-    getJwt,
-    getDoc,
-    getSettings,
-    getServices,
-    getAvailabilityRows,
-    bustDocCache,
-    findRow,
-    sastNow,
-} = require('./lib/sheet');
+        /* Text — clear luminous hierarchy */
+        --text-pri:   rgba(255,255,255,0.96);
+        --text-sec:   rgba(255,255,255,0.65);
+        --text-ter:   rgba(255,255,255,0.38);
+        --text-quat:  rgba(255,255,255,0.20);
 
-const {
-    sendAdminDepositNotification,
-    sendAdminBalancePaidNotification,
-    sendCustomerConfirmationEmail,
-    sendBalanceRequestEmail,
-    sendRebookEmail,
-} = require('./lib/email');
+        /* Borders */
+        --border-hi:  rgba(255,255,255,0.18);
+        --border-mid: rgba(255,255,255,0.10);
+        --border-lo:  rgba(255,255,255,0.05);
 
-const app = express();
+        /* Legacy compat aliases */
+        --ink:        #04040a;
+        --ink-2:      #0d0d1a;
+        --ink-soft:   rgba(255,255,255,0.38);
+        --text:       rgba(255,255,255,0.96);
+        --text-muted: rgba(255,255,255,0.38);
+        --text-faint: rgba(255,255,255,0.22);
+        --glass-hi:   rgba(255,255,255,0.96);
+        --glass-mid:  rgba(255,255,255,0.12);
+        --glass-low:  rgba(255,255,255,0.07);
+        --glass-ink:  rgba(255,255,255,0.92);
 
-// =============================================================================
-// SECURITY MIDDLEWARE
-// =============================================================================
-app.use((req, res, next) => {
-    res.set('X-Content-Type-Options',  'nosniff');
-    res.set('X-Frame-Options',          'DENY');
-    res.set('X-XSS-Protection',         '0');       // deprecated — CSP handles this
-    res.set('Referrer-Policy',          'strict-origin-when-cross-origin');
-    res.set('Permissions-Policy',       'camera=(), microphone=(), geolocation=()');
-    res.set('Content-Security-Policy',
-        "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
-        "font-src 'self' https://fonts.gstatic.com; " +
-        "img-src 'self' data: https://iili.io; " +
-        "connect-src 'self' https://maps.googleapis.com https://places.googleapis.com; " +
-        "frame-ancestors 'none';"
-    );
-    next();
-});
+        --r-xl:   28px;
+        --r-lg:   22px;
+        --r-md:   16px;
+        --r-sm:   12px;
+        --r-pill: 999px;
+      }
 
-// Body size limit — prevent large payload attacks
-// verify captures raw bytes before JSON.parse so webhook HMAC works correctly
-app.use(express.json({
-    limit: '50kb',
-    verify: (req, res, buf) => {
-        req.rawBody = buf;
-    }
-}));
+      *, *::before, *::after {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-// =============================================================================
-// RATE LIMITER (in-memory, per IP+path)
-// =============================================================================
-const rateLimitMap = new Map();
-// Rate limiter GC — purge stale entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of rateLimitMap.entries()) {
-    if (now - entry.start > 5 * 60 * 1000) rateLimitMap.delete(key);
-  }
-}, 5 * 60 * 1000).unref();
+      /* ── BODY — deep obsidian with chromatic depth ── */
+      html {
+        height: -webkit-fill-available;
+      }
+      html, body {
+        margin: 0; padding: 0;
+        font-family: 'Jost', system-ui, sans-serif;
+        color: var(--text-pri);
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+        background:
+          radial-gradient(ellipse at 15% 5%,  rgba(100, 60,220,0.80) 0%, transparent 36%),
+          radial-gradient(ellipse at 85% 4%,  rgba(65,  35,165,0.70) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 52%, rgba(50,  25,130,0.60) 0%, transparent 42%),
+          radial-gradient(ellipse at 8%  94%, rgba(80,  45,175,0.65) 0%, transparent 34%),
+          radial-gradient(ellipse at 92% 92%, rgba(58,  28,130,0.60) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 50%, rgba(18,  10, 55,0.92) 0%, transparent 66%),
+          var(--obsidian);
+        background-attachment: fixed;
+      }
 
-function rateLimit(maxReqs, windowMs) {
-    return (req, res, next) => {
-        const key   = req.ip + req.path;
-        const now   = Date.now();
-        const entry = rateLimitMap.get(key) || { count: 0, start: now };
-        if (now - entry.start > windowMs) { entry.count = 0; entry.start = now; }
-        entry.count++;
-        rateLimitMap.set(key, entry);
-        if (entry.count > maxReqs) {
-            return res.status(429).json({ error: 'Too many requests — please wait a moment.' });
+      /* ── LAYOUT ── */
+      .app-frame {
+        width: 100%; min-height: 100vh;
+        padding: 14px 10px 20px;
+        display: flex; align-items: stretch; justify-content: center;
+      }
+
+      /* ── SHELL — dark glass master card ── */
+      .shell {
+        width: 100%; max-width: 520px;
+        min-height: calc(100vh - 32px);
+        border-radius: var(--r-xl);
+        padding: 20px 16px;
+        background: rgba(255,255,255,0.10);
+        backdrop-filter: blur(72px) saturate(200%);
+        -webkit-backdrop-filter: blur(72px) saturate(200%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.20) inset,
+          0 1px 0 rgba(255,255,255,0.14) inset,
+          0 0 0 0.5px rgba(255,255,255,0.06),
+          0 28px 80px rgba(0,0,0,0.70),
+          0 4px 16px rgba(0,0,0,0.50);
+        display: flex; flex-direction: column;
+        position: relative; overflow: hidden;
+      }
+      /* Prismatic top-edge highlight */
+      .shell::before {
+        content: '';
+        position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+        background: linear-gradient(90deg,
+          transparent,
+          rgba(255,255,255,0.45) 30%,
+          rgba(255,255,255,0.80) 50%,
+          rgba(255,255,255,0.45) 70%,
+          transparent);
+        border-radius: var(--r-pill);
+      }
+      @media(min-width:768px){
+        .app-frame { padding: 32px 16px; }
+        .shell { border-radius: 32px; padding: 28px 24px; }
+      }
+
+      /* ── HEADER ── */
+      header {
+        display: flex; flex-direction: column; align-items: center;
+        margin-bottom: 18px;
+      }
+
+      /* Logo — dark glass ring with inner glow */
+      .logo-wrap {
+        width: 82px; height: 82px;
+        border-radius: 27px; padding: 2.5px;
+        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.18) inset,
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 12px 44px rgba(0,0,0,0.75),
+          0 2px 10px rgba(0,0,0,0.50),
+          0 0 40px rgba(120,90,220,0.10);
+        position: relative;
+      }
+      /* Inner glass shine */
+      .logo-wrap::before {
+        content: '';
+        position: absolute; inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+        pointer-events: none;
+      }
+      .logo {
+        width: 100%; height: 100%; border-radius: 23px;
+        object-fit: cover;
+        border: none; display: block;
+      }
+
+      /* ── BRAND TYPOGRAPHY — luxury hierarchy ── */
+      .brand-tag {
+        margin-top: 14px;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; letter-spacing: 0.36em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.70); font-weight: 800;
+      }
+      h1 {
+        margin: 6px 0 2px;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 30px; font-weight: 400;
+        letter-spacing: 0.03em; line-height: 1.1;
+        color: rgba(255,255,255,0.97);
+      }
+      .sub-heading {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; font-weight: 700;
+        letter-spacing: 0.24em; text-transform: uppercase;
+        color: rgba(255,255,255,0.38);
+        margin-bottom: 16px;
+      }
+
+      /* ══ STEP PROGRESS — animated fill system ══════════════════════════════
+         Each segment fills left-to-right. Completed = solid white.
+         Current step = 60% fill with trailing shimmer pulse.
+         Future = empty track.
+         ═══════════════════════════════════════════════════════════════════ */
+      .step-indicator {
+        width: 100%;
+        display: flex; flex-direction: column;
+        align-items: center; gap: 10px;
+      }
+      .step-track-row {
+        display: flex; align-items: center; gap: 5px;
+        width: 100%; padding: 0 2px;
+      }
+      /* Individual segment tracks */
+      .step-pill {
+        flex: 1; height: 3px; border-radius: var(--r-pill);
+        background: rgba(255,255,255,0.10);
+        overflow: visible; position: relative;
+      }
+      .step-pill-inner {
+        width: 0; height: 100%; border-radius: inherit;
+        background: linear-gradient(90deg,
+          rgba(200,180,255,0.70) 0%,
+          rgba(255,255,255,0.98) 100%);
+        box-shadow: 0 0 10px rgba(200,180,255,0.50), 0 0 3px rgba(255,255,255,0.60);
+        transition: width 0.60s cubic-bezier(0.4,0,0.2,1);
+        position: relative;
+      }
+      /* Active shimmer — only on current step's bar */
+      .step-pill-inner.pb-active::after {
+        content: '';
+        position: absolute; top: -2px; right: -20px;
+        width: 28px; height: calc(100% + 4px);
+        background: linear-gradient(90deg, transparent, rgba(220,200,255,0.90));
+        border-radius: var(--r-pill);
+        filter: blur(3px);
+        animation: pbShimmer 1.8s ease-in-out infinite;
+      }
+      @keyframes pbShimmer {
+        0%, 100% { opacity: 0; transform: translateX(-12px); }
+        50%       { opacity: 1; transform: translateX(0); }
+      }
+
+      /* Step dot row — labels under each segment */
+      .step-dots-row {
+        display: flex; width: 100%;
+        justify-content: space-between;
+        padding: 0 2px;
+      }
+      .step-dot {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 3px; flex: 1;
+        transition: opacity 0.3s ease;
+      }
+      .step-dot-num {
+        width: 20px; height: 20px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Jost', sans-serif;
+        font-size: 8px; font-weight: 800;
+        transition: all 0.35s ease;
+        border: 0.5px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.30);
+      }
+      .step-dot.sd-done .step-dot-num {
+        background: rgba(255,255,255,0.97);
+        color: var(--obsidian);
+        border-color: transparent;
+        box-shadow: 0 0 12px rgba(200,180,255,0.35), 0 2px 8px rgba(255,255,255,0.20);
+      }
+      .step-dot.sd-active .step-dot-num {
+        background: rgba(255,255,255,0.18);
+        color: rgba(255,255,255,0.96);
+        border-color: rgba(255,255,255,0.35);
+        box-shadow: 0 0 14px rgba(200,180,255,0.30), 0 0 0 1px rgba(255,255,255,0.10);
+      }
+      .step-dot-lbl {
+        font-family: 'Jost', sans-serif;
+        font-size: 7.5px; font-weight: 700;
+        letter-spacing: 0.10em; text-transform: uppercase;
+        color: rgba(255,255,255,0.22);
+        text-align: center; white-space: nowrap;
+        transition: color 0.3s ease;
+      }
+      .step-dot.sd-active .step-dot-lbl { color: rgba(255,255,255,0.65); }
+      .step-dot.sd-done  .step-dot-lbl  { color: rgba(255,255,255,0.35); }
+
+      /* Legacy: small text label below whole bar */
+      .step-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.25);
+        margin-top: 2px; letter-spacing: 0.04em;
+        display: none; /* replaced by dot labels */
+      }
+
+      /* ── SURFACE — inner dark glass pane ── */
+      .surface {
+        flex: 1; margin-top: 12px; padding: 15px;
+        border-radius: var(--r-lg);
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(36px) saturate(180%);
+        -webkit-backdrop-filter: blur(36px) saturate(180%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.12) inset,
+          0 1px 0 rgba(255,255,255,0.07) inset,
+          0 0 0 0.5px rgba(255,255,255,0.04);
+        border: none;
+        display: flex; flex-direction: column;
+        overflow: visible;
+      }
+      .surface-inner {
+        position: relative; z-index: 1;
+        display: flex; flex-direction: column;
+        flex: 1; min-height: 0;
+      }
+      .view { display: none; height: 100%; }
+      .view.active {
+        display: flex; flex-direction: column;
+        animation: fadeSlide 0.28s ease-out;
+      }
+      @keyframes fadeSlide {
+        from { opacity: 0; transform: translateY(7px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-4px); }
+        to   { opacity: 1; transform: none; }
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes shimmer { 0%,100% { opacity:0.55; } 50% { opacity:0.85; } }
+
+      .section-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; letter-spacing: 0.30em;
+        text-transform: uppercase; color: rgba(255,255,255,0.50);
+        margin-bottom: 14px; flex-shrink: 0; font-weight: 800;
+      }
+
+      .scroll-area {
+        overflow-y: auto; overflow-x: visible;
+        padding-right: 2px; flex: 1; min-height: 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.08) transparent;
+      }
+
+      /* ── CATEGORY CHIPS ── */
+      .chip-row {
+        display: flex; flex-wrap: nowrap; gap: 7px;
+        margin-bottom: 16px;
+        overflow-x: auto; overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px 1px 8px;
+      }
+      .chip-row::-webkit-scrollbar { display: none; }
+      .chip {
+        border-radius: var(--r-pill);
+        height: 33px; padding: 0 17px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; font-weight: 600; letter-spacing: 0.10em;
+        text-transform: uppercase;
+        white-space: nowrap; flex-shrink: 0;
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.40);
+        cursor: pointer; transition: all 0.2s ease;
+      }
+      .chip:hover {
+        background: rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.70);
+        border-color: rgba(255,255,255,0.22);
+        transform: translateY(-1px);
+      }
+      .chip.active {
+        background: rgba(255,255,255,0.94);
+        border: 0.5px solid transparent;
+        color: var(--obsidian);
+        font-weight: 700; letter-spacing: 0.09em;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 4px 18px rgba(255,255,255,0.12);
+      }
+
+      /* ── SERVICE CARDS ── */
+      .category-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.20em;
+        color: rgba(255,255,255,0.40);
+        margin: 18px 0 10px; padding-left: 12px;
+        position: relative;
+      }
+      .category-title::before {
+        content: '';
+        position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+        width: 3px; height: 14px; border-radius: var(--r-pill);
+        background: linear-gradient(180deg, rgba(255,255,255,0.60), rgba(255,255,255,0.25));
+      }
+      .service-card {
+        border-radius: 18px; padding: 16px 15px;
+        margin-bottom: 9px;
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(255,255,255,0.09);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 0.5px solid rgba(255,255,255,0.13);
+        box-shadow:
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 0 0 0.5px rgba(255,255,255,0.04),
+          0 4px 20px rgba(0,0,0,0.25);
+        cursor: pointer;
+        transition: all 0.22s ease;
+      }
+      .service-card:hover {
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.18);
+        box-shadow:
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 8px 26px rgba(0,0,0,0.30);
+        transform: translateY(-1px);
+      }
+      .service-card.selected {
+        background: rgba(255,255,255,0.94);
+        border: 0.5px solid transparent;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 1px 0 rgba(255,255,255,0.60) inset,
+          0 12px 40px rgba(0,0,0,0.50),
+          0 0 30px rgba(255,255,255,0.05);
+        transform: none;
+      }
+      .service-main { flex: 1; margin-right: 12px; }
+      .service-header {
+        display: flex; justify-content: space-between;
+        align-items: baseline; gap: 8px;
+      }
+      /* Service name — Cormorant for elegance, legible size */
+      .service-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px; font-weight: 500;
+        letter-spacing: 0.01em; color: rgba(255,255,255,0.95);
+        line-height: 1.2;
+      }
+      .service-price {
+        font-family: 'Jost', sans-serif;
+        font-size: 14px; font-weight: 700;
+        white-space: nowrap; color: rgba(255,255,255,0.80);
+      }
+      /* Meta — boosted contrast for legibility */
+      .service-meta {
+        margin-top: 5px;
+        font-family: 'Jost', sans-serif;
+        font-size: 12.5px; color: rgba(255,255,255,0.55);
+        line-height: 1.50; letter-spacing: 0.01em;
+      }
+      /* Selected state — dark text on white card */
+      .service-card.selected .service-name  { color: rgba(4,4,10,0.92); }
+      .service-card.selected .service-price { color: rgba(4,4,10,0.65); }
+      .service-card.selected .service-meta  { color: rgba(4,4,10,0.45); }
+
+      /* ── CHECK CIRCLE ── */
+      .check-circle {
+        width: 26px; height: 26px; flex-shrink: 0;
+        border-radius: 50%;
+        border: 0.5px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.22s ease;
+      }
+      .service-card.selected .check-circle {
+        background: rgba(4,4,10,0.88);
+        border-color: rgba(4,4,10,0.30);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.40);
+      }
+      .check-circle svg { display: none; }
+      .service-card.selected .check-circle svg { display: block; }
+
+      /* ── CART BAR ── */
+      .cart-bar {
+        margin-top: 10px; flex-shrink: 0;
+        border-radius: var(--r-md); padding: 11px 13px;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
+        display: none;
+      }
+      .cart-bar.visible { display: block; animation: fadeSlide 0.22s ease; }
+      .cart-bar-top {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 7px;
+      }
+      .cart-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.18em; color: rgba(255,255,255,0.50);
+      }
+      .cart-total {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px; font-weight: 400; color: rgba(255,255,255,0.90);
+      }
+      .cart-items { display: flex; flex-direction: column; gap: 3px; }
+      .cart-item {
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 11.5px; font-family: 'Jost', sans-serif;
+      }
+      .cart-item-name {
+        color: rgba(255,255,255,0.60); flex: 1; margin-right: 8px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        font-size: 11.5px;
+      }
+      .cart-item-price { color: rgba(255,255,255,0.80); white-space: nowrap; font-size: 11.5px; font-weight: 600; }
+      .cart-remove {
+        margin-left: 6px; cursor: pointer;
+        color: rgba(255,255,255,0.18); font-size: 11px; font-weight: 700;
+        transition: color 0.15s;
+      }
+      .cart-remove:hover { color: rgba(255,255,255,0.70); }
+      .cart-duration { margin-top: 6px; font-family: 'Jost', sans-serif; font-size: 10px; color: rgba(255,255,255,0.22); letter-spacing: 0.04em; }
+
+      /* ── CALENDAR ── */
+      .cal-wrap {
+        border-radius: var(--r-md);
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(26px);
+        -webkit-backdrop-filter: blur(26px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
+        overflow: hidden; margin-bottom: 14px;
+      }
+      .cal-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 14px;
+        border-bottom: 0.5px solid rgba(255,255,255,0.06);
+      }
+      .cal-month-label {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 15px; font-weight: 400; letter-spacing: 0.02em;
+        color: rgba(255,255,255,0.90);
+      }
+      .cal-nav {
+        width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.60); font-size: 14px; line-height: 1;
+        transition: all 0.18s ease; user-select: none;
+      }
+      .cal-nav:hover {
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.22);
+        color: rgba(255,255,255,0.90);
+        transform: scale(1.08);
+      }
+      .cal-nav.disabled { opacity: 0.18; cursor: not-allowed; pointer-events: none; }
+      .cal-weekdays {
+        display: grid; grid-template-columns: repeat(7, 1fr);
+        padding: 6px 10px 2px;
+      }
+      .cal-wd {
+        text-align: center; font-family: 'Jost', sans-serif;
+        font-size: 9px; color: rgba(255,255,255,0.22);
+        font-weight: 700; letter-spacing: 0.10em; padding: 2px 0;
+      }
+      .cal-days {
+        display: grid; grid-template-columns: repeat(7, 1fr);
+        gap: 3px; padding: 4px 10px 10px;
+      }
+      .cal-day {
+        aspect-ratio: 1; border-radius: 10px;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+        position: relative; user-select: none;
+        color: rgba(255,255,255,0.40);
+      }
+      .cal-day.empty    { pointer-events: none; }
+      .cal-day.past     { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
+      .cal-day.no-slots { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
+      .cal-day.has-slots {
+        background: rgba(255,255,255,0.07);
+        border-color: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.75);
+      }
+      .cal-day.has-slots:hover {
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.95);
+        transform: scale(1.08);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.30);
+      }
+      .cal-day.loading-month {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.06);
+        pointer-events: none;
+        animation: shimmer 1.6s ease-in-out infinite;
+      }
+      .cal-day.selected {
+        background: rgba(255,255,255,0.96) !important;
+        border-color: transparent !important;
+        color: var(--obsidian) !important; font-weight: 700;
+        box-shadow: 0 4px 18px rgba(255,255,255,0.14);
+        transform: scale(1.10);
+      }
+      .cal-day.today:not(.selected):not(.past) {
+        border-color: rgba(255,255,255,0.24); font-weight: 600; color: rgba(255,255,255,0.90);
+      }
+      .cal-day-dot {
+        width: 3.5px; height: 3.5px; border-radius: 50%;
+        background: rgba(255,255,255,0.30);
+        position: absolute; bottom: 4px;
+      }
+      .cal-day.selected .cal-day-dot { background: rgba(4,4,10,0.35); }
+
+      /* ── TIME SLOTS ── */
+      .time-section-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+        color: rgba(255,255,255,0.50); margin-bottom: 9px; font-weight: 800;
+      }
+      .time-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 7px;
+      }
+      .time-slot {
+        border-radius: var(--r-sm); padding: 9px 4px;
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; text-align: center; cursor: pointer;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        color: rgba(255,255,255,0.65);
+        transition: all 0.15s ease; user-select: none;
+        animation: fadeSlide 0.2s ease;
+      }
+      .time-slot:hover {
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.90);
+        transform: translateY(-1px);
+      }
+      .time-slot.selected {
+        background: rgba(255,255,255,0.94);
+        border-color: transparent;
+        box-shadow: 0 4px 16px rgba(255,255,255,0.10);
+        color: var(--obsidian); font-weight: 600;
+      }
+
+      /* ── FORM ── */
+      .form-group { margin-bottom: 11px; position: relative; }
+      .safety-q-wrap { border-bottom: 0.5px solid rgba(255,255,255,0.06); padding-bottom: 12px; }
+      .safety-q-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.80);
+        margin-bottom: 10px; line-height: 1.55;
+      }
+      .safety-q-label small {
+        display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px;
+      }
+      .safety-yn { display: flex; gap: 8px; margin-bottom: 0; }
+      .syn-btn {
+        flex: 1; padding: 9px; border-radius: 10px;
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.40);
+        font-family: 'Jost', sans-serif;
+        font-size: 13px; font-weight: 600;
+        cursor: pointer; transition: all 0.15s;
+      }
+      .syn-btn:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.70); }
+      .syn-btn[data-v="no"].active,
+      .syn-btn[data-v="yes"].active {
+        background: rgba(255,255,255,0.92);
+        border-color: transparent; color: var(--obsidian);
+        box-shadow: 0 2px 8px rgba(255,255,255,0.10);
+      }
+      .safety-detail {
+        width: 100%; margin-top: 10px; padding: 10px 13px;
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        border-radius: var(--r-sm); color: rgba(255,255,255,0.85);
+        font-family: 'Jost', sans-serif; font-size: 13px; outline: none;
+        resize: vertical; min-height: 56px;
+        animation: fadeIn 0.15s ease;
+      }
+      .safety-detail::placeholder { color: rgba(255,255,255,0.22); }
+      .safety-detail:focus { border-color: rgba(255,255,255,0.22); }
+      label {
+        display: block; font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        letter-spacing: 0.18em; text-transform: uppercase;
+        margin-bottom: 5px; color: rgba(255,255,255,0.45);
+      }
+      .input-wrap { position: relative; display: flex; align-items: center; }
+      .input-icon {
+        position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+        color: rgba(255,255,255,0.22); pointer-events: none; line-height: 1; font-size: 14px;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"] {
+        width: 100%; border-radius: var(--r-sm); padding: 11px 12px;
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.90);
+        font-family: 'Jost', sans-serif; font-size: 13px; outline: none;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      }
+      input.has-icon { padding-left: 34px; }
+      input::placeholder { color: rgba(255,255,255,0.22); }
+      input:focus {
+        border-color: rgba(255,255,255,0.22);
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.10);
+      }
+      input.input-valid { border-color: rgba(255,255,255,0.14); }
+      input.input-error {
+        border-color: rgba(255,100,100,0.55);
+        box-shadow: 0 0 0 1px rgba(255,100,100,0.16);
+      }
+      .field-hint {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.22); margin-top: 4px; padding-left: 2px;
+      }
+
+      /* ── ADDRESS DROPDOWN ── */
+      .addr-suggestions {
+        position: absolute; top: 100%; left: 0; right: 0; z-index: 9999;
+        background: rgba(12,12,22,0.98);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border: 0.5px solid rgba(255,255,255,0.16);
+        border-radius: 13px;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.60);
+        margin-top: 4px; overflow: hidden; display: none;
+      }
+      .addr-suggestions.open { display: block; }
+      .addr-suggestion-item {
+        padding: 9px 13px; font-family: 'Jost', sans-serif;
+        font-size: 12.5px; color: rgba(255,255,255,0.65);
+        border-top: 0.5px solid rgba(255,255,255,0.05);
+        cursor: pointer; transition: background 0.12s; line-height: 1.4;
+      }
+      .addr-suggestion-item:first-child { border-top: none; }
+      .addr-suggestion-item:hover,
+      .addr-suggestion-item.active { background: rgba(255,255,255,0.07); }
+      .addr-suggestion-main { font-weight: 500; color: rgba(255,255,255,0.88); }
+      .addr-suggestion-sec { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+      /* ── SUMMARY CARD ── */
+      .summary-card {
+        border-radius: 18px; padding: 15px 14px; margin-bottom: 8px;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
+      }
+      .summary-row {
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 8px; font-size: 12.5px; margin-bottom: 7px;
+      }
+      .summary-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 11px; }
+      .summary-value { font-family: 'Jost', sans-serif; text-align: right; font-size: 12px; max-width: 58%; color: rgba(255,255,255,0.70); }
+      .summary-divider { margin: 10px 0; border-top: 0.5px solid rgba(255,255,255,0.06); }
+      .summary-total-row {
+        display: flex; justify-content: space-between; align-items: baseline;
+        font-size: 15px; font-weight: 700; margin-bottom: 5px;
+      }
+      .summary-deposit-note {
+        font-family: 'Jost', sans-serif;
+        font-size: 11.5px; color: rgba(255,255,255,0.30); margin-bottom: 4px;
+      }
+      .summary-deposit-note strong { color: rgba(255,255,255,0.75); }
+      .fee-row {
+        display: flex; justify-content: space-between; align-items: center;
+        gap: 8px; margin-bottom: 7px;
+      }
+      .fee-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 12px; }
+      .fee-value { font-family: 'Jost', sans-serif; font-size: 13px; color: rgba(255,255,255,0.70); }
+      .fee-calculating {
+        font-family: 'Jost', sans-serif;
+        font-size: 11px; color: rgba(255,255,255,0.28);
+        display: flex; align-items: center; gap: 5px;
+      }
+      .summary-grand-total {
+        display: flex; justify-content: space-between; align-items: baseline;
+        margin: 4px 0 6px;
+      }
+      .summary-grand-total .gtl {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.30);
+      }
+      .summary-grand-total .gtv {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 24px; font-weight: 400; color: rgba(255,255,255,0.95);
+      }
+      .deposit-box {
+        border-radius: 12px; padding: 11px 13px; margin: 10px 0;
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        display: flex; justify-content: space-between; align-items: center;
+      }
+      .deposit-box-label { font-family: 'Jost', sans-serif; font-size: 11px; color: rgba(255,255,255,0.35); }
+      .deposit-box-amount {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 20px; font-weight: 400; color: rgba(255,255,255,0.95);
+      }
+      .balance-note {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.28); text-align: right; margin-top: 3px;
+      }
+
+      /* ── DIVA TOGGLE ── */
+      .diva-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+      .diva-btn {
+        flex: 1; padding: 11px 8px;
+        border-radius: var(--r-md);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.40);
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 600;
+        cursor: pointer; transition: all 0.18s; letter-spacing: 0.02em;
+      }
+      .diva-btn:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.70); }
+      .diva-btn.active {
+        background: rgba(255,255,255,0.92);
+        border-color: transparent; color: var(--obsidian);
+        box-shadow: 0 4px 18px rgba(255,255,255,0.10);
+      }
+
+      /* Safety banner */
+      .safety-banner {
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        border-radius: var(--r-md); padding: 13px 15px; margin-bottom: 14px;
+      }
+      .safety-banner-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.55);
+        text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 5px;
+      }
+      .safety-banner-body {
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.55;
+      }
+      .safety-banner a {
+        color: rgba(255,255,255,0.55); font-weight: 600;
+        text-decoration: underline; text-underline-offset: 2px;
+        font-size: 11px; display: inline-block; margin-top: 8px;
+      }
+
+      /* ── BUTTONS ── */
+      .actions { display: flex; gap: 10px; margin-top: 14px; flex-shrink: 0; }
+      button {
+        flex: 1; border-radius: 16px; padding: 13px 0;
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 700; border: none;
+        cursor: pointer; outline: none; letter-spacing: 0.08em; text-transform: uppercase;
+        transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+      }
+      .btn-outline {
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        color: rgba(255,255,255,0.50);
+        border: 0.5px solid rgba(255,255,255,0.12);
+      }
+      .btn-outline:hover {
+        transform: translateY(-1px);
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.75);
+      }
+      .btn-primary {
+        background: rgba(255,255,255,0.95);
+        color: var(--obsidian);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 1px 0 rgba(255,255,255,0.50) inset,
+          0 10px 30px rgba(255,255,255,0.08),
+          0 3px 8px rgba(0,0,0,0.30);
+      }
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-1.5px);
+        background: rgba(255,255,255,1);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.40) inset,
+          0 14px 36px rgba(255,255,255,0.12),
+          0 4px 10px rgba(0,0,0,0.35);
+      }
+      .btn-primary:active:not(:disabled) { transform: translateY(0px); }
+      .btn-primary:disabled {
+        background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.20);
+        box-shadow: none; border: 0.5px solid rgba(255,255,255,0.06);
+        cursor: not-allowed;
+      }
+
+      /* ── TOAST ── */
+      .toast {
+        position: fixed; left: 50%; bottom: 24px;
+        transform: translateX(-50%) translateY(130%);
+        min-width: 240px; max-width: 90vw;
+        padding: 10px 18px; border-radius: var(--r-pill);
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.90);
+        background: rgba(14,14,24,0.98);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border: 0.5px solid rgba(255,255,255,0.16);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.06) inset,
+          0 16px 44px rgba(0,0,0,0.60);
+        opacity: 0; z-index: 9999; text-align: center;
+        transition: transform 0.28s cubic-bezier(0.18,0.89,0.32,1.28), opacity 0.28s ease;
+      }
+      .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+      .toast.error { color: rgba(255,130,130,0.95); border-color: rgba(255,100,100,0.25); }
+
+      /* ── LOADER ── */
+      .loader {
+        display: inline-block; width: 17px; height: 17px; border-radius: 50%;
+        border: 2px solid rgba(4,4,10,0.12);
+        border-top-color: rgba(4,4,10,0.70);
+        animation: spin 0.85s linear infinite; vertical-align: middle;
+      }
+      .btn-outline .loader, .toast .loader {
+        border-color: rgba(255,255,255,0.14);
+        border-top-color: rgba(255,255,255,0.70);
+      }
+
+      /* ── SUCCESS ── */
+      .success-view {
+        display: none; flex-direction: column; align-items: center;
+        justify-content: center; text-align: center; flex: 1; padding: 20px 0;
+      }
+      .success-view.active { display: flex; animation: fadeSlide 0.4s ease; }
+      .success-icon {
+        width: 66px; height: 66px; border-radius: 50%;
+        background: rgba(255,255,255,0.95);
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 18px;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 10px 36px rgba(255,255,255,0.12);
+      }
+      .success-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 24px; font-weight: 300; margin-bottom: 6px;
+        color: rgba(255,255,255,0.95); letter-spacing: 0.02em;
+      }
+      .success-sub { font-family: 'Jost', sans-serif; font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.6; }
+      .success-totals {
+        margin-top: 18px; width: 100%;
+        border-radius: var(--r-md); padding: 14px;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        text-align: left;
+      }
+      .success-total-row {
+        display: flex; justify-content: space-between;
+        font-family: 'Jost', sans-serif;
+        font-size: 12.5px; margin-bottom: 5px; color: rgba(255,255,255,0.38);
+      }
+      .success-total-row.highlight {
+        color: rgba(255,255,255,0.90); font-weight: 700; font-size: 14px;
+      }
+
+      /* ── SKELETON SHIMMER ── */
+      .skel {
+        border-radius:16px;padding:14px;margin-bottom:8px;
+        background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.06);
+        animation:shimmer 1.6s ease-in-out infinite;
+      }
+      .skel-line {
+        height:10px;border-radius:5px;background:rgba(255,255,255,0.06);margin-bottom:8px;
+      }
+
+      /* ══════════════════════════════════════════════════════════════
+         WELCOME PAGE — Luxury Spa Experience
+         ══════════════════════════════════════════════════════════════ */
+      .welcome-page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+        background: var(--obsidian);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        overflow: hidden;
+      }
+      
+      /* Animated ambient background */
+      .welcome-page::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 20% 0%,  rgba(180,160,220,0.25) 0%, transparent 50%),
+          radial-gradient(ellipse at 80% 0%,  rgba(140,120,200,0.20) 0%, transparent 45%),
+          radial-gradient(ellipse at 50% 100%, rgba(120,100,180,0.22) 0%, transparent 50%),
+          radial-gradient(ellipse at 0% 50%,  rgba(100,80,160,0.15) 0%, transparent 40%),
+          radial-gradient(ellipse at 100% 50%, rgba(100,80,160,0.15) 0%, transparent 40%);
+        animation: ambientShift 8s ease-in-out infinite;
+        pointer-events: none;
+      }
+      
+      @keyframes ambientShift {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
+      }
+      
+      /* Floating particles effect */
+      .welcome-page::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: 
+          radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.3) 0%, transparent 100%),
+          radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.25) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 30% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+          radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+          radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.25) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 20% 90%, rgba(255,255,255,0.2) 0%, transparent 100%),
+          radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.25) 0%, transparent 100%);
+        animation: floatParticles 20s linear infinite;
+        pointer-events: none;
+      }
+      
+      @keyframes floatParticles {
+        0% { transform: translateY(0) rotate(0deg); }
+        100% { transform: translateY(-100vh) rotate(360deg); }
+      }
+      
+      .welcome-page.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .welcome-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: contentFadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+      
+      @keyframes contentFadeIn {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      
+      /* Logo with golden ring glow */
+      .welcome-logo {
+        width: 120px; height: 120px;
+        border-radius: 36px;
+        padding: 3px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.4) 100%);
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,0.15) inset,
+          0 0 60px rgba(255,255,255,0.12),
+          0 25px 80px rgba(0,0,0,0.6);
+        margin-bottom: 36px;
+        position: relative;
+        animation: logoReveal 1s ease-out 0.2s both, logoFloat 4s ease-in-out 1.2s infinite;
+      }
+      
+      @keyframes logoReveal {
+        0% { opacity: 0; transform: scale(0.8); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      
+      @keyframes logoFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+      
+      /* Rotating golden ring */
+      .welcome-logo::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 44px;
+        background: conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          rgba(255,255,255,0.5) 60deg,
+          rgba(255,255,255,0.3) 120deg,
+          transparent 180deg,
+          rgba(255,255,255,0.4) 240deg,
+          rgba(255,255,255,0.2) 300deg,
+          transparent 360deg
+        );
+        animation: ringRotate 6s linear infinite;
+        mask: radial-gradient(transparent 58%, black 60%, black 100%);
+        -webkit-mask: radial-gradient(transparent 58%, black 60%, black 100%);
+      }
+      
+      @keyframes ringRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .welcome-logo img {
+        width: 100%; height: 100%;
+        border-radius: 33px;
+        object-fit: cover;
+      }
+      
+      /* Brand name - Abril Fatface */
+      .welcome-title {
+        font-family: 'Abril Fatface', 'Playfair Display', Georgia, serif;
+        font-size: 42px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.95);
+        text-align: center;
+        margin-bottom: 8px;
+        letter-spacing: 0.02em;
+        text-shadow: 0 0 60px rgba(255,255,255,0.25);
+        animation: textReveal 0.8s ease-out 0.5s both;
+      }
+      
+      @keyframes textReveal {
+        0% { opacity: 0; transform: translateY(20px); letter-spacing: 0.15em; }
+        100% { opacity: 1; transform: translateY(0); letter-spacing: 0.02em; }
+      }
+      
+      /* Subtitle hierarchy */
+      .welcome-subtitle {
+        font-family: 'Jost', sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.85);
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        margin-bottom: 6px;
+        animation: textReveal 0.8s ease-out 0.7s both;
+      }
+      
+      .welcome-subtitle-small {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.35);
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.30em;
+        margin-bottom: 44px;
+        animation: textReveal 0.8s ease-out 0.85s both;
+      }
+      
+      /* Decorative line */
+      .welcome-divider {
+        width: 60px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+        margin-bottom: 32px;
+        animation: dividerExpand 1s ease-out 1s both;
+      }
+      
+      @keyframes dividerExpand {
+        0% { width: 0; opacity: 0; }
+        100% { width: 60px; opacity: 1; }
+      }
+      
+      /* Tagline */
+      .welcome-tagline {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 17px;
+        font-style: italic;
+        font-weight: 300;
+        color: rgba(255,255,255,0.45);
+        text-align: center;
+        max-width: 260px;
+        line-height: 1.85;
+        margin-bottom: 52px;
+        animation: textReveal 0.8s ease-out 1.1s both;
+      }
+      
+      /* ══════════════════════════════════════════════════════════════
+         CTA BUTTON — Luxury Animated Entrance
+         ══════════════════════════════════════════════════════════════ */
+      .welcome-btn-wrap {
+        position: relative;
+        animation: btnReveal 1s ease-out 1.4s both;
+      }
+      
+      @keyframes btnReveal {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      
+      .welcome-btn {
+        position: relative;
+        padding: 18px 52px;
+        border: none;
+        border-radius: 999px;
+        background: transparent;
+        cursor: pointer;
+        overflow: hidden;
+        isolation: isolate;
+      }
+      
+      /* Outer glow ring */
+      .welcome-btn::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, 
+          rgba(255,255,255,0.6) 0%, 
+          rgba(255,255,255,0.4) 25%,
+          rgba(255,255,255,0.6) 50%,
+          rgba(255,255,255,0.4) 75%,
+          rgba(255,255,255,0.6) 100%);
+        background-size: 300% 300%;
+        animation: shimmerBorder 3s ease-in-out infinite;
+        z-index: -2;
+      }
+      
+      @keyframes shimmerBorder {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+      }
+      
+      /* Inner background */
+      .welcome-btn::after {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #0a0a12 0%, #12121a 100%);
+        z-index: -1;
+      }
+      
+      .welcome-btn-inner {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        z-index: 1;
+      }
+      
+      .welcome-btn-text {
+        font-family: 'Jost', sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, 
+          rgba(255,255,255,1) 0%, 
+          rgba(255,255,255,1) 50%, 
+          rgba(255,255,255,1) 100%);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: textShimmer 3s ease-in-out infinite;
+      }
+      
+      @keyframes textShimmer {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+      }
+      
+      .welcome-btn-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+        border: 1px solid rgba(255,255,255,0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .welcome-btn-icon svg {
+        width: 12px;
+        height: 12px;
+        stroke: rgba(255,255,255,0.9);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .welcome-btn:hover .welcome-btn-icon {
+        background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 100%);
+        transform: scale(1.1);
+      }
+      
+      .welcome-btn:hover .welcome-btn-icon svg {
+        transform: translateX(2px);
+      }
+      
+      /* Ripple effect on hover */
+      .welcome-btn-ripple {
+        position: absolute;
+        inset: 2px;
+        border-radius: 999px;
+        background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: 0;
+      }
+      
+      .welcome-btn:hover .welcome-btn-ripple {
+        opacity: 1;
+        animation: ripplePulse 1.5s ease-in-out infinite;
+      }
+      
+      @keyframes ripplePulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.05); opacity: 1; }
+      }
+      
+      /* Button glow on hover */
+      .welcome-btn:hover {
+        box-shadow: 
+          0 0 40px rgba(255,255,255,0.2),
+          0 20px 60px rgba(0,0,0,0.4);
+      }
+      
+      .welcome-btn:active {
+        transform: scale(0.98);
+      }
+      
+      /* Bottom flourish */
+      .welcome-footer {
+        position: absolute;
+        bottom: 32px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        animation: footerFade 1s ease-out 1.8s both;
+      }
+      
+      @keyframes footerFade {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      
+      .welcome-footer-text {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.20);
+        text-transform: uppercase;
+        letter-spacing: 0.20em;
+      }
+      
+      .welcome-footer-icon {
+        animation: scrollHint 2s ease-in-out infinite;
+      }
+      
+      @keyframes scrollHint {
+        0%, 100% { transform: translateY(0); opacity: 0.3; }
+        50% { transform: translateY(4px); opacity: 0.6; }
+      }
+
+      /* ── RETURNING CLIENT SECTION ── */
+      .returning-section {
+        display: none;
+        background: rgba(139,92,246,0.08);
+        border: 0.5px solid rgba(139,92,246,0.20);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        margin-top: 4px;
+      }
+      .returning-section-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px;
+        font-weight: 700;
+        color: rgba(167,139,250,0.85);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        margin-bottom: 5px;
+      }
+      .returning-section-body {
+        font-family: 'Jost', sans-serif;
+        font-size: 12px;
+        color: rgba(255,255,255,0.45);
+        line-height: 1.55;
+        margin-bottom: 10px;
+      }
+    
+      .phone-wrap { display: flex; gap: 0; }
+      .phone-country-select {
+        border: 1.5px solid var(--border, #ddd);
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        background: var(--surface, #f9f9f9);
+        padding: 0 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        outline: none;
+        min-width: 90px;
+        height: 100%;
+      }
+      .phone-wrap .has-country {
+        border-radius: 0 10px 10px 0 !important;
+        flex: 1;
+      }
+
+      </style>
+  </head>
+  <body>
+    <!-- WELCOME PAGE — Luxury Spa Experience -->
+    <div class="welcome-page" id="welcome-page">
+      <div class="welcome-content">
+        <div class="welcome-logo">
+          <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty">
+        </div>
+        <div class="welcome-title">PhenomeBeauty</div>
+        <div class="welcome-subtitle">Mobile Beauty Studio</div>
+        <div class="welcome-subtitle-small">Premium At-Home Treatments</div>
+        <div class="welcome-divider"></div>
+        <div class="welcome-tagline">
+          "Every woman deserves to feel beautiful in the comfort of her own space."
+        </div>
+        <div class="welcome-btn-wrap">
+          <button class="welcome-btn" onclick="enterBooking()">
+            <div class="welcome-btn-ripple"></div>
+            <div class="welcome-btn-inner">
+              <span class="welcome-btn-text">Begin Your Experience</span>
+              <span class="welcome-btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="welcome-footer">
+        <span class="welcome-footer-text">Cape Town</span>
+        <span class="welcome-footer-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="app-frame" id="app-frame" style="display:none;position:relative;z-index:1;">
+      <div class="shell">
+        <header>
+          <div class="logo-wrap">
+            <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty" class="logo">
+          </div>
+          <div class="brand-tag" style="text-shadow: 0 0 20px rgba(180,160,255,0.40);">Mobile Beauty Studio</div>
+          <div style="width:32px;height:0.5px;margin:10px auto 6px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.40),transparent);"></div>
+          <h1 id="view-title" style="text-shadow: 0 2px 20px rgba(200,180,255,0.20);">Choose Services</h1>
+          <div class="sub-heading">Premium At-Home Treatments</div>
+          <div class="step-indicator">
+            <div class="step-track-row">
+              <div class="step-pill"><div class="step-pill-inner" id="step-bar-1"></div></div>
+              <div class="step-pill"><div class="step-pill-inner" id="step-bar-2"></div></div>
+              <div class="step-pill"><div class="step-pill-inner" id="step-bar-3"></div></div>
+              <div class="step-pill"><div class="step-pill-inner" id="step-bar-4"></div></div>
+            </div>
+            <div class="step-dots-row">
+              <div class="step-dot sd-active" id="sdot-1"><div class="step-dot-num" id="sdot-num-1">1</div><div class="step-dot-lbl">Services</div></div>
+              <div class="step-dot" id="sdot-2"><div class="step-dot-num" id="sdot-num-2">2</div><div class="step-dot-lbl">Schedule</div></div>
+              <div class="step-dot" id="sdot-3"><div class="step-dot-num" id="sdot-num-3">3</div><div class="step-dot-lbl">Details</div></div>
+              <div class="step-dot" id="sdot-4"><div class="step-dot-num" id="sdot-num-4">4</div><div class="step-dot-lbl">Review</div></div>
+            </div>
+          </div>
+        </header>
+
+        <div class="surface">
+          <div class="surface-inner">
+
+            <!-- Step 1: Services + Cart -->
+            <div id="step-services" class="view active">
+              <div class="section-label">Select your treatments</div>
+              <div class="scroll-area" id="services-scroll">
+                <div class="chip-row" id="category-chips"></div>
+                <div id="services-list">
+                  <div class="skel"><div class="skel-line" style="width:65%;"></div><div class="skel-line" style="width:40%;margin-bottom:0;"></div></div>
+                  <div class="skel" style="animation-delay:.18s;"><div class="skel-line" style="width:55%;"></div><div class="skel-line" style="width:35%;margin-bottom:0;"></div></div>
+                  <div class="skel" style="animation-delay:.36s;"><div class="skel-line" style="width:70%;"></div><div class="skel-line" style="width:45%;margin-bottom:0;"></div></div>
+                </div>
+              </div>
+              <div class="cart-bar" id="cart-bar">
+                <div class="cart-bar-top">
+                  <span class="cart-title">Your Selection</span>
+                  <span class="cart-total" id="cart-total-price">R0</span>
+                </div>
+                <div class="cart-items" id="cart-items-list"></div>
+                <div class="cart-duration" id="cart-duration"></div>
+              </div>
+            </div>
+
+            <!-- Step 2: Date & Time -->
+            <div id="step-datetime" class="view">
+              <div class="section-label">Choose date &amp; time</div>
+              <div class="scroll-area">
+                <div class="cal-wrap">
+                  <div class="cal-header">
+                    <div class="cal-nav" id="cal-prev">&#8249;</div>
+                    <div class="cal-month-label" id="cal-month-label">—</div>
+                    <div class="cal-nav" id="cal-next">&#8250;</div>
+                  </div>
+                  <div class="cal-weekdays">
+                    <div class="cal-wd">Su</div><div class="cal-wd">Mo</div>
+                    <div class="cal-wd">Tu</div><div class="cal-wd">We</div>
+                    <div class="cal-wd">Th</div><div class="cal-wd">Fr</div>
+                    <div class="cal-wd">Sa</div>
+                  </div>
+                  <div id="cal-days" class="cal-days"></div>
+                </div>
+                <div id="time-section" style="display:none;">
+                  <div class="time-section-label" id="time-section-label">Available times</div>
+                  <div class="time-grid" id="time-grid"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Details -->
+            <div id="step-details" class="view">
+              <div class="section-label">Your details</div>
+              <div class="scroll-area">
+
+                <!-- Diva toggle -->
+                <div class="form-group" style="margin-bottom:14px;">
+                  <label style="margin-bottom:8px;display:block;">Have you booked with us before?</label>
+                  <div style="display:flex;gap:8px;">
+                    <button type="button" id="diva-existing" onclick="toggleDiva('existing')"
+                      style="flex:1;padding:10px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.18);
+                             background:rgba(255,255,255,0.92);color:var(--obsidian);font-weight:700;
+                             font-size:13px;cursor:pointer;transition:all 0.15s;font-family:'Jost',sans-serif;
+                             box-shadow:0 2px 8px rgba(255,255,255,0.10);">
+                      ✨ Existing Diva
+                    </button>
+                    <button type="button" id="diva-new" onclick="toggleDiva('new')"
+                      style="flex:1;padding:10px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.10);
+                             background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);font-weight:600;
+                             font-size:13px;cursor:pointer;transition:all 0.15s;font-family:'Jost',sans-serif;">
+                      🌸 New Diva
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="client-name">Full Name</label>
+                  <div class="input-wrap">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="client-name" class="has-icon"
+                           placeholder="Jane Smith" autocomplete="name"
+                           maxlength="80" oninput="updateNextBtn()">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="client-phone">Phone Number</label>
+                  <div class="input-wrap phone-wrap">
+                    <select id="phone-country" class="phone-country-select" onchange="formatPhone(document.getElementById('client-phone'))">
+                      <option value="+27" data-flag="🇿🇦">🇿🇦 +27</option>
+                      <option value="+1"  data-flag="🇺🇸">🇺🇸 +1</option>
+                      <option value="+44" data-flag="🇬🇧">🇬🇧 +44</option>
+                      <option value="+61" data-flag="🇦🇺">🇦🇺 +61</option>
+                      <option value="+64" data-flag="🇳🇿">🇳🇿 +64</option>
+                      <option value="+49" data-flag="🇩🇪">🇩🇪 +49</option>
+                      <option value="+33" data-flag="🇫🇷">🇫🇷 +33</option>
+                      <option value="+31" data-flag="🇳🇱">🇳🇱 +31</option>
+                      <option value="+971" data-flag="🇦🇪">🇦🇪 +971</option>
+                      <option value="+91" data-flag="🇮🇳">🇮🇳 +91</option>
+                      <option value="+other" data-flag="🌍">🌍 Other</option>
+                    </select>
+                    <input type="tel" id="client-phone" class="has-country"
+                           placeholder="82 123 4567" autocomplete="tel"
+                           inputmode="tel" maxlength="20"
+                           oninput="formatPhone(this)">
+                  </div>
+                  <div class="field-hint">e.g. 082 123 4567 or +44 7911 123456</div>
+                </div>
+                <div class="form-group">
+                  <label for="client-email">Email Address</label>
+                  <div class="input-wrap">
+                    <span class="input-icon">✉️</span>
+                    <input type="email" id="client-email" class="has-icon"
+                           placeholder="jane@example.com" autocomplete="email"
+                           inputmode="email" maxlength="120"
+                           oninput="validateEmail(this)">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="client-address">Home Address</label>
+                  <div class="input-wrap" style="position:relative;flex-direction:column;align-items:stretch;">
+                    <span class="input-icon" style="top:18px;">📍</span>
+                    <input type="text" id="client-address" class="has-icon"
+                           placeholder="Start typing your address…" autocomplete="off" maxlength="200">
+                    <div id="addr-suggestions" class="addr-suggestions"></div>
+                  </div>
+                  <div class="field-hint">Used to calculate your call-out fee</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="client-source">How did you hear about us?</label>
+                  <div class="input-wrap" style="padding:0;">
+                    <select id="client-source"
+                      style="width:100%;padding:12px 14px;
+                             background:rgba(255,255,255,0.07);
+                             border:0.5px solid rgba(255,255,255,0.10);
+                             border-radius:var(--r-sm);color:rgba(255,255,255,0.80);
+                             font-family:'Jost',sans-serif;font-size:13px;outline:none;cursor:pointer;
+                             -webkit-appearance:none;appearance:none;">
+                      <option value="" style="background:#0d0d1a;">Select an option…</option>
+                      <option value="Instagram" style="background:#0d0d1a;">Instagram</option>
+                      <option value="TikTok" style="background:#0d0d1a;">TikTok</option>
+                      <option value="Facebook" style="background:#0d0d1a;">Facebook</option>
+                      <option value="Google" style="background:#0d0d1a;">Google Search</option>
+                      <option value="Word of Mouth" style="background:#0d0d1a;">Word of Mouth</option>
+                      <option value="Referred by Friend" style="background:#0d0d1a;">Referred by a Friend</option>
+                      <option value="Returning Client" style="background:#0d0d1a;">I'm a returning client</option>
+                      <option value="Other" style="background:#0d0d1a;">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Safety assessment — new divas only -->
+                <div id="safety-section" style="display:none;margin-top:4px;">
+                  <div style="background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.10);
+                               border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+                    <div style="font-family:'Jost',sans-serif;font-size:9px;font-weight:700;
+                                color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.18em;margin-bottom:5px;">
+                      🌸 New Client Safety Check
+                    </div>
+                    <div style="font-family:'Jost',sans-serif;font-size:12px;color:rgba(255,255,255,0.38);line-height:1.55;">
+                      Answer all questions honestly. Your information is strictly confidential.
+                    </div>
+                    <a href="/policy.html" target="_blank"
+                       style="display:inline-block;margin-top:8px;font-family:'Jost',sans-serif;
+                              font-size:11px;font-weight:600;
+                              color:rgba(255,255,255,0.55);text-decoration:underline;text-underline-offset:2px;">
+                      View full consultation &amp; policy document ↗
+                    </a>
+                  </div>
+
+                  <div class="form-group safety-q-wrap">
+                    <div class="safety-q-label">1. Any skin conditions in the treatment area?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Rashes, cuts, sunburn, eczema, acne, etc.</span>
+                    </div>
+                    <div class="safety-yn" data-q="skin">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'skin')">No</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'skin')">Yes</button>
+                    </div>
+                    <textarea id="safety-skin" class="safety-detail" maxlength="500" placeholder="Please describe…" style="display:none;"></textarea>
+                  </div>
+                  <div class="form-group safety-q-wrap">
+                    <div class="safety-q-label">2. Any medications or recent skin treatments?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Retinoids, blood thinners, chemical peels, laser, etc.</span>
+                    </div>
+                    <div class="safety-yn" data-q="meds">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'meds')">No</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'meds')">Yes</button>
+                    </div>
+                    <textarea id="safety-meds" class="safety-detail" maxlength="500" placeholder="Please list…" style="display:none;"></textarea>
+                  </div>
+                  <div class="form-group safety-q-wrap">
+                    <div class="safety-q-label">3. Any known allergies to wax or beauty products?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Resins, latex, fragrances, oils, creams, etc.</span>
+                    </div>
+                    <div class="safety-yn" data-q="allergies">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'allergies')">No</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'allergies')">Yes</button>
+                    </div>
+                    <textarea id="safety-allergies" class="safety-detail" maxlength="500" placeholder="Please describe your allergy…" style="display:none;"></textarea>
+                  </div>
+                  <div class="form-group safety-q-wrap">
+                    <div class="safety-q-label">4. Are you currently pregnant?</div>
+                    <div class="safety-yn" data-q="pregnant">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'pregnant')">No</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'pregnant')">Yes</button>
+                    </div>
+                  </div>
+                  <div class="form-group safety-q-wrap">
+                    <div class="safety-q-label">5. Any health conditions affecting skin, healing, or safety?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Diabetes, varicose veins, immune conditions, recent surgery, etc.</span>
+                    </div>
+                    <div class="safety-yn" data-q="health">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'health')">No</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'health')">Yes</button>
+                    </div>
+                    <textarea id="safety-health" class="safety-detail" maxlength="500" placeholder="Please explain…" style="display:none;"></textarea>
+                  </div>
+                  <div class="form-group safety-q-wrap">
+                    <div class="safety-q-label">6. Significant environmental exposure?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Sun, heat, chemicals, frequent water or sweat contact in the area.</span>
+                    </div>
+                    <div class="safety-yn" data-q="enviro">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'enviro')">No</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'enviro')">Yes</button>
+                    </div>
+                    <textarea id="safety-enviro" class="safety-detail" maxlength="300" placeholder="Please describe…" style="display:none;"></textarea>
+                  </div>
+                  <div class="form-group safety-q-wrap">
+                    <div class="safety-q-label">7. Frequent pressure or friction on areas to be waxed?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Due to work, sport, tight clothing, etc.</span>
+                    </div>
+                    <div class="safety-yn" data-q="physical">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'physical')">No</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'physical')">Yes</button>
+                    </div>
+                    <textarea id="safety-physical" class="safety-detail" maxlength="300" placeholder="Please describe…" style="display:none;"></textarea>
+                  </div>
+                  <div class="form-group safety-q-wrap" style="margin-bottom:4px;">
+                    <div class="safety-q-label">8. At least 2 weeks of uninterrupted hair growth?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">This is required for effective waxing results.</span>
+                    </div>
+                    <div class="safety-yn" data-q="hair">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'hair')">No</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'hair')">Yes</button>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-top:10px;">
+                    <label for="safety-notes" style="font-size:12px;">Anything else we should know? <span style="color:var(--text-faint);font-weight:400;">(optional)</span></label>
+                    <textarea id="safety-notes" maxlength="500" placeholder="Additional information…"
+                      style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.07);
+                             border:0.5px solid rgba(255,255,255,0.10);border-radius:var(--r-sm);
+                             color:rgba(255,255,255,0.85);font-family:'Jost',sans-serif;font-size:13px;
+                             outline:none;resize:vertical;min-height:56px;"></textarea>
+                  </div>
+                </div>
+
+                <!-- Returning Client Section - for existing divas -->
+                <div id="returning-section" class="returning-section">
+                  <div class="returning-section-title">✨ Welcome Back!</div>
+                  <div class="returning-section-body">
+                    Please let us know if anything has changed since your last appointment.
+                  </div>
+                  <div class="form-group safety-q-wrap" style="border-bottom:none;padding-bottom:0;">
+                    <div class="safety-q-label" style="color:rgba(167,139,250,0.85);">Has anything changed since your last visit?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">New medications, skin conditions, pregnancy, allergies, etc.</span>
+                    </div>
+                    <div class="safety-yn" data-q="changes">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'changes')">No changes</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'changes')">Yes, something changed</button>
+                    </div>
+                    <textarea id="returning-changes" class="safety-detail" maxlength="500" placeholder="Please describe what has changed…" style="display:none;"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4: Review + Payment -->
+            <div id="step-summary" class="view">
+              <div class="section-label">Review booking</div>
+              <div class="scroll-area">
+                <div class="summary-card" style="margin-bottom:10px;">
+                  <div id="summary-block"></div>
+                </div>
+                <div class="summary-card" style="margin-bottom:10px;">
+                  <div class="fee-row">
+                    <span class="fee-label">Services</span>
+                    <span class="fee-value" id="sum-services-total">—</span>
+                  </div>
+                  <div class="fee-row">
+                    <span class="fee-label">Call-out fee</span>
+                    <span class="fee-value" id="sum-callout-fee">
+                      <span class="fee-calculating"><span class="loader" style="width:11px;height:11px;border-width:1.5px;border-color:rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.60);"></span> Calculating…</span>
+                    </span>
+                  </div>
+                  <div class="summary-divider"></div>
+                  <div class="summary-grand-total">
+                    <span class="gtl">Total</span>
+                    <span class="gtv" id="sum-total">—</span>
+                  </div>
+                  <div class="deposit-box">
+                    <div>
+                      <div class="deposit-box-label">Deposit due now (50%)</div>
+                      <div class="balance-note" id="sum-balance-note">Balance due on the day</div>
+                    </div>
+                    <div class="deposit-box-amount" id="sum-deposit">—</div>
+                  </div>
+                </div>
+                <div style="text-align:center;padding:10px 4px 2px;">
+                  <p style="margin:0;font-family:'Jost',sans-serif;font-size:11px;color:rgba(255,255,255,0.22);line-height:1.7;letter-spacing:0.02em;">
+                    By making payment you agree to our
+                    <a href="/policy.html?terms" target="_blank"
+                       style="color:rgba(255,255,255,0.50);text-decoration:underline;text-underline-offset:2px;font-weight:600;white-space:nowrap;">
+                      Terms &amp; Conditions
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Success screen -->
+            <div class="success-view" id="success-view">
+              <div class="success-icon" id="success-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <div class="success-title" id="success-title">You're booked!</div>
+              <div class="success-totals" id="success-totals"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="actions" id="actions-bar">
+          <button class="btn-outline" id="btn-back" style="display:none;" onclick="prevStep()">Back</button>
+          <button class="btn-primary" id="btn-next" onclick="nextStep()" disabled>Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      // PhenomeBeauty Booking — v5.0 (Luxury B&W)
+      // ── STATE ──────────────────────────────────────────────────────────────
+      let currentStep      = 1;
+      let services         = [];
+      let selectedServices = [];
+      let selectedDate     = '';
+      let selectedTime     = '';
+      let activeCategory   = null;
+      let appConfig        = {};
+      let lastFeeData      = { fee: 0, oneWayKm: 0, roundTripKm: 0 };
+      let addressConfirmed = false;
+      let addrDebounceTimer = null;
+
+      // ── WELCOME PAGE TRANSITION ───────────────────────────────────────────
+      function enterBooking() {
+        const welcomePage = document.getElementById('welcome-page');
+        const appFrame = document.getElementById('app-frame');
+        welcomePage.classList.add('hidden');
+        appFrame.style.display = 'flex';
+        setTimeout(() => {
+          welcomePage.style.display = 'none';
+        }, 500);
+      }
+
+      // ── INIT ───────────────────────────────────────────────────────────────
+      window.onload = () => {
+        const params = new URLSearchParams(window.location.search);
+        const pStatus = params.get('payment');
+        const pRef    = params.get('ref');
+        
+        // Skip welcome page if returning from payment or has query params
+        if (pStatus || pRef) {
+          document.getElementById('welcome-page').style.display = 'none';
+          document.getElementById('app-frame').style.display = 'flex';
         }
-        next();
-    };
-}
+        
+        if (pStatus) {
+          window.history.replaceState({}, '', window.location.pathname);
+          if (pStatus === 'success' && pRef) {
+            fetch('/api/check-payment?ref=' + encodeURIComponent(pRef))
+              .then(r => r.json())
+              .then(data => showDepositThankYou(data))
+              .catch(() => showDepositThankYou(null));
+          } else if (pStatus === 'balance-success' && pRef) {
+            fetch('/api/check-payment?ref=' + encodeURIComponent(pRef))
+              .then(r => r.json())
+              .then(data => showBalanceThankYou(data))
+              .catch(() => showBalanceThankYou(null));
+          } else if (pStatus === 'cancelled' || pStatus === 'balance-cancelled') {
+            showBanner('Payment cancelled — your slot is still held. You can pay anytime.', false);
+          }
+        }
+        fetch('/api?action=getConfig')
+          .then(r => r.json())
+          .then(cfg => { appConfig = cfg || {}; })
+          .catch(() => {})
+          .finally(() => { loadServices(); calInit(); updateStepUI(); });
+      };
 
-// =============================================================================
-// INPUT SANITIZER
-// =============================================================================
-function sanitize(val, maxLen = 200) {
-    if (val === null || val === undefined) return '';
-    return String(val).replace(/<[^>]*>/g, '').replace(/[<>"']/g, '').trim().slice(0, maxLen);
-}
+      // ── THANK YOU SCREENS ────────────────────────────────────────────────────
+      function hideBookingUI() {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('actions-bar').style.display = 'none';
+        document.getElementById('step-label').textContent = '';
+        for (let i = 1; i <= 4; i++)
+          document.getElementById('step-bar-' + i).style.width = '100%';
+        document.getElementById('success-icon').style.display = '';
+        document.getElementById('success-title').textContent = "You're booked!";
+        document.getElementById('success-title').style.display = '';
+      }
 
-// =============================================================================
-// ADMIN AUTH — stateless HMAC tokens (survive Vercel cold starts)
-// =============================================================================
-const ADMIN_TOKEN_SECRET = (() => {
-  const s = process.env.ADMIN_TOKEN_SECRET;
-  if (!s) throw new Error('ADMIN_TOKEN_SECRET env var is required');
-  return s;
-})();
+      function showDepositThankYou(data) {
+        hideBookingUI();
+        document.getElementById('view-title').textContent = 'Booking Confirmed';
+        document.getElementById('success-title').textContent = "You're booked!";
+        const firstName = data && data.name ? data.name.split(' ')[0] : 'Beautiful';
+        document.getElementById('success-totals').innerHTML = `
+          <div style="text-align:center;padding:4px 0 18px;">
+            <div style="font-size:42px;margin-bottom:10px;">🌸</div>
+            <p style="margin:0 0 18px;font-family:'Cormorant Garamond',serif;font-size:15px;color:rgba(255,255,255,0.55);line-height:1.80;font-style:italic;">
+              Your deposit is confirmed and your stylist<br>is looking forward to pampering you.
+            </p>
+          </div>
+          ${data ? `
+          <div style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:15px 17px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:8px;">
+              <span style="color:rgba(255,255,255,0.35);">📅 Date</span>
+              <strong style="color:rgba(255,255,255,0.90);">${escHtml(fmtDateDisplay(data.date))}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:8px;">
+              <span style="color:rgba(255,255,255,0.35);">🕐 Time</span>
+              <strong style="color:rgba(255,255,255,0.90);">${escHtml(data.time||'')}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;">
+              <span style="color:rgba(255,255,255,0.35);">💅 Service</span>
+              <span style="text-align:right;max-width:55%;font-size:11px;color:rgba(255,255,255,0.65);">${escHtml(data.services||'')}</span>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:15px 17px;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:6px;">
+              <span style="color:rgba(255,255,255,0.35);">Deposit Paid ✅</span>
+              <strong style="color:rgba(255,255,255,0.90);">R${escHtml(String(data.deposit||'0'))}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;">
+              <span style="color:rgba(255,255,255,0.35);">Balance (after service)</span>
+              <strong style="color:rgba(255,255,255,0.90);">R${escHtml(String(data.balance||'0'))}</strong>
+            </div>
+          </div>
+          <p style="font-family:'Jost',sans-serif;font-size:11px;color:rgba(255,255,255,0.28);text-align:center;margin:0 0 4px;">
+            A confirmation email is on its way 📧
+          </p>
+          <p style="font-family:'Jost',sans-serif;font-size:10px;color:rgba(255,255,255,0.18);text-align:center;margin:0;letter-spacing:0.04em;">
+            Ref: ${escHtml(data.bookingId||'')}
+          </p>` : `
+          <p style="font-family:'Jost',sans-serif;font-size:13px;color:rgba(255,255,255,0.38);text-align:center;">
+            A confirmation email is on its way 📧
+          </p>`}
+        `;
+        document.getElementById('success-view').classList.add('active');
+      }
 
-function makeAdminToken(password) {
-    return crypto.createHmac('sha256', ADMIN_TOKEN_SECRET).update(password).digest('hex');
-}
+      function showBalanceThankYou(data) {
+        hideBookingUI();
+        document.getElementById('success-icon').style.display = 'none';
+        document.getElementById('success-title').style.display = 'none';
+        const firstName  = data && data.name ? data.name.split(' ')[0] : 'Beautiful';
+        const appBase    = (data && data.appBase) ? data.appBase : window.location.origin;
+        const isPaid     = data && data.balanceStatus === 'Paid';
+        document.getElementById('view-title').textContent = isPaid ? 'Thank You' : 'Payment Received';
+        document.getElementById('success-totals').innerHTML = isPaid ? `
+          <div style="text-align:center;padding:8px 0 18px;">
+            <div style="font-size:46px;margin-bottom:10px;">💅</div>
+            <h2 style="margin:0 0 8px;font-size:18px;font-weight:400;color:#1d1d1f;font-family:'Playfair Display',Georgia,serif;">
+              Thank you, ${escHtml(firstName)}
+            </h2>
+            <p style="margin:0 0 20px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.75;">
+              Your full payment is in and we are so grateful<br>for your trust in PhenomeBeauty.
+            </p>
+          </div>
+          <div style="background:rgba(0,0,0,0.04);border:0.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:16px 18px;margin-bottom:18px;text-align:center;">
+            <div style="font-family:'Jost',sans-serif;font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:5px;text-transform:uppercase;letter-spacing:.14em;">Total Paid</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:rgba(255,255,255,0.95);">R${escHtml(String(data.total||'0'))} ✅</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.03);border:0.5px solid rgba(0,0,0,0.06);border-radius:14px;padding:18px;margin-bottom:16px;text-align:center;">
+            <p style="margin:0 0 14px;font-family:'Cormorant Garamond',serif;font-size:14px;color:rgba(255,255,255,0.50);line-height:1.80;font-style:italic;">
+              Beauty is a lifestyle, not a luxury.<br>We'd love to see you again soon.
+            </p>
+            <a href="${escHtml(appBase)}" style="display:inline-block;background:linear-gradient(160deg,#1c1c1e,#0a0a0a);color:#ffffff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:.01em;">
+              Book Your Next Appointment →
+            </a>
+          </div>
+          <p style="font-family:'Jost',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin:0;">
+            A receipt has been sent to your email 📧
+          </p>` : `
+          <div style="text-align:center;padding:8px 0 18px;">
+            <div style="font-size:46px;margin-bottom:10px;">💳</div>
+            <h2 style="margin:0 0 8px;font-size:18px;font-weight:400;color:#1d1d1f;font-family:'Playfair Display',Georgia,serif;">
+              Payment is being processed
+            </h2>
+            <p style="margin:0 0 20px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.75;">
+              Thank you, ${escHtml(firstName)}! Your payment is on its way.<br>
+              We'll send you a confirmation email shortly.
+            </p>
+          </div>
+          <div style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:16px 18px;margin-bottom:16px;text-align:center;font-family:'Jost',sans-serif;font-size:13px;color:rgba(255,255,255,0.50);">
+            ⏳ Payments can take a moment — please don't pay again.
+          </div>`;
+        document.getElementById('success-view').classList.add('active');
+      }
 
-async function adminOnly(req, res, next) {
-    const token = (req.headers['x-admin-token'] || '').trim();
-    if (!token || token.length !== 64) return res.status(401).json({ error: 'Not authenticated' });
-    try {
-        const doc      = await getDoc();
-        const s        = await getSettings(doc);
-        const expected = makeAdminToken(s.admin_password || '');
-        const tBuf     = Buffer.from(token.padEnd(64, '0'));
-        const eBuf     = Buffer.from(expected.padEnd(64, '0'));
-        const match    = s.admin_password && token.length === expected.length &&
-                         crypto.timingSafeEqual(tBuf, eBuf);
-        if (!match) return res.status(401).json({ error: 'Invalid credentials' });
-        req.doc = doc; req.settings = s; next();
-    } catch (e) { res.status(500).json({ error: 'Authentication error' }); }
-}
+      function fmtDateDisplay(ds) {
+        if (!ds) return '';
+        const [y,m,d] = ds.split('-').map(Number);
+        const dt = new Date(y, m-1, d);
+        const D = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return D[dt.getDay()] + ', ' + d + ' ' + M[m-1] + ' ' + y;
+      }
 
-// =============================================================================
-// CALENDAR HELPERS
-// =============================================================================
-function toISO(dateStr, timeStr) {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    const [h, mn]   = timeStr.split(':').map(Number);
-    return new Date(y, m - 1, d, h, mn).toISOString();
-}
+      // ── TOAST / BANNER ──────────────────────────────────────────────────────
+      function showToast(msg, isError) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show' + (isError ? ' error' : '');
+        clearTimeout(t._t);
+        t._t = setTimeout(() => t.classList.remove('show'), 3500);
+      }
 
-async function calCreate(s, b) {
-    const calId = s.google_calendar_id || '';
-    if (!calId) return null;
-    const cal = google.calendar({ version: 'v3', auth: getJwt() });
-    const [startT, endT] = (b.time || '00:00-01:00').split('-');
-    try {
-        const r = await cal.events.insert({ calendarId: calId, requestBody: {
-            summary:     `${b.name} — ${b.services}`,
-            description: `ID: ${b.bookingId}\nPhone: ${b.phone}\nEmail: ${b.email}\nAddress: ${b.address}\nTotal: R${b.totalAmount}\nDeposit: R${b.deposit}\nBalance: R${b.balance}`,
-            location:    b.address,
-            start: { dateTime: toISO(b.date, startT),           timeZone: 'Africa/Johannesburg' },
-            end:   { dateTime: toISO(b.date, endT || '01:00'),   timeZone: 'Africa/Johannesburg' },
-            colorId: '2',
-        }});
-        return r.data.id;
-    } catch (e) { console.error('calCreate:', e.message); return null; }
-}
+      function showBanner(msg, success) {
+        const b = document.createElement('div');
+        b.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:99999;' +
+          'max-width:92vw;padding:13px 18px;border-radius:14px;font-size:13px;font-weight:600;' +
+          'text-align:center;box-shadow:0 16px 40px rgba(0,0,0,.2);cursor:pointer;' +
+          'background:rgba(255,255,255,0.92);color:var(--obsidian);border:0.5px solid transparent;' +
+          'backdrop-filter:blur(20px);';
+        b.textContent = msg;
+        document.body.appendChild(b);
+        setTimeout(() => b.remove(), 7000);
+        b.onclick = () => b.remove();
+      }
 
-async function calUpdate(s, eventId, b) {
-    const calId = s.google_calendar_id || '';
-    if (!calId || !eventId) return false;
-    const cal = google.calendar({ version: 'v3', auth: getJwt() });
-    const [startT, endT] = (b.time || '00:00-01:00').split('-');
-    try {
-        await cal.events.patch({ calendarId: calId, eventId, requestBody: {
-            summary:  `${b.name} — ${b.services}`,
-            location: b.address,
-            start: { dateTime: toISO(b.date, startT),          timeZone: 'Africa/Johannesburg' },
-            end:   { dateTime: toISO(b.date, endT || '01:00'), timeZone: 'Africa/Johannesburg' },
-        }});
+      // ── SERVICES ───────────────────────────────────────────────────────────
+      function loadServices() {
+        fetch('/api?action=getServices')
+          .then(r => r.json())
+          .then(data => { services = Array.isArray(data) ? data : []; renderServices(); })
+          .catch(() => showToast('Unable to load services — please refresh', true));
+      }
+
+      function renderServices() {
+        const grouped = {};
+        services.forEach(s => {
+          const c = s.category || 'Other';
+          if (!grouped[c]) grouped[c] = [];
+          grouped[c].push(s);
+        });
+        const cats = Object.keys(grouped);
+        if (!activeCategory && cats.length) activeCategory = cats[0];
+        const chips = document.getElementById('category-chips');
+        chips.innerHTML = cats.map(c =>
+          `<button type="button" class="chip ${c === activeCategory ? 'active' : ''}" data-cat="${escHtml(c)}">${escHtml(c)}</button>`
+        ).join('');
+        chips.querySelectorAll('.chip').forEach(btn =>
+          btn.addEventListener('click', () => { activeCategory = btn.dataset.cat; renderServices(); }));
+        const list = grouped[activeCategory] || [];
+        const el   = document.getElementById('services-list');
+        el.innerHTML = list.map(s => {
+          const sel = selectedServices.some(x => String(x.id) === String(s.id));
+          return `<div class="service-card ${sel ? 'selected' : ''}" data-id="${escHtml(String(s.id))}">
+            <div class="service-main">
+              <div class="service-header">
+                <div class="service-name">${escHtml(s.name)}</div>
+                <div class="service-price">R${Number(s.price).toFixed(0)}</div>
+              </div>
+              <div class="service-meta">${escHtml(s.description||'')} · ${s.duration||0} min</div>
+            </div>
+            <div class="check-circle">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>`;
+        }).join('');
+        el.querySelectorAll('.service-card').forEach(card =>
+          card.addEventListener('click', () => {
+            const id = String(card.dataset.id);
+            const svc = services.find(x => String(x.id) === id);
+            if (!svc) return;
+            const idx = selectedServices.findIndex(x => String(x.id) === id);
+            if (idx > -1) selectedServices.splice(idx, 1);
+            else          selectedServices.push(svc);
+            renderServices();
+          }));
+        renderCart();
+        updateNextBtn();
+      }
+
+      // ── CART ───────────────────────────────────────────────────────────────
+      function renderCart() {
+        const bar = document.getElementById('cart-bar');
+        if (!selectedServices.length) { bar.classList.remove('visible'); return; }
+        bar.classList.add('visible');
+        const total    = selectedServices.reduce((a, s) => a + Number(s.price), 0);
+        const duration = selectedServices.reduce((a, s) => a + (Number(s.duration)||0), 0);
+        document.getElementById('cart-total-price').textContent = 'R' + total.toFixed(0);
+        const cartList = document.getElementById('cart-items-list');
+        cartList.innerHTML = selectedServices.map(s =>
+          `<div class="cart-item" data-id="${escHtml(String(s.id))}">
+            <span class="cart-item-name">${escHtml(s.name)}</span>
+            <span class="cart-item-price">R${Number(s.price).toFixed(0)}</span>
+            <span class="cart-remove">✕</span>
+          </div>`
+        ).join('');
+        cartList.querySelectorAll('.cart-remove').forEach(btn =>
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            const id = String(btn.closest('.cart-item').dataset.id);
+            const idx = selectedServices.findIndex(x => String(x.id) === id);
+            if (idx > -1) { selectedServices.splice(idx, 1); renderServices(); }
+          }));
+        document.getElementById('cart-duration').textContent =
+          `${selectedServices.length} service${selectedServices.length > 1 ? 's' : ''} · ${duration} min total`;
+      }
+
+      // ── CALENDAR ───────────────────────────────────────────────────────────
+      const monthCache = {};
+      let calYear, calMonth;
+
+      function calInit() {
+        const now = new Date();
+        calYear  = now.getFullYear();
+        calMonth = now.getMonth();
+        document.getElementById('cal-prev').addEventListener('click', () => {
+          const now2 = new Date(); const cy = now2.getFullYear(); const cm = now2.getMonth();
+          if (calYear < cy || (calYear === cy && calMonth <= cm)) return;
+          calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+          calRender();
+        });
+        document.getElementById('cal-next').addEventListener('click', () => {
+          calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+          calRender();
+        });
+        calRender();
+      }
+
+      function calPad(n) { return String(n).padStart(2,'0'); }
+      function calKey()  { return `${calYear}-${calPad(calMonth+1)}`; }
+
+      function calRender() {
+        const now = new Date();
+        const isPast = calYear < now.getFullYear() ||
+                       (calYear === now.getFullYear() && calMonth < now.getMonth());
+        document.getElementById('cal-prev').classList.toggle('disabled', isPast);
+        const MONTHS = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+        document.getElementById('cal-month-label').textContent = MONTHS[calMonth] + ' ' + calYear;
+        const key = calKey();
+        if (monthCache[key] && monthCache[key].loaded) { calDrawDays(); }
+        else {
+          if (!monthCache[key]) monthCache[key] = { loaded: false, slots: {} };
+          calDrawDays('loading');
+          fetch('/api?action=getMonthAvailability&month=' + encodeURIComponent(key))
+            .then(r => r.json())
+            .then(slots => {
+              monthCache[key] = { loaded: true, slots: slots || {} };
+              if (calKey() === key) calDrawDays();
+            })
+            .catch(() => { monthCache[key] = { loaded: true, slots: {} }; calDrawDays(); });
+        }
+      }
+
+      function calDrawDays(state) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const key   = calKey();
+        const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+        const firstDow    = new Date(calYear, calMonth, 1).getDay();
+        let html = '';
+        for (let i = 0; i < firstDow; i++) html += '<div class="cal-day empty"></div>';
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateStr = `${calYear}-${calPad(calMonth+1)}-${calPad(d)}`;
+          const dt      = new Date(calYear, calMonth, d);
+          const isPast  = dt < today;
+          const isToday = dt.getTime() === today.getTime();
+          const isSel   = dateStr === selectedDate;
+          let cls = 'cal-day', dot = '';
+          if (isSel)       cls += ' selected';
+          else if (isPast) cls += ' past';
+          else if (state === 'loading') cls += ' loading-month';
+          else {
+            const times = (monthCache[key] && monthCache[key].slots[dateStr]) || [];
+            if (times.length) { cls += ' has-slots'; dot = '<div class="cal-day-dot"></div>'; }
+            else              cls += ' no-slots';
+          }
+          if (isToday && !isSel && !isPast) cls += ' today';
+          html += `<div class="${cls}" data-date="${dateStr}">${d}${dot}</div>`;
+        }
+        const container = document.getElementById('cal-days');
+        container.innerHTML = html;
+        container.querySelectorAll('.cal-day.has-slots, .cal-day.selected').forEach(el =>
+          el.addEventListener('click', () => {
+            if (selectedDate === el.dataset.date) return;
+            selectedDate = el.dataset.date;
+            selectedTime = '';
+            calDrawDays();
+            const times = (monthCache[calKey()] && monthCache[calKey()].slots[selectedDate]) || [];
+            renderTimeSlots(times);
+            updateNextBtn();
+          }));
+      }
+
+      function renderTimeSlots(times) {
+        const section = document.getElementById('time-section');
+        const grid    = document.getElementById('time-grid');
+        const label   = document.getElementById('time-section-label');
+        if (!times || !times.length) { section.style.display = 'none'; return; }
+        const dt = new Date(selectedDate + 'T00:00:00');
+        const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const MTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        label.textContent = DAYS[dt.getDay()] + ', ' + dt.getDate() + ' ' + MTHS[dt.getMonth()];
+        grid.innerHTML = times.map(t =>
+          `<div class="time-slot ${selectedTime === t ? 'selected' : ''}" data-time="${escHtml(t)}">${escHtml(t)}</div>`
+        ).join('');
+        grid.querySelectorAll('.time-slot').forEach(el =>
+          el.addEventListener('click', () => {
+            selectedTime = el.dataset.time;
+            grid.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            updateNextBtn();
+          }));
+        section.style.display = 'block';
+      }
+
+      // ── NAVIGATION ─────────────────────────────────────────────────────────
+      function nextStep() {
+        if (currentStep === 3 && (!validateDetails() || !safetyComplete())) return;
+        if (currentStep === 4) { submitBooking(); return; }
+        currentStep++;
+        updateStepUI();
+      }
+      function prevStep() {
+        if (currentStep <= 1) return;
+        currentStep--;
+        updateStepUI();
+      }
+      function updateStepUI() {
+        const views  = ['services','datetime','details','summary'];
+        const titles = ['Choose Services','Select Date & Time','Your Details','Review Booking'];
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('step-' + views[currentStep - 1]).classList.add('active');
+        document.getElementById('view-title').textContent  = 'PhenomeBeauty';
+        document.getElementById('btn-back').style.display  = currentStep === 1 ? 'none' : 'block';
+        document.getElementById('btn-next').textContent    = currentStep === 4 ? 'Proceed to Payment' : 'Next';
+
+        /* ── ANIMATED PROGRESS BAR ──────────────────────────────────────
+           Each segment fills to 100% when that step is completed.
+           The current step's bar fills to 55% with a shimmer active pulse.
+           Future bars stay empty (0%).
+           ────────────────────────────────────────────────────────────── */
+        const CHECK_SVG = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        for (let i = 1; i <= 4; i++) {
+          const bar  = document.getElementById('step-bar-' + i);
+          const dot  = document.getElementById('sdot-' + i);
+          const num  = document.getElementById('sdot-num-' + i);
+          if (i < currentStep) {
+            // Completed — full bar, white filled dot with checkmark
+            bar.style.width = '100%';
+            bar.classList.remove('pb-active');
+            dot.className = 'step-dot sd-done';
+            num.innerHTML = CHECK_SVG;
+          } else if (i === currentStep) {
+            // Active — 55% fill with trailing shimmer
+            bar.style.width = '55%';
+            bar.classList.add('pb-active');
+            dot.className = 'step-dot sd-active';
+            num.textContent = i;
+          } else {
+            // Future — empty
+            bar.style.width = '0%';
+            bar.classList.remove('pb-active');
+            dot.className = 'step-dot';
+            num.textContent = i;
+          }
+        }
+
+        if (currentStep === 2) {
+          calDrawDays();
+          if (selectedDate) {
+            const _k = calKey();
+            if (monthCache[_k] && monthCache[_k].slots && monthCache[_k].slots[selectedDate]) {
+              renderTimeSlots(monthCache[_k].slots[selectedDate]);
+            }
+          }
+          const k = calKey();
+          if (!monthCache[k] || !monthCache[k].loaded) calRender();
+        }
+        if (currentStep === 3) initPlacesAutocomplete();
+        if (currentStep === 4) renderSummary();
+        updateNextBtn();
+      }
+
+      const SAFETY_KEYS = ['skin','meds','allergies','pregnant','health','enviro','physical','hair'];
+      function safetyComplete() {
+        if (divaType !== 'new') return true;
+        return SAFETY_KEYS.every(k => safetyAnswers[k] === 'yes' || safetyAnswers[k] === 'no');
+      }
+      function updateNextBtn() {
+        const btn = document.getElementById('btn-next');
+        if (currentStep === 1) btn.disabled = selectedServices.length === 0;
+        else if (currentStep === 2) btn.disabled = !selectedDate || !selectedTime;
+        else if (currentStep === 3) {
+          const name  = document.getElementById('client-name').value.trim();
+          const phone = document.getElementById('client-phone').value.replace(/\D/g,'');
+          const email = document.getElementById('client-email').value.trim();
+          const addr  = document.getElementById('client-address').value.trim();
+          btn.disabled = name.length < 2 || (() => { const d = normalizePhone().replace(/\D/g,''); return d.length < 7 || d.length > 15; })() ||
+                         !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || addr.length < 5 || !safetyComplete();
+        } else { btn.disabled = false; }
+      }
+
+      // ── PHONE / EMAIL ───────────────────────────────────────────────────────
+      function normalizePhone() {
+        const select = document.getElementById('phone-country');
+        const input  = document.getElementById('client-phone');
+        const countryCode = select ? select.value : '+27';
+        // Strip everything except digits and leading +
+        let raw = input.value.replace(/[\s\-().]/g, '');
+        // Remove leading zeros after country code e.g. +27(0)82 → +2782
+        // If user typed full number with country code, use as-is
+        if (raw.startsWith('+')) {
+          // Remove (0) pattern: +27082 → +2782
+          raw = raw.replace(/^(\+\d{1,3})(0)/, '$1');
+          return raw;
+        }
+        // Remove leading zero then prepend country code
+        raw = raw.replace(/^0/, '');
+        return countryCode + raw;
+      }
+
+      function formatPhone(input) {
+        if (!input) input = document.getElementById('client-phone');
+        // Allow digits, spaces, hyphens, parens, plus
+        let val = input.value.replace(/[^\d\s\-().+]/g, '');
+        input.value = val;
+        const normalized = normalizePhone();
+        // Valid if normalized is 7-15 digits (after stripping non-digits)
+        const digitsOnly = normalized.replace(/\D/g, '');
+        const ok = digitsOnly.length >= 7 && digitsOnly.length <= 15;
+        input.classList.toggle('input-valid', ok);
+        input.classList.toggle('input-error', val.length > 4 && !ok);
+        updateNextBtn();
+      }
+      function validateEmail(input) {
+        const v = input.value.trim();
+        const ok = v.length > 4 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+        input.classList.toggle('input-valid', ok);
+        input.classList.toggle('input-error', v.includes('@') && v.split('@')[1]?.includes('.') && !ok);
+        updateNextBtn();
+      }
+
+      // ── ADDRESS AUTOCOMPLETE ────────────────────────────────────────────────
+      function initPlacesAutocomplete() {
+        const key = appConfig.google_maps_api_key || appConfig.mapsApiKey;
+        const input    = document.getElementById('client-address');
+        const dropdown = document.getElementById('addr-suggestions');
+        if (!key || !input || !dropdown || input.dataset.acAttached) return;
+        input.dataset.acAttached = '1';
+        input.addEventListener('input', () => {
+          addressConfirmed = false;
+          input.classList.remove('input-valid','input-error');
+          updateNextBtn();
+          clearTimeout(addrDebounceTimer);
+          const q = input.value.trim();
+          if (q.length < 3) { closeDropdown(); return; }
+          addrDebounceTimer = setTimeout(async () => {
+            try {
+              const r = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': key },
+                body: JSON.stringify({ input: q, includedRegionCodes: ['za'], languageCode: 'en' }),
+              });
+              const data = await r.json();
+              const sugs = data.suggestions || [];
+              if (!sugs.length) { closeDropdown(); return; }
+              dropdown.innerHTML = sugs.slice(0,5).map(s => {
+                const p    = s.placePrediction;
+                const main = p?.structuredFormat?.mainText?.text || p?.text?.text || '';
+                const sec  = p?.structuredFormat?.secondaryText?.text || '';
+                const full = p?.text?.text || main;
+                return `<div class="addr-suggestion-item" data-full="${escHtml(full)}">
+                  <div class="addr-suggestion-main">${escHtml(main)}</div>
+                  ${sec ? `<div class="addr-suggestion-sec">${escHtml(sec)}</div>` : ''}
+                </div>`;
+              }).join('');
+              dropdown.querySelectorAll('.addr-suggestion-item').forEach(item => {
+                item.addEventListener('mousedown', e => e.preventDefault());
+                item.addEventListener('click', () => {
+                  input.value = item.dataset.full;
+                  addressConfirmed = true;
+                  input.classList.add('input-valid');
+                  input.classList.remove('input-error');
+                  closeDropdown(); updateNextBtn();
+                });
+              });
+              dropdown.classList.add('open');
+            } catch(e) { closeDropdown(); }
+          }, 220);
+        });
+        input.addEventListener('keydown', e => {
+          const items  = [...dropdown.querySelectorAll('.addr-suggestion-item')];
+          const active = dropdown.querySelector('.addr-suggestion-item.active');
+          let idx = items.indexOf(active);
+          if (e.key === 'ArrowDown') { e.preventDefault(); idx=(idx+1)%items.length; }
+          else if (e.key === 'ArrowUp') { e.preventDefault(); idx=(idx-1+items.length)%items.length; }
+          else if (e.key === 'Enter' && active) { e.preventDefault(); active.click(); return; }
+          else if (e.key === 'Escape') { closeDropdown(); return; }
+          items.forEach(i=>i.classList.remove('active')); items[idx]?.classList.add('active');
+        });
+        document.addEventListener('click', e => {
+          if (!input.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
+        });
+      }
+      function closeDropdown() {
+        const d = document.getElementById('addr-suggestions');
+        if (d) { d.classList.remove('open'); d.innerHTML=''; }
+      }
+
+      // ── VALIDATION ──────────────────────────────────────────────────────────
+      function validateDetails() {
+        const name  = document.getElementById('client-name').value.trim();
+        const phone = document.getElementById('client-phone').value.replace(/\D/g,'');
+        const email = document.getElementById('client-email').value.trim();
+        const addr  = document.getElementById('client-address').value.trim();
+        if (name.length < 2)                       { showToast('Please enter your full name', true);            return false; }
+        if (!/^[+]?[\d\s\-().]{7,20}$/.test(phone.replace(/\s/g,''))) { showToast('Enter a valid phone number', true); return false; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showToast('Enter a valid email address', true);    return false; }
+        if (addr.length < 5)                       { showToast('Please enter your full address', true);         return false; }
         return true;
-    } catch (e) { console.error('calUpdate:', e.message); return false; }
-}
+      }
 
-async function calDelete(s, eventId) {
-    const calId = s.google_calendar_id || '';
-    if (!calId || !eventId) return;
-    const cal = google.calendar({ version: 'v3', auth: getJwt() });
-    try { await cal.events.delete({ calendarId: calId, eventId }); }
-    catch (e) { console.error('calDelete:', e.message); }
-}
-
-// =============================================================================
-// YOCO CHECKOUT HELPER
-// =============================================================================
-async function yocoCheckout({ key, cents, successUrl, cancelUrl, customer, metadata, desc }) {
-    const r = await fetch('https://payments.yoco.com/api/checkouts', {
-        method:  'POST',
-        headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ amount: cents, currency: 'ZAR', successUrl, cancelUrl, customer, metadata, description: desc }),
-    });
-    const d = await r.json();
-    console.log('Yoco:', r.status, JSON.stringify(d).slice(0, 200));
-    return { ok: r.ok, data: d };
-}
-
-// =============================================================================
-// GET /api — getServices | getMonthAvailability | getCallOutFee | getConfig
-// =============================================================================
-app.get('/api', async (req, res) => {
-    const action = req.query.action;
-    try {
-        const doc = await getDoc();
-
-        // ── getServices ──────────────────────────────────────────────────────
-        if (action === 'getServices') {
-            return res.json(await getServices(doc));
-        }
-
-        // ── getMonthAvailability ─────────────────────────────────────────────
-        if (action === 'getMonthAvailability') {
-            const [reqY, reqM] = (req.query.month || '').split('-').map(Number);
-            const now      = new Date();
-            const year     = reqY  || now.getFullYear();
-            const month    = reqM  || now.getMonth() + 1;
-            const pad      = n => String(n).padStart(2, '0');
-            const monthKey = `${year}-${pad(month)}`;
-
-            const DAYS = { sunday:0, monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6 };
-            const avRows     = await getAvailabilityRows(doc);
-            const slotsByDow = {};
-            avRows.forEach(r => {
-                if ((r.get('Available (YES/NO)') || '').toUpperCase() !== 'YES') return;
-                const day  = (r.get('Weekday/Date') || '').trim().toLowerCase();
-                const slot = (r.get('Time Slot')    || '').trim();
-                const dow  = DAYS[day];
-                if (dow === undefined || !slot) return;
-                if (!slotsByDow[dow]) slotsByDow[dow] = [];
-                slotsByDow[dow].push(slot);
-            });
-
-            // Build set of already-booked slots for this month
-            const bSheet = doc.sheetsByTitle['Bookings'];
-            const booked = {};
-            if (bSheet) {
-                const bRows = await bSheet.getRows();
-                bRows.forEach(r => {
-                    const status = (r.get('Deposit Status') || '').trim();
-                    if (['Cancelled', 'Refunded'].includes(status)) return;
-                    const d = (r.get('Date') || '').trim();
-                    const t = (r.get('Time') || '').trim();
-                    if (!d.startsWith(monthKey) || !t) return;
-                    if (!booked[d]) booked[d] = new Set();
-                    booked[d].add(t);
-                });
-            }
-
-            const sast        = sastNow();
-            const todayStr    = sast.dateStr;
-            const nowMins     = sast.mins;
-            const daysInMonth = new Date(year, month, 0).getDate();
-            const result      = {};
-
-            console.log(`Availability SAST: ${todayStr} ${Math.floor(nowMins / 60)}:${pad(nowMins % 60)}`);
-
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dateStr = `${year}-${pad(month)}-${pad(d)}`;
-                if (dateStr < todayStr) continue;   // skip past dates
-
-                const dow   = new Date(year, month - 1, d).getDay();
-                let   slots = (slotsByDow[dow] || []).slice();
-
-                // Remove already-booked slots
-                if (booked[dateStr]) slots = slots.filter(t => !booked[dateStr].has(t));
-
-                // Remove past slots for today
-                if (dateStr === todayStr) {
-                    slots = slots.filter(slot => {
-                        const [h, m] = (slot.split('-')[0] || '00:00').split(':').map(Number);
-                        return (h * 60 + m) > nowMins;
-                    });
-                }
-
-                if (slots.length) result[dateStr] = slots;
-            }
-
-            return res.json(result);
-        }
-
-        // ── getCallOutFee ────────────────────────────────────────────────────
-        if (action === 'getCallOutFee') {
-            const addr = (req.query.address || '').trim();
-            if (!addr) return res.json({ fee: 0, error: 'No address' });
-
-            const s    = await getSettings(doc);
-            const mk   = s.google_maps_api_key    || '';
-            const orig = s.fixed_origin_address   || '';
-            const free = parseFloat(s.call_out_free_km     || '0');
-            const rate = parseFloat(s.call_out_rate_per_km || '6.3');
-
-            if (!mk)   return res.json({ fee: 0, error: 'google_maps_api_key not set' });
-            if (!orig) return res.json({ fee: 0, error: 'fixed_origin_address not set' });
-
-            const url = `https://maps.googleapis.com/maps/api/distancematrix/json` +
-                        `?origins=${encodeURIComponent(orig)}` +
-                        `&destinations=${encodeURIComponent(addr)}` +
-                        `&units=metric&mode=driving&key=${encodeURIComponent(mk)}`;
-            const md  = await (await fetch(url)).json();
-            if (md.status !== 'OK') return res.json({ fee: 0, error: 'Maps: ' + md.status });
-            const el  = md.rows?.[0]?.elements?.[0];
-            if (!el || el.status !== 'OK') return res.json({ fee: 0, error: 'No route found' });
-
-            const oneWay    = el.distance.value / 1000;
-            const roundTrip = oneWay * 2;
-            const billable  = roundTrip > free ? roundTrip - free : 0;
-            const fee       = billable > 0 ? Math.round(billable * rate * 100) / 100 : 0;
-
-            return res.json({
-                fee,
-                oneWayKm:    Math.round(oneWay    * 10) / 10,
-                roundTripKm: Math.round(roundTrip * 10) / 10,
-                duration:    el.duration.text,
-            });
-        }
-
-        // ── getConfig ────────────────────────────────────────────────────────
-        if (action === 'getConfig') {
-            const full = await getSettings(doc);
-            return res.json({
-                deposit_percent:     full.deposit_percent     || '50',
-                google_maps_api_key: full.google_maps_api_key || '',
-                app_base_url:        full.app_base_url        || '',
-            });
-        }
-
-        res.status(404).json({ error: 'Unknown action' });
-
-    } catch (e) {
-        console.error('GET /api error:', e.message);
-        res.status(500).json({ error: 'Service unavailable — please try again' });
-    }
-});
-
-// =============================================================================
-// POST /api/book
-// =============================================================================
-app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
-    try {
-        const doc = await getDoc();
-        const s   = await getSettings(doc);
-
-        const {
-            name, email, phone, address, services, date, time,
-            servicesTotal, callOutFee, totalAmount, depositAmount,
-            balanceDue, oneWayKm, roundTripKm, source, divaType, safety, returningChanges,
-        } = req.body;
-
-        // ── Input validation ─────────────────────────────────────────────────
-        const cleanName  = sanitize(name,    80);
-        const cleanEmail = sanitize(email,  120);
-        // Normalize phone: strip formatting, handle leading zero + country code
-        let cleanPhone = String(phone || '').replace(/[\s\-().]/g, '');
-        // Remove (0) after country code e.g. +27(0)82 → +2782
-        cleanPhone = cleanPhone.replace(/^(\+\d{1,3})(0)/, '$1');
-        // If no country code, strip leading zero and prepend +27
-        if (!cleanPhone.startsWith('+')) {
-            cleanPhone = '+27' + cleanPhone.replace(/^0/, '');
-        }
-        cleanPhone = cleanPhone.slice(0, 16);
-        const cleanAddr  = sanitize(address, 200);
-        const cleanSrc   = sanitize(source,   50);
-
-        if (cleanName.length < 2)                                              return res.status(400).json({ error: 'Invalid name' });
-        if (!/^\+\d{7,15}$/.test(cleanPhone))                                 return res.status(400).json({ error: 'Invalid phone number' });
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail))               return res.status(400).json({ error: 'Invalid email' });
-        if (cleanAddr.length < 5)                                              return res.status(400).json({ error: 'Invalid address' });
-        if (!Array.isArray(services) || services.length === 0)                return res.status(400).json({ error: 'No services selected' });
-        if (services.length > 20)                                              return res.status(400).json({ error: 'Too many services' });
-        if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date))                      return res.status(400).json({ error: 'Invalid date format' });
-        if (!time || !/^\d{2}:\d{2}-\d{2}:\d{2}$/.test(time))               return res.status(400).json({ error: 'Invalid time format' });
-
-        // ── Service data ─────────────────────────────────────────────────────
-        const nameParts = cleanName.split(/\s+/);
-        const svcNames  = services.map(x => sanitize(typeof x === 'object' ? x.name : x, 60)).filter(Boolean).join(', ');
-        const svcIds    = services.map(x => (typeof x === 'object' ? x.id : '') || '').filter(Boolean).join(', ');
-        const svcMins   = services.reduce((a, x) => a + parseInt((typeof x === 'object' ? x.duration : 0) || 0), 0);
-
-        // ── Server-side amount recalculation ─────────────────────────────────
-        const serverServicesTotal = services.reduce((sum, x) => {
-            const p = typeof x === 'object' ? parseFloat(x.price || 0) : 0;
-            return sum + (isFinite(p) && p >= 0 ? p : 0);
-        }, 0);
-        const serverCallOut = Math.max(0, parseFloat(callOutFee) || 0);
-        const serverTotal   = serverServicesTotal + serverCallOut;
-        const settingPct    = parseFloat(s.deposit_percent || '50') / 100;
-        const serverDeposit = serverTotal > 0
-            ? Math.round(serverTotal * settingPct * 100) / 100
-            : Math.round(Number(depositAmount) * 100) / 100;
-        const serverBalance = Math.round((serverTotal - serverDeposit) * 100) / 100;
-
-        const dep       = Math.max(0, serverDeposit);
-        const bal       = Math.max(0, serverBalance);
-        const bookingId = 'PB-' + crypto.randomBytes(6).toString('hex').toUpperCase();
-
-        // ── Safety / consultation fields ─────────────────────────────────────
-        const isDivaNew     = divaType === 'new';
-        const safetyData    = (isDivaNew && safety) ? safety : null;
-        const skinNotes     = safetyData ? sanitize(safetyData.skinConditions,    500) : (isDivaNew ? '' : 'On File');
-        const medsNotes     = safetyData ? sanitize(safetyData.medications,       500) : (isDivaNew ? '' : 'On File');
-        const allergyNotes  = safetyData ? sanitize(safetyData.allergies,         500) : (isDivaNew ? '' : 'On File');
-        const healthNotes   = safetyData ? sanitize(safetyData.healthConditions,  500) : (isDivaNew ? '' : 'On File');
-        const environNotes  = safetyData ? sanitize(safetyData.environmental,     300) : '';
-        const physicalNotes = safetyData ? sanitize(safetyData.physical,          300) : '';
-        const pregnantNote  = safetyData ? (safetyData.pregnant     ? 'Yes' : 'No') : 'On File';
-        const hairOkNote    = safetyData ? (safetyData.hairLengthOk ? 'Yes' : 'No') : '';
-        const addlNotes     = safetyData ? sanitize(safetyData.additionalInfo,    500) : '';
-        const changesNote   = !isDivaNew && returningChanges ? sanitize(returningChanges, 500) : '';
-
-        // ── Write to Bookings sheet ──────────────────────────────────────────
-        const sheet = doc.sheetsByTitle['Bookings'];
-        if (!sheet) throw new Error('Bookings tab not found');
-
-        await sheet.addRow({
-            'Booking ID':             bookingId,
-            'Date':                   date,
-            'Time':                   time,
-            'Client Name':            cleanName,
-            'Client Phone':           cleanPhone,
-            'Client Email':           cleanEmail,
-            'Client Address':         cleanAddr,
-            'Service IDs':            svcIds,
-            'Service Names':          svcNames,
-            'Service Duration (min)': svcMins || '',
-            'One Way Km':             Number(oneWayKm)    || '',
-            'Round Trip Km':          Number(roundTripKm) || '',
-            'Call Out Fee (R)':       Number(callOutFee).toFixed(2),
-            'Service Price (R)':      Number(servicesTotal).toFixed(2),
-            'Total Amount (R)':       Number(totalAmount).toFixed(2),
-            'Deposit Amount (R)':     dep.toFixed(2),
-            'Balance Due (R)':        bal.toFixed(2),
-            'Deposit Status':         'Pending Payment',
-            'Balance Status':         'Pending',
-            'Yoco Link':              '',
-            'Calendar Event ID':      '',
-            'Created At':             new Date().toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' }),
-            'Yoco Checkout ID':       '',
-            'Notes':                  '',
-        });
-
-        // ── Write to Consultations sheet (non-fatal) ─────────────────────────
-        try {
-            const consultSheet = doc.sheetsByTitle['Consultations'];
-            if (consultSheet) {
-                const consultRow = {
-                    'Booking ID':        bookingId,
-                    'Client Type':       isDivaNew ? 'New' : 'Existing',
-                    'Lead Source':       cleanSrc,
-                    'Skin Conditions':   skinNotes,
-                    'Medications':       medsNotes,
-                    'Allergies':         allergyNotes,
-                    'Health Conditions': healthNotes,
-                    'Pregnancy':         pregnantNote,
-                };
-                await consultSheet.loadHeaderRow();
-                const headers = consultSheet.headerValues || [];
-                if (headers.includes('Additional Notes'))       consultRow['Additional Notes']       = addlNotes;
-                if (headers.includes('Environmental Exposure')) consultRow['Environmental Exposure'] = environNotes;
-                if (headers.includes('Physical Factors'))       consultRow['Physical Factors']       = physicalNotes;
-                if (headers.includes('Hair Length OK'))         consultRow['Hair Length OK']         = hairOkNote;
-                if (headers.includes('Changes Since Last Visit')) consultRow['Changes Since Last Visit'] = changesNote;
-                await consultSheet.addRow(consultRow);
+      // ── SUMMARY ─────────────────────────────────────────────────────────────
+      function fmtDate(ds) {
+        if (!ds) return '—';
+        const [y,m,d] = ds.split('-').map(Number);
+        const dt = new Date(y, m-1, d);
+        const D = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return D[dt.getDay()] + ', ' + d + ' ' + M[m-1] + ' ' + y;
+      }
+      function renderSummary() {
+        const sTotal   = selectedServices.reduce((a, s) => a + Number(s.price), 0);
+        const sDur     = selectedServices.reduce((a, s) => a + (Number(s.duration)||0), 0);
+        const name     = document.getElementById('client-name').value.trim();
+        const rawPhone = document.getElementById('client-phone').value.replace(/\D/g,'');
+        const phone    = rawPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+        const address  = document.getElementById('client-address').value.trim();
+        document.getElementById('summary-block').innerHTML = `
+          <div class="summary-row"><span class="summary-label">Date</span><span class="summary-value">${fmtDate(selectedDate)}</span></div>
+          <div class="summary-row"><span class="summary-label">Time</span><span class="summary-value">${escHtml(selectedTime)||'—'}</span></div>
+          <div class="summary-row"><span class="summary-label">Services (${selectedServices.length})</span>
+            <span class="summary-value" style="font-size:11.5px;">${selectedServices.map(s=>escHtml(s.name)).join(', ')}</span></div>
+          <div class="summary-row"><span class="summary-label">Duration</span><span class="summary-value">${sDur} min</span></div>
+          <div class="summary-divider"></div>
+          <div class="summary-row"><span class="summary-label">Client</span><span class="summary-value">${escHtml(name)}</span></div>
+          <div class="summary-row"><span class="summary-label">Phone</span><span class="summary-value">${escHtml(phone)}</span></div>
+          <div class="summary-row"><span class="summary-label">Address</span><span class="summary-value" style="font-size:11.5px;">${escHtml(address)}</span></div>`;
+        document.getElementById('sum-services-total').textContent = 'R' + sTotal.toFixed(2);
+        document.getElementById('sum-callout-fee').innerHTML =
+          '<span class="fee-calculating"><span class="loader" style="width:11px;height:11px;border-width:1.5px;border-color:rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.60);"></span> Calculating…</span>';
+        document.getElementById('sum-total').textContent   = '—';
+        document.getElementById('sum-deposit').textContent = '—';
+        document.getElementById('sum-balance-note').textContent = 'Balance due on the day';
+        document.getElementById('btn-next').disabled = true;
+        fetch('/api?action=getCallOutFee&address=' + encodeURIComponent(address))
+          .then(r => r.json())
+          .then(result => {
+            const pct     = parseFloat(appConfig.deposit_percent || 50) / 100;
+            const fee     = typeof result.fee === 'number' ? result.fee : 0;
+            const total   = sTotal + fee;
+            const deposit = Math.round(total * pct * 100) / 100;
+            const balance = Math.round((total - deposit) * 100) / 100;
+            lastFeeData   = { fee, oneWayKm: result.oneWayKm||0, roundTripKm: result.roundTripKm||0 };
+            if (fee === 0 && result.error) {
+              document.getElementById('sum-callout-fee').innerHTML =
+                'R0.00 <span style="font-size:10px;color:rgba(180,60,60,.8);" title="'+escHtml(result.error)+'">⚠</span>';
             } else {
-                console.warn('Consultations tab not found — skipping');
+              document.getElementById('sum-callout-fee').textContent = 'R' + fee.toFixed(2);
             }
-        } catch (consultErr) {
-            console.warn('Consultation row write failed (non-fatal):', consultErr.message);
+            document.getElementById('sum-total').textContent        = 'R' + total.toFixed(2);
+            document.getElementById('sum-deposit').textContent      = 'R' + deposit.toFixed(2);
+            document.getElementById('sum-balance-note').textContent = 'Balance on the day: R' + balance.toFixed(2);
+            document.getElementById('btn-next').disabled = false;
+          })
+          .catch(() => {
+            const pct = parseFloat(appConfig.deposit_percent || 50) / 100;
+            const dep = Math.round(sTotal * pct * 100) / 100;
+            document.getElementById('sum-callout-fee').innerHTML =
+              'R0.00 <span style="font-size:10px;color:rgba(180,60,60,.8);">⚠</span>';
+            document.getElementById('sum-total').textContent        = 'R' + sTotal.toFixed(2);
+            document.getElementById('sum-deposit').textContent      = 'R' + dep.toFixed(2);
+            document.getElementById('sum-balance-note').textContent = 'Balance on the day: R' + (sTotal - dep).toFixed(2);
+            document.getElementById('btn-next').disabled = false;
+          });
+      }
+
+      // ── SAFETY TOGGLES ──────────────────────────────────────────────────────
+      const safetyAnswers = {};
+      function safetyToggle(btn, key) {
+        const val = btn.dataset.v;
+        safetyAnswers[key] = val;
+        btn.closest('.safety-yn').querySelectorAll('.syn-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const detail = document.getElementById('safety-' + key);
+        if (detail) {
+          detail.style.display = val === 'yes' ? 'block' : 'none';
+          if (val === 'no') detail.value = '';
         }
-
-        bustDocCache();
-        console.log(`Saved ${bookingId} — ${svcNames} on ${date} ${time}`);
-
-        // ── Deposit below R2 — skip payment link ─────────────────────────────
-        if (dep < 2) return res.json({
-            success: true, bookingId, paymentUrl: null,
-            paymentError: 'Deposit below R2 — we will contact you.',
-            depositAmount: dep, balanceDue: bal,
-        });
-
-        // ── Build Yoco payment URL ────────────────────────────────────────────
-        const appBase    = s.app_base_url           || 'http://localhost:3000';
-        const successUrl = s.booking_success_url    || `${appBase}/thankyou.html?ref=${bookingId}`;
-        const cancelUrl  = s.booking_cancel_url     || `${appBase}/?payment=cancelled&ref=${bookingId}`;
-        const yocoKey    = s.yoco_secret_key        || '';
-        const rawSlug    = s.yoco_payment_page_slug || '';
-        const yocoSlug   = rawSlug.replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
-
-        let paymentUrl = null, paymentError = null;
-
-        if (yocoKey) {
-            const { ok, data } = await yocoCheckout({
-                key: yocoKey, cents: Math.round(dep * 100), successUrl, cancelUrl,
-                customer: {
-                    email:     cleanEmail,
-                    firstName: nameParts[0]  || '',
-                    lastName:  nameParts.slice(1).join(' ') || '',
-                    phone:     cleanPhone,
-                },
-                metadata: { bookingId, serviceDate: date, serviceTime: time },
-                desc:     `PhenomeBeauty deposit — ${svcNames}`,
-            });
-            if (ok && data.redirectUrl) {
-                paymentUrl = data.redirectUrl;
-                const { row } = await findRow(doc, bookingId);
-                if (row) {
-                    row.set('Yoco Checkout ID', data.id || '');
-                    row.set('Yoco Link', paymentUrl);
-                    await row.save();
-                }
-            } else {
-                paymentError = data.displayMessage || data.message || 'Yoco API error';
-            }
+        updateNextBtn();
+      }
+      let divaType = 'existing';
+      function toggleDiva(type) {
+        divaType = type;
+        const safetySection = document.getElementById('safety-section');
+        const returningSection = document.getElementById('returning-section');
+        const btnExisting   = document.getElementById('diva-existing');
+        const btnNew        = document.getElementById('diva-new');
+        if (type === 'new') {
+          safetySection.style.display = 'block';
+          returningSection.style.display = 'none';
+          btnNew.style.background      = 'rgba(0,0,0,0.07)';
+          btnNew.style.color           = '#0a0a0a';
+          btnNew.style.borderColor     = 'rgba(0,0,0,0.18)';
+          btnExisting.style.background = 'rgba(255,255,255,0.40)';
+          btnExisting.style.color      = 'rgba(255,255,255,0.40)';
+          btnExisting.style.borderColor= 'rgba(0,0,0,0.08)';
+        } else {
+          safetySection.style.display = 'none';
+          returningSection.style.display = 'block';
+          Object.keys(safetyAnswers).forEach(k => delete safetyAnswers[k]);
+          document.querySelectorAll('.syn-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.safety-detail').forEach(t => { t.style.display='none'; t.value=''; });
+          btnExisting.style.background = 'rgba(0,0,0,0.07)';
+          btnExisting.style.color      = '#0a0a0a';
+          btnExisting.style.borderColor= 'rgba(0,0,0,0.18)';
+          btnNew.style.background      = 'rgba(255,255,255,0.40)';
+          btnNew.style.color           = 'rgba(255,255,255,0.40)';
+          btnNew.style.borderColor     = 'rgba(0,0,0,0.08)';
         }
-
-        if (!paymentUrl && yocoSlug) {
-            const p = new URLSearchParams({
-                amount:                   dep.toFixed(2),
-                reference:                bookingId,
-                firstName:                nameParts[0] || '',
-                lastName:                 nameParts.slice(1).join(' ') || '',
-                email,
-                redirectOnPaymentSuccess: successUrl,
-            });
-            paymentUrl = `https://pay.yoco.com/${yocoSlug}?${p}`;
-            const { row } = await findRow(doc, bookingId);
-            if (row) { row.set('Yoco Link', paymentUrl); await row.save(); }
-        }
-
-        return res.json({
-            success: true, bookingId, paymentUrl,
-            paymentError: paymentUrl ? null : (paymentError || 'No Yoco credentials in Settings'),
-            depositAmount: dep, balanceDue: bal,
-        });
-
-    } catch (e) {
-        console.error('POST /api/book:', e.message);
-        res.status(500).json({ error: 'Failed to save booking — please try again' });
-    }
-});
-
-// =============================================================================
-// POST /api/webhook/yoco
-// =============================================================================
-app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
-
-    // ── Verify Yoco webhook signature via Svix ──────────────────────────
-    const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
-
-    // Always log headers so we can debug signature issues
-    console.log('Webhook headers:', JSON.stringify(req.headers));
-
-    if (webhookSecret) {
-        try {
-            const rawBody = req.rawBody
-                ? req.rawBody.toString('utf8')
-                : JSON.stringify(req.body);
-
-            // Svix signs: "{webhook-id}.{webhook-timestamp}.{body}"
-            const msgId        = req.headers['webhook-id'] || '';
-            const msgTimestamp = req.headers['webhook-timestamp'] || '';
-            const sigHeader    = req.headers['webhook-signature'] || '';
-
-            // Secret may be raw or whsec_ prefixed — decode to bytes either way
-            const secretStr = webhookSecret.startsWith('whsec_')
-                ? webhookSecret.slice(6)
-                : Buffer.from(webhookSecret).toString('base64');
-            const secretBytes = Buffer.from(secretStr, 'base64');
-
-            const toSign  = `${msgId}.${msgTimestamp}.${rawBody}`;
-            const expected = crypto.createHmac('sha256', secretBytes).update(toSign).digest('base64');
-
-            // webhook-signature may contain multiple space-separated "v1,<sig>" values
-            const sigs = sigHeader.split(' ').map(s => s.replace(/^v1,/, ''));
-            const matched = sigs.some(sig => {
-                try {
-                    const eBuf = Buffer.from(expected);
-                    const sBuf = Buffer.from(sig);
-                    return eBuf.length === sBuf.length && crypto.timingSafeEqual(eBuf, sBuf);
-                } catch { return false; }
-            });
-
-            if (!matched) {
-                console.error('Webhook signature mismatch');
-                return res.status(401).json({ error: 'Invalid signature' });
-            }
-            console.log('Webhook: signature verified ✓');
-        } catch (err) {
-            console.error('Webhook signature verification failed:', err.message);
-            return res.status(401).json({ error: 'Invalid signature' });
-        }
-    } else {
-        console.warn('YOCO_WEBHOOK_SECRET not set — skipping verification');
-    }
-
-    // ── Process event ─────────────────────────────────────────────────────────
-    // Return 500 on failure so Yoco retries; 200 means we handled it.
-    try {
-        const event   = req.body || {};
-        const payment = event.payload || event;
-        const meta    = payment.metadata || {};
-
-        const successTypes = [
-            'payment.succeeded',
-            'payment.approved',
-            'payment_approved',
-            'payment.captured',
-            'payment_captured',
-        ];
-
-        if (!successTypes.includes(event.type)) {
-            console.log(`Webhook: ignoring event type "${event.type}"`);
-            return res.status(200).json({ received: true });
-        }
-
-        if (payment.status && payment.status !== 'succeeded') {
-            console.log(`Webhook: ignoring payment status "${payment.status}"`);
-            return res.status(200).json({ received: true });
-        }
-
-        const bookingId = meta.bookingId || '';
-        if (!bookingId) {
-            console.warn('Webhook: no bookingId in metadata — ignoring');
-            return res.status(200).json({ received: true });
-        }
-
-        const type = meta.type || 'deposit';
-
-        const doc     = await getDoc();
-        const { row } = await findRow(doc, bookingId);
-        if (!row) {
-            console.warn(`Webhook: booking ${bookingId} not found in sheet`);
-            return res.status(200).json({ received: true });
-        }
-
-        // ── Balance payment branch ────────────────────────────────────────────
-        if (type === 'balance') {
-            if (row.get('Balance Status') === 'Paid') {
-                console.log(`Webhook: balance already paid for ${bookingId} — idempotent skip`);
-                return res.status(200).json({ received: true });
-            }
-
-            row.set('Balance Status', 'Paid');
-            await row.save();
-            console.log(`Webhook: balance paid for ${bookingId}`);
-
-            const settings = await getSettings(doc);
-
-            await Promise.all([
-                sendRebookEmail(settings, {
-                    bookingId,
-                    name:     row.get('Client Name'),
-                    email:    row.get('Client Email'),
-                    total:    row.get('Total Amount (R)'),
-                    services: row.get('Service Names'),
-                }).then(() => console.log('Rebook email sent')).catch((e) => console.error('Rebook email error:', e.message)),
-
-                sendAdminBalancePaidNotification(settings, {
-                    bookingId,
-                    name:        row.get('Client Name'),
-                    email:       row.get('Client Email'),
-                    phone:       row.get('Client Phone'),
-                    address:     row.get('Client Address'),
-                    services:    row.get('Service Names'),
-                    date:        row.get('Date'),
-                    time:        row.get('Time'),
-                    totalAmount: row.get('Total Amount (R)'),
-                    deposit:     row.get('Deposit Amount (R)'),
-                    balance:     row.get('Balance Due (R)'),
-                }).then(() => console.log('Admin balance-paid email sent')).catch((e) => console.error('Admin balance-paid email error:', e.message)),
-            ]);
-
-            return res.status(200).json({ received: true });
-        }
-
-        // ── Deposit payment branch ────────────────────────────────────────────
-        const incomingPaymentId = payment.id || '';
-        const webhookMsgId = req.headers['webhook-id'] || '';
-        if (row.get('Deposit Status') === 'Confirmed' ||
-            (incomingPaymentId && row.get('Yoco Checkout ID') === incomingPaymentId) ||
-            (webhookMsgId && row.get('Last Webhook ID') === webhookMsgId)) {
-            console.log(`Webhook: deposit already confirmed for ${bookingId} — idempotent skip`);
-            return res.status(200).json({ received: true });
-        }
-        if (webhookMsgId) row.set('Last Webhook ID', webhookMsgId);
-
-        row.set('Deposit Status',   'Confirmed');
-        row.set('Yoco Checkout ID', incomingPaymentId || row.get('Yoco Checkout ID') || '');
-        await row.save();
-        console.log(`Webhook: deposit confirmed for ${bookingId}`);
-
-        const settings = await getSettings(doc);
-
-        // Create Google Calendar event
-        // Create Google Calendar event (with timeout protection)
-        let calId = null;
-        try {
-            calId = await Promise.race([
-                calCreate(settings, {
-                    bookingId,
-                    name:        row.get('Client Name'),
-                    email:       row.get('Client Email'),
-                    phone:       row.get('Client Phone'),
-                    address:     row.get('Client Address'),
-                    services:    row.get('Service Names'),
-                    date:        row.get('Date'),
-                    time:        row.get('Time'),
-                    totalAmount: row.get('Total Amount (R)'),
-                    deposit:     row.get('Deposit Amount (R)'),
-                    balance:     row.get('Balance Due (R)'),
-                }),
-                new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Calendar timeout')), 5000)
-                )
-            ]);
-            
-            if (calId) {
-                row.set('Calendar Event ID', calId);
-                await row.save();
-                console.log(`Webhook: calendar event ${calId} created for ${bookingId}`);
-            } else {
-                console.log(`Webhook: calendar creation returned null for ${bookingId}`);
-            }
-        } catch (e) {
-            console.error(`Webhook: calendar creation failed for ${bookingId}:`, e.message);
-            // Continue without calendar - don't block booking confirmation
-        }
-        // Notify admin and customer — await both so Vercel doesn't kill before send
-        await Promise.all([
-            sendAdminDepositNotification(settings, {
-                bookingId,
-                name:        row.get('Client Name'),
-                email:       row.get('Client Email'),
-                phone:       row.get('Client Phone'),
-                address:     row.get('Client Address'),
-                services:    row.get('Service Names'),
-                date:        row.get('Date'),
-                time:        row.get('Time'),
-                totalAmount: row.get('Total Amount (R)'),
-                deposit:     row.get('Deposit Amount (R)'),
-                balance:     row.get('Balance Due (R)'),
-            }).then(() => console.log('Admin deposit email sent')).catch((e) => console.error('Admin deposit email error:', e.message)),
-
-            sendCustomerConfirmationEmail(settings, {
-                bookingId,
-                name:     row.get('Client Name'),
-                email:    row.get('Client Email'),
-                address:  row.get('Client Address'),
-                services: row.get('Service Names'),
-                date:     row.get('Date'),
-                time:     row.get('Time'),
-                deposit:  row.get('Deposit Amount (R)'),
-                balance:  row.get('Balance Due (R)'),
-            }).then(() => console.log('Customer confirmation email sent')).catch((e) => console.error('Customer confirmation email error:', e.message)),
-        ]);
-
-        return res.status(200).json({ received: true });
-
-    } catch (e) {
-        // 500 tells Yoco to retry
-        console.error('Webhook processing error:', e.message);
-        return res.status(500).json({ error: 'Internal error — will retry' });
-    }
-});
-
-
-// =============================================================================
-// GET /api/check-payment
-// =============================================================================
-app.get('/api/check-payment', rateLimit(30, 60000), async (req, res) => {
-    const ref = (req.query.ref || '').trim();
-    if (!ref) return res.status(400).json({ error: 'ref required' });
-    try {
-        const doc = await getDoc();
-        const s   = await getSettings(doc);
-        const { row } = await findRow(doc, ref);
-        if (!row) return res.status(404).json({ error: 'Not found' });
-        res.json({
-            bookingId:     ref,
-            depositStatus: row.get('Deposit Status')     || '',
-            balanceStatus: row.get('Balance Status')     || '',
-            name:          row.get('Client Name')        || '',
-            services:      row.get('Service Names')      || '',
-            date:          row.get('Date')               || '',
-            time:          row.get('Time')               || '',
-            total:         row.get('Total Amount (R)')   || '',
-            deposit:       row.get('Deposit Amount (R)') || '',
-            balance:       row.get('Balance Due (R)')    || '',
-            appBase:       s.app_base_url || '',
-        });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// POST /api/admin/login
-// =============================================================================
-app.post('/api/admin/login', rateLimit(5, 60000), async (req, res) => {
-    try {
-        const doc      = await getDoc();
-        const s        = await getSettings(doc);
-        const provided = String(req.body.password || '');
-        const expected = String(s.admin_password  || '');
-        const pBuf     = Buffer.alloc(Math.max(provided.length, expected.length));
-        const eBuf     = Buffer.alloc(Math.max(provided.length, expected.length));
-        Buffer.from(provided).copy(pBuf);
-        Buffer.from(expected).copy(eBuf);
-        const match = expected.length > 0 && provided.length === expected.length &&
-                      crypto.timingSafeEqual(pBuf, eBuf);
-        if (!match) return res.status(401).json({ error: 'Invalid password' });
-        res.json({ token: makeAdminToken(provided) });
-    } catch (e) { res.status(500).json({ error: 'Login failed' }); }
-});
-
-// =============================================================================
-// GET /api/admin/bookings
-// =============================================================================
-app.get('/api/admin/bookings', adminOnly, async (req, res) => {
-    try {
-        const sheet = req.doc.sheetsByTitle['Bookings'];
-        if (!sheet) throw new Error('Bookings tab not found');
-        const rows = await sheet.getRows();
-        res.json(rows.map(r => ({
-            bookingId:     r.get('Booking ID'),
-            name:          r.get('Client Name'),
-            email:         r.get('Client Email'),
-            phone:         r.get('Client Phone'),
-            address:       r.get('Client Address'),
-            services:      r.get('Service Names'),
-            date:          r.get('Date'),
-            time:          r.get('Time'),
-            total:         r.get('Total Amount (R)'),
-            deposit:       r.get('Deposit Amount (R)'),
-            balanceDue:    r.get('Balance Due (R)'),
-            status:        r.get('Deposit Status'),
-            balanceStatus: r.get('Balance Status'),
-            checkoutId:    r.get('Yoco Checkout ID'),
-            calEventId:    r.get('Calendar Event ID'),
-            createdAt:     r.get('Created At'),
-            yocoLink:      r.get('Yoco Link'),
-        })).filter(b => b.bookingId).reverse());
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// GET /api/admin/consultations
-// =============================================================================
-app.get('/api/admin/consultations', adminOnly, async (req, res) => {
-    try {
-        const bookSheet    = req.doc.sheetsByTitle['Bookings'];
-        const consultSheet = req.doc.sheetsByTitle['Consultations'];
-        if (!consultSheet) return res.json([]);
-
-        const [bookRows, consultRows] = await Promise.all([
-            bookSheet    ? bookSheet.getRows()    : Promise.resolve([]),
-            consultSheet.getRows(),
-        ]);
-
-        const bookMap = {};
-        bookRows.forEach(r => {
-            const id = (r.get('Booking ID') || '').trim();
-            if (id) bookMap[id] = {
-                name:     r.get('Client Name')    || '',
-                email:    r.get('Client Email')   || '',
-                phone:    r.get('Client Phone')   || '',
-                date:     r.get('Date')           || '',
-                time:     r.get('Time')           || '',
-                services: r.get('Service Names')  || '',
-                status:   r.get('Deposit Status') || '',
-            };
-        });
-
-        res.json(consultRows.map(r => {
-            const id = (r.get('Booking ID') || '').trim();
-            const b  = bookMap[id] || {};
-            return {
-                bookingId:        id,
-                clientType:       r.get('Client Type')        || '',
-                leadSource:       r.get('Lead Source')        || '',
-                skinConditions:   r.get('Skin Conditions')    || '',
-                medications:      r.get('Medications')        || '',
-                allergies:        r.get('Allergies')          || '',
-                healthConditions: r.get('Health Conditions')  || '',
-                pregnancy:        r.get('Pregnancy')          || '',
-                additionalNotes:  r.get('Additional Notes')   || '',
-                name:     b.name,     email:    b.email,
-                phone:    b.phone,    date:     b.date,
-                time:     b.time,     services: b.services,
-                status:   b.status,
-            };
-        }).filter(c => c.bookingId).reverse());
-
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// POST /api/admin/update-status
-// =============================================================================
-app.post('/api/admin/update-status', adminOnly, async (req, res) => {
-    try {
-        const { bookingId, status } = req.body;
-        const VALID_STATUSES = ['Pending Payment', 'Confirmed', 'Service Complete', 'Cancelled', 'Refunded'];
-        if (!VALID_STATUSES.includes(status)) return res.status(400).json({ error: 'Invalid status' });
-
-        const { row } = await findRow(req.doc, bookingId);
-        if (!row) return res.status(404).json({ error: 'Not found' });
-
-        const prev = row.get('Deposit Status') || '';
-        row.set('Deposit Status', status);
-        await row.save();
-
-        // ── Manual confirm: create calendar event + send emails ──────────────
-        if (status === 'Confirmed') {
-            // ── Create calendar event only if one doesn't exist yet ──────────
-            if (!row.get('Calendar Event ID')) {
-                const calId = await calCreate(req.settings, {
-                    bookingId,
-                    name:        row.get('Client Name'),
-                    email:       row.get('Client Email'),
-                    phone:       row.get('Client Phone'),
-                    address:     row.get('Client Address'),
-                    services:    row.get('Service Names'),
-                    date:        row.get('Date'),
-                    time:        row.get('Time'),
-                    totalAmount: row.get('Total Amount (R)'),
-                    deposit:     row.get('Deposit Amount (R)'),
-                    balance:     row.get('Balance Due (R)'),
-                });
-                if (calId) { row.set('Calendar Event ID', calId); await row.save(); }
-            }
-
-            if (prev !== 'Confirmed') {
-                sendAdminDepositNotification(req.settings, {
-                    bookingId,
-                    name:        row.get('Client Name'),
-                    email:       row.get('Client Email'),
-                    phone:       row.get('Client Phone'),
-                    address:     row.get('Client Address'),
-                    services:    row.get('Service Names'),
-                    date:        row.get('Date'),
-                    time:        row.get('Time'),
-                    totalAmount: row.get('Total Amount (R)'),
-                    deposit:     row.get('Deposit Amount (R)'),
-                    balance:     row.get('Balance Due (R)'),
-                }).catch(() => {});
-                sendCustomerConfirmationEmail(req.settings, {
-                    bookingId,
-                    name:     row.get('Client Name'),
-                    email:    row.get('Client Email'),
-                    address:  row.get('Client Address'),
-                    services: row.get('Service Names'),
-                    date:     row.get('Date'),
-                    time:     row.get('Time'),
-                    deposit:  row.get('Deposit Amount (R)'),
-                    balance:  row.get('Balance Due (R)'),
-                }).catch(() => {});
-            }
-        }
-
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// POST /api/admin/reschedule
-// =============================================================================
-app.post('/api/admin/reschedule', adminOnly, async (req, res) => {
-    try {
-        const { bookingId, newDate, newTime } = req.body;
-        const { row } = await findRow(req.doc, bookingId);
-        if (!row) return res.status(404).json({ error: 'Not found' });
-
-        const oldCal = row.get('Calendar Event ID') || '';
-        row.set('Date', newDate);
-        row.set('Time', newTime);
-        await row.save();
-
-        if (oldCal) {
-            const updated = await calUpdate(req.settings, oldCal, {
-                name:     row.get('Client Name'),
-                address:  row.get('Client Address'),
-                services: row.get('Service Names'),
-                date:     newDate,
-                time:     newTime,
-            });
-            if (!updated) {
-                await calDelete(req.settings, oldCal);
-                const nc = await calCreate(req.settings, {
-                    bookingId,
-                    name:        row.get('Client Name'),
-                    email:       row.get('Client Email'),
-                    phone:       row.get('Client Phone'),
-                    address:     row.get('Client Address'),
-                    services:    row.get('Service Names'),
-                    date:        newDate,
-                    time:        newTime,
-                    totalAmount: row.get('Total Amount (R)'),
-                    deposit:     row.get('Deposit Amount (R)'),
-                    balance:     row.get('Balance Due (R)'),
-                });
-                if (nc) { row.set('Calendar Event ID', nc); await row.save(); }
-            }
-        }
-
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// POST /api/admin/request-balance
-// =============================================================================
-app.post('/api/admin/request-balance', adminOnly, async (req, res) => {
-    try {
-        const { bookingId } = req.body;
-        const { row } = await findRow(req.doc, bookingId);
-        if (!row) return res.status(404).json({ error: 'Not found' });
-        if (row.get('Balance Status') === 'Paid') return res.status(400).json({ error: 'Already paid' });
-
-        const bal = parseFloat((row.get('Balance Due (R)') || '').replace(/[R\s]/g, '')) || 0;
-        if (bal < 2) return res.status(400).json({ error: 'Balance below R2' });
-
-        const s    = req.settings;
-        const base = s.app_base_url || 'http://localhost:3000';
-        const sUrl = `${base}/thankyou.html?balance=true&ref=${bookingId}`;
-        const cUrl = `${base}/??payment=cancelled&ref=${bookingId}`;
-        const slug = (s.yoco_payment_page_slug || '').replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
-        const np   = (row.get('Client Name') || '').split(/\s+/);
-        let paymentUrl = null;
-
-        if (s.yoco_secret_key) {
-            const { ok, data } = await yocoCheckout({
-                key:        s.yoco_secret_key,
-                cents:      Math.round(bal * 100),
-                successUrl: sUrl,
-                cancelUrl:  cUrl,
-                customer:   { email: row.get('Client Email') || '', firstName: np[0] || '', lastName: np.slice(1).join(' ') || '', phone: row.get('Client Phone') || '' },
-                metadata:   { bookingId, type: 'balance' },
-                desc:       `PhenomeBeauty balance — ${row.get('Service Names')}`,
-            });
-            if (ok && data.redirectUrl) paymentUrl = data.redirectUrl;
-        }
-
-        if (!paymentUrl && slug) {
-            const p = new URLSearchParams({
-                amount:                   bal.toFixed(2),
-                reference:                `${bookingId}-BAL`,
-                firstName:                np[0] || '',
-                lastName:                 np.slice(1).join(' ') || '',
-                email:                    row.get('Client Email') || '',
-                redirectOnPaymentSuccess: sUrl,
-            });
-            paymentUrl = `https://pay.yoco.com/${slug}?${p}`;
-        }
-
-        if (!paymentUrl) return res.status(500).json({ error: 'No Yoco credentials' });
-
-        row.set('Balance Status',  'Requested');
-        row.set('Yoco Link',       paymentUrl);
-        row.set('Deposit Status',  'Service Complete');
-        await row.save();
-
-        sendBalanceRequestEmail(s, {
-            bookingId,
-            name:       row.get('Client Name'),
-            email:      row.get('Client Email'),
-            services:   row.get('Service Names'),
-            deposit:    row.get('Deposit Amount (R)'),
-            balance:    bal.toFixed(2),
-            paymentUrl: paymentUrl,
-        }).catch((e) => console.error('Balance request email error:', e.message));
-
-        res.json({ success: true, paymentUrl, balanceDue: bal });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// POST /api/admin/refund
-// =============================================================================
-app.post('/api/admin/refund', adminOnly, async (req, res) => {
-    try {
-        const { bookingId, reason } = req.body;
-        const { row } = await findRow(req.doc, bookingId);
-        if (!row) return res.status(404).json({ error: 'Not found' });
-
-        const key = req.settings.yoco_secret_key || '';
-        if (!key) return res.status(400).json({ error: 'yoco_secret_key not set' });
-
-        const cid = (row.get('Yoco Checkout ID') || '').trim();
-        if (!cid) return res.status(400).json({ error: 'No Checkout ID — refund manually in Yoco Dashboard' });
-
-        const r = await fetch(`https://payments.yoco.com/api/checkouts/${cid}/refund`, {
-            method:  'POST',
-            headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ reason: reason || 'requested_by_customer' }),
-        });
-        const d = await r.json();
-        if (!r.ok) return res.status(400).json({ error: d.displayMessage || d.message || 'Refund failed' });
-
-        row.set('Deposit Status', 'Refunded');
-        await row.save();
-
-        const calId = row.get('Calendar Event ID') || '';
-        if (calId) await calDelete(req.settings, calId);
-
-        res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// Vercel serverless export — never call app.listen()
-// =============================================================================
-
-app.get('/api/admin/loyalty', adminOnly, async (req, res) => {
-    try {
-        const sheet = req.doc.sheetsByTitle['Loyalty Tracker'];
-        if (!sheet) return res.json([]);
-        const rows = await sheet.getRows();
-        res.json(rows.filter(r=>(r.get('Client Name')||'').trim()).map(r=>({
-            clientName:r.get('Client Name')||'',whatsappLink:r.get('WhatsApp Link')||'',
-            phone:r.get('Phone Number')||'',packProgress:r.get('Pack Progress')||'',
-            lastWaxDate:r.get('Last Wax Date')||'',nextDueDate:r.get('Next Due Date')||'',
-            status:r.get('Status')||'',notes:r.get('Notes')||'',location:r.get('Location')||''
-        })));
-    } catch(e){res.status(500).json({error:e.message});}
-});
-app.get('/api/admin/stock', adminOnly, async (req, res) => {
-    try {
-        const sheet = req.doc.sheetsByTitle['Stock'];
-        if (!sheet) {
-            console.log('Stock: Sheet "Stock" not found. Available sheets:', Object.keys(req.doc.sheetsByTitle));
-            return res.json([]);
-        }
-        await sheet.loadHeaderRow();
-        const headers = sheet.headerValues || [];
-        console.log('Stock: Sheet headers:', headers);
-        
-        const rows = await sheet.getRows();
-        console.log('Stock: Found', rows.length, 'rows');
-        
-        // More flexible column name matching
-        const findCol = (row, ...candidates) => {
-            for (const c of candidates) {
-                const val = row.get(c);
-                if (val !== undefined && val !== null && val !== '') return val;
-            }
-            return '';
+        updateNextBtn();
+      }
+
+      // ── SUBMIT ──────────────────────────────────────────────────────────────
+      function submitBooking() {
+        const btn = document.getElementById('btn-next');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loader"></span> Saving…';
+        const sTotal  = selectedServices.reduce((a, s) => a + Number(s.price), 0);
+        const pct     = parseFloat(appConfig.deposit_percent || 50) / 100;
+        const fee     = lastFeeData.fee || 0;
+        const total   = Math.round((sTotal + fee) * 100) / 100;
+        const deposit = Math.round(total * pct * 100) / 100;
+        const balance = Math.round((total - deposit) * 100) / 100;
+        const safety = divaType === 'new' ? {
+          skinConditions:   safetyAnswers.skin === 'yes' ? (document.getElementById('safety-skin')?.value||'').trim().slice(0,500) : (safetyAnswers.skin === 'no' ? 'None' : ''),
+          medications:      safetyAnswers.meds === 'yes' ? (document.getElementById('safety-meds')?.value||'').trim().slice(0,500) : (safetyAnswers.meds === 'no' ? 'None' : ''),
+          allergies:        safetyAnswers.allergies === 'yes' ? (document.getElementById('safety-allergies')?.value||'').trim().slice(0,500) : (safetyAnswers.allergies === 'no' ? 'None' : ''),
+          pregnant:         safetyAnswers.pregnant === 'yes',
+          healthConditions: safetyAnswers.health === 'yes' ? (document.getElementById('safety-health')?.value||'').trim().slice(0,500) : (safetyAnswers.health === 'no' ? 'None' : ''),
+          environmental:    safetyAnswers.enviro === 'yes' ? (document.getElementById('safety-enviro')?.value||'').trim().slice(0,300) : (safetyAnswers.enviro === 'no' ? 'None' : ''),
+          physical:         safetyAnswers.physical === 'yes' ? (document.getElementById('safety-physical')?.value||'').trim().slice(0,300) : (safetyAnswers.physical === 'no' ? 'None' : ''),
+          hairLengthOk:     safetyAnswers.hair === 'yes',
+          additionalInfo:   (document.getElementById('safety-notes')?.value||'').trim().slice(0,500),
+        } : null;
+        // Returning client changes (captured even when divaType is 'existing')
+        const returningChanges = divaType === 'existing' && safetyAnswers.changes === 'yes' 
+          ? (document.getElementById('returning-changes')?.value||'').trim().slice(0,500) 
+          : (safetyAnswers.changes === 'no' ? 'No changes since last visit' : null);
+        const body = {
+          services: selectedServices, date: selectedDate, time: selectedTime,
+          name:    document.getElementById('client-name').value.trim().slice(0,80),
+          phone:   document.getElementById('client-phone').value.replace(/\D/g,'').slice(0,15),
+          email:   document.getElementById('client-email').value.trim().slice(0,120),
+          address: document.getElementById('client-address').value.trim().slice(0,200),
+          source:  document.getElementById('client-source').value || '',
+          divaType, safety, returningChanges, policyAgreed: true,
+          servicesTotal: sTotal, callOutFee: fee, totalAmount: total,
+          depositAmount: deposit, balanceDue: balance,
+          oneWayKm: lastFeeData.oneWayKm, roundTripKm: lastFeeData.roundTripKm,
         };
-        
-        const items = rows.filter(r => {
-            const name = findCol(r, 'Product Name', 'Product', 'Item', 'Name', 'Item Name');
-            return name.trim() !== '';
-        }).map(r => ({
-            name: findCol(r, 'Product Name', 'Product', 'Item', 'Name', 'Item Name'),
-            category: findCol(r, 'Category', 'Type', 'Product Category'),
-            quantity: findCol(r, 'Quantity', 'Stock', 'Qty', 'In Stock', 'Current Stock') || '0',
-            minStock: findCol(r, 'Min Stock', 'Minimum', 'Min', 'Reorder Level', 'Min Level') || '0',
-            unit: findCol(r, 'Unit', 'Units', 'UOM'),
-            notes: findCol(r, 'Notes', 'Note', 'Comments', 'Description')
-        }));
-        
-        console.log('Stock: Returning', items.length, 'items');
-        res.json(items);
-    } catch(e) {
-        console.error('Stock error:', e.message);
-        res.status(500).json({ error: e.message });
-    }
-});
+        fetch('/api/book', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+          .then(r => r.json())
+          .then(result => {
+            if (!result || !result.success) {
+              showToast((result && result.error) || 'Booking failed — please try again', true);
+              btn.disabled = false; btn.textContent = 'Proceed to Payment'; return;
+            }
+            if (result.paymentUrl) {
+              btn.innerHTML = '<span class="loader"></span> Redirecting to payment…';
+              window.location.href = result.paymentUrl;
+            } else {
+              btn.style.display = 'none';
+              document.getElementById('btn-back').style.display = 'none';
+              showDepositThankYou({
+                bookingId: result.bookingId || '',
+                name:      document.getElementById('client-name').value.trim(),
+                date:      selectedDate, time: selectedTime,
+                services:  selectedServices.map(s => s.name).join(', '),
+                deposit:   String(result.depositAmount || '0'),
+                balance:   String(result.balanceDue    || '0'),
+              });
+            }
+          })
+          .catch(() => {
+            showToast('Network error — please try again', true);
+            btn.disabled = false; btn.textContent = 'Proceed to Payment';
+          });
+      }
 
-// =============================================================================
-// GET /api/admin/client-history — Get client's previous bookings
-// =============================================================================
-app.get('/api/admin/client-history', adminOnly, async (req, res) => {
-    try {
-        const { email, phone } = req.query;
-        if (!email && !phone) return res.status(400).json({ error: 'email or phone required' });
-        
-        const sheet = req.doc.sheetsByTitle['Bookings'];
-        if (!sheet) return res.json([]);
-        
-        const rows = await sheet.getRows();
-        const history = rows.filter(r => {
-            const rowEmail = (r.get('Client Email') || '').toLowerCase().trim();
-            const rowPhone = (r.get('Client Phone') || '').replace(/\D/g, '');
-            const qEmail = (email || '').toLowerCase().trim();
-            const qPhone = (phone || '').replace(/\D/g, '');
-            return (qEmail && rowEmail === qEmail) || (qPhone && rowPhone.includes(qPhone.slice(-9)));
-        }).map(r => ({
-            bookingId: r.get('Booking ID'),
-            date: r.get('Date'),
-            time: r.get('Time'),
-            services: r.get('Service Names'),
-            status: r.get('Deposit Status'),
-            total: r.get('Total Amount (R)'),
-        })).filter(b => b.bookingId && ['Confirmed', 'Service Complete'].includes(b.status))
-          .sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        res.json(history);
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
+      function showSuccessScreen(data) { showDepositThankYou(data); }
 
-// =============================================================================
-// POST /api/admin/add-service — Add service to existing booking (during service)
-// =============================================================================
-app.post('/api/admin/add-service', adminOnly, async (req, res) => {
-    try {
-        const { bookingId, serviceName, servicePrice } = req.body;
-        if (!bookingId || !serviceName) return res.status(400).json({ error: 'bookingId and serviceName required' });
-        
-        const { row } = await findRow(req.doc, bookingId);
-        if (!row) return res.status(404).json({ error: 'Booking not found' });
-        
-        const status = row.get('Deposit Status') || '';
-        if (!['Confirmed', 'Service Complete'].includes(status)) {
-            return res.status(400).json({ error: 'Booking must be Confirmed or Service Complete to add services' });
-        }
-        
-        // Update service names
-        const currentServices = row.get('Service Names') || '';
-        const newServices = currentServices ? `${currentServices}, ${serviceName}` : serviceName;
-        row.set('Service Names', newServices);
-        
-        // Update amounts
-        const price = parseFloat(servicePrice) || 0;
-        const currentServicePrice = parseFloat((row.get('Service Price (R)') || '0').replace(/[R\s]/g, '')) || 0;
-        const currentTotal = parseFloat((row.get('Total Amount (R)') || '0').replace(/[R\s]/g, '')) || 0;
-        const currentBalance = parseFloat((row.get('Balance Due (R)') || '0').replace(/[R\s]/g, '')) || 0;
-        
-        row.set('Service Price (R)', (currentServicePrice + price).toFixed(2));
-        row.set('Total Amount (R)', (currentTotal + price).toFixed(2));
-        row.set('Balance Due (R)', (currentBalance + price).toFixed(2));
-        
-        // Add note about add-on
-        const notes = row.get('Notes') || '';
-        const timestamp = new Date().toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' });
-        row.set('Notes', notes ? `${notes}\n[${timestamp}] Added: ${serviceName} R${price.toFixed(2)}` : `[${timestamp}] Added: ${serviceName} R${price.toFixed(2)}`);
-        
-        await row.save();
-        
-        res.json({
-            success: true,
-            newServices,
-            newTotal: (currentTotal + price).toFixed(2),
-            newBalance: (currentBalance + price).toFixed(2),
-        });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// GET /api/admin/reviews — Fetch Google Reviews
-// =============================================================================
-app.get('/api/admin/reviews', adminOnly, async (req, res) => {
-    try {
-        const s = req.settings;
-        const placeId = s.google_place_id || '';
-        const apiKey = s.google_maps_api_key || '';
-        
-        if (!placeId || !apiKey) {
-            return res.json({ 
-                reviews: [], 
-                error: !placeId ? 'google_place_id not configured in Settings' : 'google_maps_api_key not configured',
-                configured: false 
-            });
-        }
-        
-        // Fetch place details including reviews
-        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=reviews,rating,user_ratings_total,name&key=${encodeURIComponent(apiKey)}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.status !== 'OK') {
-            return res.json({ reviews: [], error: `Google API: ${data.status}`, configured: true });
-        }
-        
-        const result = data.result || {};
-        res.json({
-            configured: true,
-            placeName: result.name || '',
-            rating: result.rating || 0,
-            totalReviews: result.user_ratings_total || 0,
-            reviews: (result.reviews || []).map(r => ({
-                author: r.author_name,
-                authorUrl: r.author_url,
-                profilePhoto: r.profile_photo_url,
-                rating: r.rating,
-                text: r.text,
-                time: r.time,
-                relativeTime: r.relative_time_description,
-            }))
-        });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// =============================================================================
-// POST /api/admin/test-email — Send a test email
-// =============================================================================
-app.post('/api/admin/test-email', adminOnly, async (req, res) => {
-    try {
-        const s = req.settings;
-        const { sendAdminDepositNotification } = require('./lib/email');
-        
-        // Check email config
-        const smtpUser = s.smtp_user || s.smtpuser || s.admin_email || '';
-        const smtpPass = s.smtp_pass || s.smtppass || '';
-        
-        if (!smtpUser || !smtpPass) {
-            return res.status(400).json({ 
-                error: 'Email not configured',
-                details: {
-                    smtp_user: smtpUser ? '✓ Set' : '✗ Missing',
-                    smtp_pass: smtpPass ? '✓ Set' : '✗ Missing',
-                }
-            });
-        }
-        
-        // Send test email to admin
-        await sendAdminDepositNotification(s, {
-            bookingId: 'TEST-001',
-            name: 'Test Client',
-            email: smtpUser,
-            phone: '+27000000000',
-            address: '123 Test Street, Cape Town',
-            services: 'Test Service',
-            date: new Date().toISOString().split('T')[0],
-            time: '10:00-11:00',
-            totalAmount: '500.00',
-            deposit: '250.00',
-            balance: '250.00',
-        });
-        
-        res.json({ success: true, message: `Test email sent to ${smtpUser}` });
-    } catch (e) { 
-        res.status(500).json({ error: e.message, details: 'Check SMTP credentials and Gmail app password' }); 
-    }
-});
-
-// =============================================================================
-// GET /api/admin/email-config — Check email configuration status
-// =============================================================================
-app.get('/api/admin/email-config', adminOnly, async (req, res) => {
-    try {
-        const s = req.settings;
-        const smtpUser = s.smtp_user || s.smtpuser || process.env.SMTP_USER || '';
-        const smtpPass = s.smtp_pass || s.smtppass || process.env.SMTP_PASS || '';
-        const adminEmail = s.admin_email || s.adminemail || '';
-        
-        res.json({
-            smtp_user: smtpUser ? `✓ ${smtpUser}` : '✗ Not set',
-            smtp_pass: smtpPass ? '✓ Set (hidden)' : '✗ Not set',
-            admin_email: adminEmail ? `✓ ${adminEmail}` : '✗ Not set',
-            ready: !!(smtpUser && smtpPass),
-        });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-module.exports = app;
+      // ── UTILS ───────────────────────────────────────────────────────────────
+      function escHtml(s) {
+        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+      }
+    </script>
+  </body>
+</html>
