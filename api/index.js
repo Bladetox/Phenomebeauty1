@@ -1,6 +1,6 @@
 require('dotenv').config({ override: true });
 
-// api/index.js — PhenomeBeauty Booking Server v5.3
+// api/index.js — PhenomeBeauty Booking Server v5.4
 // Vercel serverless entry point — exports Express app, never calls app.listen()
 'use strict';
 
@@ -43,7 +43,7 @@ app.use((req, res, next) => {
         "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
         "font-src 'self' https://fonts.gstatic.com; " +
-        "img-src 'self' data: https://iili.io; " +
+        "img-src 'self' data: https://iili.io https://lh3.googleusercontent.com; " +
         "connect-src 'self' https://maps.googleapis.com https://places.googleapis.com; " +
         "frame-ancestors 'none';"
     );
@@ -992,7 +992,6 @@ app.post('/api/admin/request-balance', adminOnly, async (req, res) => {
 
         if (!paymentUrl) return res.status(500).json({ error: 'No Yoco credentials' });
 
-        // fix bug 1: set Service Complete + Requested + send balance email
         row.set('Deposit Status',  'Service Complete');
         row.set('Balance Status',  'Requested');
         row.set('Yoco Link',       paymentUrl);
@@ -1079,27 +1078,150 @@ app.get('/api/admin/stock', adminOnly, async (req, res) => {
 });
 
 // =============================================================================
-// GET /api/admin/reviews  — fix bug 2: new endpoint to serve reviews from sheet
+// GET /api/admin/reviews  — fetches live reviews from Google Places API (New)
+// Requires: google_maps_api_key + google_place_id in Settings sheet
+// Falls back gracefully if not configured.
 // =============================================================================
-app.get('/api/admin/reviews', adminOnly, async (req, res) => {
+app.get('/api/admin/reviews', adminOnly, rateLimit(10, 60000), async (req, res) => {
     try {
-        const sheet = req.doc.sheetsByTitle['Reviews'];
-        if (!sheet) {
-            // No Reviews sheet — return empty array gracefully
-            return res.json([]);
+        const s       = req.settings;
+        const apiKey  = s.google_maps_api_key || '';
+        const placeId = (s.google_place_id || '').trim();
+
+        if (!apiKey || !placeId) {
+            return res.json({ configured: false });
         }
+
+        // Use Places API (New) — places.googleapis.com
+        const fields  = 'displayName,rating,userRatingCount,reviews';
+        const url     = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}` +
+                        `?fields=${fields}&key=${encodeURIComponent(apiKey)}`;
+
+        const resp = await fetch(url, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!resp.ok) {
+            const errBody = await resp.text();
+            console.error('Places API error:', resp.status, errBody.slice(0, 300));
+            return res.json({
+                configured: true,
+                error: `Google Places API error (${resp.status}) — check your API key and Place ID in Settings`,
+            });
+        }
+
+        const data = await resp.json();
+
+        const reviews = (data.reviews || []).map(r => ({
+            author:       r.authorAttribution?.displayName   || 'Anonymous',
+            profilePhoto: r.authorAttribution?.photoUri      || '',
+            rating:       r.rating                           || 0,
+            text:         r.text?.text                       || '',
+            relativeTime: r.relativePublishTimeDescription   || '',
+            publishTime:  r.publishTime                      || '',
+        }));
+
+        return res.json({
+            configured:   true,
+            rating:       data.rating        || 0,
+            totalReviews: data.userRatingCount || 0,
+            placeName:    data.displayName?.text || placeId,
+            reviews,
+        });
+
+    } catch (e) {
+        console.error('reviews endpoint error:', e.message);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// =============================================================================
+// GET /api/admin/client-history
+// =============================================================================
+app.get('/api/admin/client-history', adminOnly, async (req, res) => {
+    try {
+        const email = (req.query.email || '').trim().toLowerCase();
+        const phone = (req.query.phone || '').trim();
+        const sheet = req.doc.sheetsByTitle['Bookings'];
+        if (!sheet) return res.json([]);
         const rows = await sheet.getRows();
-        res.json(rows.filter(r => (
-            r.get('Client Name') || r.get('Name') || r.get('Reviewer') || ''
-        ).trim()).map(r => ({
-            clientName: r.get('Client Name') || r.get('Name') || r.get('Reviewer') || '',
-            rating:     r.get('Rating')      || r.get('Stars') || '',
-            review:     r.get('Review')      || r.get('Comment') || r.get('Feedback') || '',
-            date:       r.get('Date')        || r.get('Submitted') || '',
-            source:     r.get('Source')      || 'Google',
-            bookingId:  r.get('Booking ID')  || '',
-        })).reverse());
-    } catch(e) { res.status(500).json({ error: e.message }); }
+        const matches = rows.filter(r => {
+            const rEmail = (r.get('Client Email') || '').trim().toLowerCase();
+            const rPhone = (r.get('Client Phone') || '').trim();
+            return (email && rEmail === email) || (phone && rPhone === phone);
+        });
+        res.json(matches.map(r => ({
+            bookingId: r.get('Booking ID') || '',
+            services:  r.get('Service Names') || '',
+            date:      r.get('Date') || '',
+            status:    r.get('Deposit Status') || '',
+        })).filter(b => b.bookingId).reverse());
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/add-service
+// =============================================================================
+app.post('/api/admin/add-service', adminOnly, async (req, res) => {
+    try {
+        const { bookingId, serviceName, servicePrice } = req.body;
+        if (!bookingId || !serviceName) return res.status(400).json({ error: 'bookingId and serviceName required' });
+        const { row } = await findRow(req.doc, bookingId);
+        if (!row) return res.status(404).json({ error: 'Booking not found' });
+
+        const price       = Math.max(0, parseFloat(servicePrice) || 0);
+        const oldServices = row.get('Service Names') || '';
+        const newServices = oldServices ? `${oldServices}, ${sanitize(serviceName, 60)}` : sanitize(serviceName, 60);
+        const oldTotal    = parseFloat(row.get('Total Amount (R)')   || 0);
+        const oldBalance  = parseFloat(row.get('Balance Due (R)')    || 0);
+        const newTotal    = Math.round((oldTotal   + price) * 100) / 100;
+        const newBalance  = Math.round((oldBalance + price) * 100) / 100;
+
+        row.set('Service Names',   newServices);
+        row.set('Total Amount (R)', newTotal.toFixed(2));
+        row.set('Balance Due (R)',  newBalance.toFixed(2));
+        await row.save();
+
+        res.json({ success: true, newServices, newTotal: newTotal.toFixed(2), newBalance: newBalance.toFixed(2) });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/test-email
+// =============================================================================
+app.post('/api/admin/test-email', adminOnly, async (req, res) => {
+    try {
+        const s = req.settings;
+        await sendAdminDepositNotification(s, {
+            bookingId:   'TEST-001',
+            name:        'Test Client',
+            email:       s.admin_email || '',
+            phone:       '+27000000000',
+            address:     '1 Test Street, Cape Town',
+            services:    'Test Service',
+            date:        new Date().toISOString().slice(0, 10),
+            time:        '10:00-11:00',
+            totalAmount: '200.00',
+            deposit:     '100.00',
+            balance:     '100.00',
+        });
+        res.json({ success: true, message: 'Test email sent to ' + (s.admin_email || 'admin') });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// GET /api/admin/email-config
+// =============================================================================
+app.get('/api/admin/email-config', adminOnly, async (req, res) => {
+    try {
+        const s = req.settings;
+        res.json({
+            ready:     !!(s.smtp_host && s.smtp_user && s.smtp_pass),
+            smtpHost:  s.smtp_host  || '',
+            smtpUser:  s.smtp_user  || '',
+            adminEmail:s.admin_email|| '',
+        });
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // =============================================================================
