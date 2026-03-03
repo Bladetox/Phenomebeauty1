@@ -314,7 +314,7 @@
         <p class="signature">Toodles 💜</p>
         
         <p class="refresh-note">
-            Refreshing this page will take you back to the booking page.
+            Bookmarking this page? Head back to <a href="/" style="color:inherit;text-decoration:underline;">the booking page</a>.
         </p>
     </div>
     
@@ -322,6 +322,7 @@
         const params = new URLSearchParams(window.location.search);
         const ref = params.get('ref');
         
+        // fix: only fetch and guard session if a valid ref exists
         if (ref) {
             fetch('/api/check-payment?ref=' + encodeURIComponent(ref))
                 .then(r => r.json())
@@ -334,14 +335,13 @@
                 .catch(() => {
                     console.log('Could not fetch booking details');
                 });
-        }
-        
-        const hasVisited = sessionStorage.getItem('thankyou-visited-' + ref);
-        
-        if (hasVisited) {
-            window.location.href = '/';
-        } else {
-            sessionStorage.setItem('thankyou-visited-' + ref, 'true');
+
+            const hasVisited = sessionStorage.getItem('thankyou-visited-' + ref);
+            if (hasVisited) {
+                window.location.href = '/';
+            } else {
+                sessionStorage.setItem('thankyou-visited-' + ref, 'true');
+            }
         }
     </script>
 </body>

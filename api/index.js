@@ -314,6 +314,7 @@ app.get('/api', async (req, res) => {
                 deposit_percent:     full.deposit_percent     || '50',
                 google_maps_api_key: full.google_maps_api_key || '',
                 app_base_url:        full.app_base_url        || '',
+                google_review_url:   full.google_review_url   || '',  // fix: expose for thankyou.html review button
             });
         }
 
@@ -470,7 +471,8 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
 
         // ── Build Yoco payment URL ────────────────────────────────────────────
         const appBase    = s.app_base_url           || 'http://localhost:3000';
-        const successUrl = s.booking_success_url    || `${appBase}/thankyou.html?ref=${bookingId}`;
+        // fix: default success URL now points to thankyou-balance.html (deposit confirmation screen)
+        const successUrl = s.booking_success_url    || `${appBase}/thankyou-balance.html?ref=${bookingId}`;
         const cancelUrl  = s.booking_cancel_url     || `${appBase}/?payment=cancelled&ref=${bookingId}`;
         const yocoKey    = s.yoco_secret_key        || '';
         const rawSlug    = s.yoco_payment_page_slug || '';
@@ -681,7 +683,6 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
 
         const settings = await getSettings(doc);
 
-        // Create Google Calendar event
         // Create Google Calendar event (with timeout protection)
         let calId = null;
         try {
@@ -699,11 +700,11 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
                     deposit:     row.get('Deposit Amount (R)'),
                     balance:     row.get('Balance Due (R)'),
                 }),
-                new Promise((_, reject) => 
+                new Promise((_, reject) =>
                     setTimeout(() => reject(new Error('Calendar timeout')), 5000)
                 )
             ]);
-            
+
             if (calId) {
                 row.set('Calendar Event ID', calId);
                 await row.save();
@@ -713,9 +714,9 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
             }
         } catch (e) {
             console.error(`Webhook: calendar creation failed for ${bookingId}:`, e.message);
-            // Continue without calendar - don't block booking confirmation
         }
-        // Notify admin and customer — await both so Vercel doesn't kill before send
+
+        // Notify admin and customer
         await Promise.all([
             sendAdminDepositNotification(settings, {
                 bookingId,
@@ -747,7 +748,6 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
         return res.status(200).json({ received: true });
 
     } catch (e) {
-        // 500 tells Yoco to retry
         console.error('Webhook processing error:', e.message);
         return res.status(500).json({ error: 'Internal error — will retry' });
     }
@@ -900,7 +900,6 @@ app.post('/api/admin/update-status', adminOnly, async (req, res) => {
 
         // ── Manual confirm: create calendar event + send emails ──────────────
         if (status === 'Confirmed') {
-            // ── Create calendar event only if one doesn't exist yet ──────────
             if (!row.get('Calendar Event ID')) {
                 const calId = await calCreate(req.settings, {
                     bookingId,
@@ -1011,7 +1010,7 @@ app.post('/api/admin/request-balance', adminOnly, async (req, res) => {
         const s    = req.settings;
         const base = s.app_base_url || 'http://localhost:3000';
         const sUrl = `${base}/thankyou.html?balance=true&ref=${bookingId}`;
-        const cUrl = `${base}/??payment=cancelled&ref=${bookingId}`;
+        const cUrl = `${base}/?payment=cancelled&ref=${bookingId}`;
         const slug = (s.yoco_payment_page_slug || '').replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
         const np   = (row.get('Client Name') || '').split(/\s+/);
         let paymentUrl = null;
@@ -1096,9 +1095,8 @@ app.post('/api/admin/refund', adminOnly, async (req, res) => {
 });
 
 // =============================================================================
-// Vercel serverless export — never call app.listen()
+// GET /api/admin/loyalty
 // =============================================================================
-
 app.get('/api/admin/loyalty', adminOnly, async (req, res) => {
     try {
         const sheet = req.doc.sheetsByTitle['Loyalty Tracker'];
@@ -1112,6 +1110,10 @@ app.get('/api/admin/loyalty', adminOnly, async (req, res) => {
         })));
     } catch(e){res.status(500).json({error:e.message});}
 });
+
+// =============================================================================
+// GET /api/admin/stock
+// =============================================================================
 app.get('/api/admin/stock', adminOnly, async (req, res) => {
     try {
         const sheet = req.doc.sheetsByTitle['Stock'];
@@ -1124,4 +1126,8 @@ app.get('/api/admin/stock', adminOnly, async (req, res) => {
         })));
     } catch(e){res.status(500).json({error:e.message});}
 });
+
+// =============================================================================
+// Vercel serverless export — never call app.listen()
+// =============================================================================
 module.exports = app;
