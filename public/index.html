@@ -968,6 +968,138 @@
       .skel-line {
         height:10px;border-radius:5px;background:rgba(255,255,255,0.06);margin-bottom:8px;
       }
+
+      /* ── WELCOME PAGE ── */
+      .welcome-page {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 15% 5%,  rgba(100, 60,220,0.80) 0%, transparent 36%),
+          radial-gradient(ellipse at 85% 4%,  rgba(65,  35,165,0.70) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 52%, rgba(50,  25,130,0.60) 0%, transparent 42%),
+          radial-gradient(ellipse at 8%  94%, rgba(80,  45,175,0.65) 0%, transparent 34%),
+          radial-gradient(ellipse at 92% 92%, rgba(58,  28,130,0.60) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 50%, rgba(18,  10, 55,0.92) 0%, transparent 66%),
+          var(--obsidian);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        opacity: 1;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .welcome-page.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(1.02);
+      }
+      .welcome-logo {
+        width: 110px; height: 110px;
+        border-radius: 32px;
+        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
+        padding: 3px;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.18) inset,
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 20px 60px rgba(0,0,0,0.75),
+          0 0 50px rgba(120,90,220,0.15);
+        margin-bottom: 28px;
+        animation: welcomePulse 2s ease-in-out infinite;
+      }
+      @keyframes welcomePulse {
+        0%, 100% { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.18) inset, 0 20px 60px rgba(0,0,0,0.75), 0 0 50px rgba(120,90,220,0.15); }
+        50% { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.25) inset, 0 20px 60px rgba(0,0,0,0.75), 0 0 70px rgba(140,100,240,0.25); }
+      }
+      .welcome-logo img {
+        width: 100%; height: 100%;
+        border-radius: 29px;
+        object-fit: cover;
+      }
+      .welcome-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 36px;
+        font-weight: 300;
+        color: rgba(255,255,255,0.96);
+        text-align: center;
+        margin-bottom: 12px;
+        letter-spacing: 0.02em;
+        text-shadow: 0 0 40px rgba(180,160,255,0.30);
+      }
+      .welcome-subtitle {
+        font-family: 'Jost', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.50);
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        margin-bottom: 40px;
+      }
+      .welcome-tagline {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px;
+        font-style: italic;
+        color: rgba(255,255,255,0.55);
+        text-align: center;
+        max-width: 280px;
+        line-height: 1.7;
+        margin-bottom: 48px;
+      }
+      .welcome-btn {
+        padding: 16px 48px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.95);
+        color: var(--obsidian);
+        font-family: 'Jost', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 12px 40px rgba(255,255,255,0.15);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .welcome-btn:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 16px 50px rgba(255,255,255,0.20);
+      }
+      .welcome-btn:active {
+        transform: translateY(0);
+      }
+
+      /* ── RETURNING CLIENT SECTION ── */
+      .returning-section {
+        display: none;
+        background: rgba(139,92,246,0.08);
+        border: 0.5px solid rgba(139,92,246,0.20);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        margin-top: 4px;
+      }
+      .returning-section-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px;
+        font-weight: 700;
+        color: rgba(167,139,250,0.85);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        margin-bottom: 5px;
+      }
+      .returning-section-body {
+        font-family: 'Jost', sans-serif;
+        font-size: 12px;
+        color: rgba(255,255,255,0.45);
+        line-height: 1.55;
+        margin-bottom: 10px;
+      }
     
       .phone-wrap { display: flex; gap: 0; }
       .phone-country-select {
@@ -990,7 +1122,20 @@
       </style>
   </head>
   <body>
-    <div class="app-frame">
+    <!-- WELCOME PAGE -->
+    <div class="welcome-page" id="welcome-page">
+      <div class="welcome-logo">
+        <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty">
+      </div>
+      <div class="welcome-title">PhenomeBeauty</div>
+      <div class="welcome-subtitle">Mobile Beauty Studio</div>
+      <div class="welcome-tagline">
+        "Every woman deserves to feel beautiful in the comfort of her own space."
+      </div>
+      <button class="welcome-btn" onclick="enterBooking()">Book Your Treatment</button>
+    </div>
+
+    <div class="app-frame" id="app-frame" style="display:none;">
       <div class="shell">
         <header>
           <div class="logo-wrap">
@@ -1270,6 +1415,24 @@
                              outline:none;resize:vertical;min-height:56px;"></textarea>
                   </div>
                 </div>
+
+                <!-- Returning Client Section - for existing divas -->
+                <div id="returning-section" class="returning-section">
+                  <div class="returning-section-title">✨ Welcome Back!</div>
+                  <div class="returning-section-body">
+                    Please let us know if anything has changed since your last appointment.
+                  </div>
+                  <div class="form-group safety-q-wrap" style="border-bottom:none;padding-bottom:0;">
+                    <div class="safety-q-label" style="color:rgba(167,139,250,0.85);">Has anything changed since your last visit?
+                      <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">New medications, skin conditions, pregnancy, allergies, etc.</span>
+                    </div>
+                    <div class="safety-yn" data-q="changes">
+                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'changes')">No changes</button>
+                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'changes')">Yes, something changed</button>
+                    </div>
+                    <textarea id="returning-changes" class="safety-detail" maxlength="500" placeholder="Please describe what has changed…" style="display:none;"></textarea>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1353,11 +1516,29 @@
       let addressConfirmed = false;
       let addrDebounceTimer = null;
 
+      // ── WELCOME PAGE TRANSITION ───────────────────────────────────────────
+      function enterBooking() {
+        const welcomePage = document.getElementById('welcome-page');
+        const appFrame = document.getElementById('app-frame');
+        welcomePage.classList.add('hidden');
+        appFrame.style.display = 'flex';
+        setTimeout(() => {
+          welcomePage.style.display = 'none';
+        }, 500);
+      }
+
       // ── INIT ───────────────────────────────────────────────────────────────
       window.onload = () => {
         const params = new URLSearchParams(window.location.search);
         const pStatus = params.get('payment');
         const pRef    = params.get('ref');
+        
+        // Skip welcome page if returning from payment or has query params
+        if (pStatus || pRef) {
+          document.getElementById('welcome-page').style.display = 'none';
+          document.getElementById('app-frame').style.display = 'flex';
+        }
+        
         if (pStatus) {
           window.history.replaceState({}, '', window.location.pathname);
           if (pStatus === 'success' && pRef) {
@@ -2002,10 +2183,12 @@
       function toggleDiva(type) {
         divaType = type;
         const safetySection = document.getElementById('safety-section');
+        const returningSection = document.getElementById('returning-section');
         const btnExisting   = document.getElementById('diva-existing');
         const btnNew        = document.getElementById('diva-new');
         if (type === 'new') {
           safetySection.style.display = 'block';
+          returningSection.style.display = 'none';
           btnNew.style.background      = 'rgba(0,0,0,0.07)';
           btnNew.style.color           = '#0a0a0a';
           btnNew.style.borderColor     = 'rgba(0,0,0,0.18)';
@@ -2014,6 +2197,7 @@
           btnExisting.style.borderColor= 'rgba(0,0,0,0.08)';
         } else {
           safetySection.style.display = 'none';
+          returningSection.style.display = 'block';
           Object.keys(safetyAnswers).forEach(k => delete safetyAnswers[k]);
           document.querySelectorAll('.syn-btn').forEach(b => b.classList.remove('active'));
           document.querySelectorAll('.safety-detail').forEach(t => { t.style.display='none'; t.value=''; });
@@ -2049,6 +2233,10 @@
           hairLengthOk:     safetyAnswers.hair === 'yes',
           additionalInfo:   (document.getElementById('safety-notes')?.value||'').trim().slice(0,500),
         } : null;
+        // Returning client changes (captured even when divaType is 'existing')
+        const returningChanges = divaType === 'existing' && safetyAnswers.changes === 'yes' 
+          ? (document.getElementById('returning-changes')?.value||'').trim().slice(0,500) 
+          : (safetyAnswers.changes === 'no' ? 'No changes since last visit' : null);
         const body = {
           services: selectedServices, date: selectedDate, time: selectedTime,
           name:    document.getElementById('client-name').value.trim().slice(0,80),
@@ -2056,7 +2244,7 @@
           email:   document.getElementById('client-email').value.trim().slice(0,120),
           address: document.getElementById('client-address').value.trim().slice(0,200),
           source:  document.getElementById('client-source').value || '',
-          divaType, safety, policyAgreed: true,
+          divaType, safety, returningChanges, policyAgreed: true,
           servicesTotal: sTotal, callOutFee: fee, totalAmount: total,
           depositAmount: deposit, balanceDue: balance,
           oneWayKm: lastFeeData.oneWayKm, roundTripKm: lastFeeData.roundTripKm,
