@@ -6,7 +6,7 @@
     <title>PhenomeBeauty Booking</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       /* ═══════════════════════════════════════════════════════════
          PHENOMEBEAUTY — OBSIDIAN ATELIER
@@ -969,109 +969,390 @@
         height:10px;border-radius:5px;background:rgba(255,255,255,0.06);margin-bottom:8px;
       }
 
-      /* ── WELCOME PAGE ── */
+      /* ══════════════════════════════════════════════════════════════
+         WELCOME PAGE — Luxury Spa Experience
+         ══════════════════════════════════════════════════════════════ */
       .welcome-page {
         position: fixed;
         inset: 0;
-        background:
-          radial-gradient(ellipse at 15% 5%,  rgba(100, 60,220,0.80) 0%, transparent 36%),
-          radial-gradient(ellipse at 85% 4%,  rgba(65,  35,165,0.70) 0%, transparent 34%),
-          radial-gradient(ellipse at 50% 52%, rgba(50,  25,130,0.60) 0%, transparent 42%),
-          radial-gradient(ellipse at 8%  94%, rgba(80,  45,175,0.65) 0%, transparent 34%),
-          radial-gradient(ellipse at 92% 92%, rgba(58,  28,130,0.60) 0%, transparent 34%),
-          radial-gradient(ellipse at 50% 50%, rgba(18,  10, 55,0.92) 0%, transparent 66%),
-          var(--obsidian);
+        background: var(--obsidian);
         z-index: 1000;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         padding: 24px;
-        opacity: 1;
-        transition: opacity 0.5s ease, transform 0.5s ease;
+        overflow: hidden;
       }
+      
+      /* Animated ambient background */
+      .welcome-page::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 20% 0%,  rgba(180,160,220,0.25) 0%, transparent 50%),
+          radial-gradient(ellipse at 80% 0%,  rgba(140,120,200,0.20) 0%, transparent 45%),
+          radial-gradient(ellipse at 50% 100%, rgba(120,100,180,0.22) 0%, transparent 50%),
+          radial-gradient(ellipse at 0% 50%,  rgba(100,80,160,0.15) 0%, transparent 40%),
+          radial-gradient(ellipse at 100% 50%, rgba(100,80,160,0.15) 0%, transparent 40%);
+        animation: ambientShift 8s ease-in-out infinite;
+        pointer-events: none;
+      }
+      
+      @keyframes ambientShift {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
+      }
+      
+      /* Floating particles effect */
+      .welcome-page::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: 
+          radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.3) 0%, transparent 100%),
+          radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.25) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 30% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+          radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+          radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.25) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 20% 90%, rgba(255,255,255,0.2) 0%, transparent 100%),
+          radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.25) 0%, transparent 100%);
+        animation: floatParticles 20s linear infinite;
+        pointer-events: none;
+      }
+      
+      @keyframes floatParticles {
+        0% { transform: translateY(0) rotate(0deg); }
+        100% { transform: translateY(-100vh) rotate(360deg); }
+      }
+      
       .welcome-page.hidden {
         opacity: 0;
         pointer-events: none;
-        transform: scale(1.02);
+        transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       }
+      
+      .welcome-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: contentFadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+      
+      @keyframes contentFadeIn {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      
+      /* Logo with golden ring glow */
       .welcome-logo {
-        width: 110px; height: 110px;
-        border-radius: 32px;
-        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
+        width: 120px; height: 120px;
+        border-radius: 36px;
         padding: 3px;
+        background: linear-gradient(145deg, rgba(212,175,130,0.4) 0%, rgba(180,140,100,0.2) 50%, rgba(212,175,130,0.4) 100%);
         box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.18) inset,
-          0 1px 0 rgba(255,255,255,0.10) inset,
-          0 20px 60px rgba(0,0,0,0.75),
-          0 0 50px rgba(120,90,220,0.15);
-        margin-bottom: 28px;
-        animation: welcomePulse 2s ease-in-out infinite;
+          0 0 0 1px rgba(212,175,130,0.15) inset,
+          0 0 60px rgba(212,175,130,0.12),
+          0 25px 80px rgba(0,0,0,0.6);
+        margin-bottom: 36px;
+        position: relative;
+        animation: logoReveal 1s ease-out 0.2s both, logoFloat 4s ease-in-out 1.2s infinite;
       }
-      @keyframes welcomePulse {
-        0%, 100% { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.18) inset, 0 20px 60px rgba(0,0,0,0.75), 0 0 50px rgba(120,90,220,0.15); }
-        50% { box-shadow: 0 0 0 0.5px rgba(255,255,255,0.25) inset, 0 20px 60px rgba(0,0,0,0.75), 0 0 70px rgba(140,100,240,0.25); }
+      
+      @keyframes logoReveal {
+        0% { opacity: 0; transform: scale(0.8); }
+        100% { opacity: 1; transform: scale(1); }
       }
+      
+      @keyframes logoFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+      
+      /* Rotating golden ring */
+      .welcome-logo::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 44px;
+        background: conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          rgba(212,175,130,0.5) 60deg,
+          rgba(255,220,180,0.3) 120deg,
+          transparent 180deg,
+          rgba(212,175,130,0.4) 240deg,
+          rgba(255,220,180,0.2) 300deg,
+          transparent 360deg
+        );
+        animation: ringRotate 6s linear infinite;
+        mask: radial-gradient(transparent 58%, black 60%, black 100%);
+        -webkit-mask: radial-gradient(transparent 58%, black 60%, black 100%);
+      }
+      
+      @keyframes ringRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
       .welcome-logo img {
         width: 100%; height: 100%;
-        border-radius: 29px;
+        border-radius: 33px;
         object-fit: cover;
       }
+      
+      /* Brand name - Abril Fatface */
       .welcome-title {
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 36px;
-        font-weight: 300;
-        color: rgba(255,255,255,0.96);
+        font-family: 'Abril Fatface', 'Playfair Display', Georgia, serif;
+        font-size: 42px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.95);
         text-align: center;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         letter-spacing: 0.02em;
-        text-shadow: 0 0 40px rgba(180,160,255,0.30);
+        text-shadow: 0 0 60px rgba(212,175,130,0.25);
+        animation: textReveal 0.8s ease-out 0.5s both;
       }
+      
+      @keyframes textReveal {
+        0% { opacity: 0; transform: translateY(20px); letter-spacing: 0.15em; }
+        100% { opacity: 1; transform: translateY(0); letter-spacing: 0.02em; }
+      }
+      
+      /* Subtitle hierarchy */
       .welcome-subtitle {
         font-family: 'Jost', sans-serif;
-        font-size: 13px;
+        font-size: 11px;
         font-weight: 500;
-        color: rgba(255,255,255,0.50);
+        color: rgba(212,175,130,0.85);
         text-align: center;
         text-transform: uppercase;
-        letter-spacing: 0.25em;
-        margin-bottom: 40px;
+        letter-spacing: 0.35em;
+        margin-bottom: 6px;
+        animation: textReveal 0.8s ease-out 0.7s both;
       }
-      .welcome-tagline {
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 18px;
-        font-style: italic;
-        color: rgba(255,255,255,0.55);
-        text-align: center;
-        max-width: 280px;
-        line-height: 1.7;
-        margin-bottom: 48px;
-      }
-      .welcome-btn {
-        padding: 16px 48px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.95);
-        color: var(--obsidian);
+      
+      .welcome-subtitle-small {
         font-family: 'Jost', sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
+        font-size: 9px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.35);
+        text-align: center;
         text-transform: uppercase;
+        letter-spacing: 0.30em;
+        margin-bottom: 44px;
+        animation: textReveal 0.8s ease-out 0.85s both;
+      }
+      
+      /* Decorative line */
+      .welcome-divider {
+        width: 60px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(212,175,130,0.5), transparent);
+        margin-bottom: 32px;
+        animation: dividerExpand 1s ease-out 1s both;
+      }
+      
+      @keyframes dividerExpand {
+        0% { width: 0; opacity: 0; }
+        100% { width: 60px; opacity: 1; }
+      }
+      
+      /* Tagline */
+      .welcome-tagline {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 17px;
+        font-style: italic;
+        font-weight: 300;
+        color: rgba(255,255,255,0.45);
+        text-align: center;
+        max-width: 260px;
+        line-height: 1.85;
+        margin-bottom: 52px;
+        animation: textReveal 0.8s ease-out 1.1s both;
+      }
+      
+      /* ══════════════════════════════════════════════════════════════
+         CTA BUTTON — Luxury Animated Entrance
+         ══════════════════════════════════════════════════════════════ */
+      .welcome-btn-wrap {
+        position: relative;
+        animation: btnReveal 1s ease-out 1.4s both;
+      }
+      
+      @keyframes btnReveal {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      
+      .welcome-btn {
+        position: relative;
+        padding: 18px 52px;
         border: none;
+        border-radius: 999px;
+        background: transparent;
         cursor: pointer;
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.30) inset,
-          0 12px 40px rgba(255,255,255,0.15);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        overflow: hidden;
+        isolation: isolate;
       }
+      
+      /* Outer glow ring */
+      .welcome-btn::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, 
+          rgba(212,175,130,0.6) 0%, 
+          rgba(255,220,180,0.4) 25%,
+          rgba(212,175,130,0.6) 50%,
+          rgba(255,220,180,0.4) 75%,
+          rgba(212,175,130,0.6) 100%);
+        background-size: 300% 300%;
+        animation: shimmerBorder 3s ease-in-out infinite;
+        z-index: -2;
+      }
+      
+      @keyframes shimmerBorder {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+      }
+      
+      /* Inner background */
+      .welcome-btn::after {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #0a0a12 0%, #12121a 100%);
+        z-index: -1;
+      }
+      
+      .welcome-btn-inner {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        z-index: 1;
+      }
+      
+      .welcome-btn-text {
+        font-family: 'Jost', sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, 
+          rgba(212,175,130,1) 0%, 
+          rgba(255,230,200,1) 50%, 
+          rgba(212,175,130,1) 100%);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: textShimmer 3s ease-in-out infinite;
+      }
+      
+      @keyframes textShimmer {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+      }
+      
+      .welcome-btn-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(212,175,130,0.2) 0%, rgba(212,175,130,0.1) 100%);
+        border: 1px solid rgba(212,175,130,0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .welcome-btn-icon svg {
+        width: 12px;
+        height: 12px;
+        stroke: rgba(212,175,130,0.9);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .welcome-btn:hover .welcome-btn-icon {
+        background: linear-gradient(135deg, rgba(212,175,130,0.4) 0%, rgba(212,175,130,0.2) 100%);
+        transform: scale(1.1);
+      }
+      
+      .welcome-btn:hover .welcome-btn-icon svg {
+        transform: translateX(2px);
+      }
+      
+      /* Ripple effect on hover */
+      .welcome-btn-ripple {
+        position: absolute;
+        inset: 2px;
+        border-radius: 999px;
+        background: radial-gradient(circle at center, rgba(212,175,130,0.15) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: 0;
+      }
+      
+      .welcome-btn:hover .welcome-btn-ripple {
+        opacity: 1;
+        animation: ripplePulse 1.5s ease-in-out infinite;
+      }
+      
+      @keyframes ripplePulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.05); opacity: 1; }
+      }
+      
+      /* Button glow on hover */
       .welcome-btn:hover {
-        transform: translateY(-2px);
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.30) inset,
-          0 16px 50px rgba(255,255,255,0.20);
+        box-shadow: 
+          0 0 40px rgba(212,175,130,0.2),
+          0 20px 60px rgba(0,0,0,0.4);
       }
+      
       .welcome-btn:active {
-        transform: translateY(0);
+        transform: scale(0.98);
+      }
+      
+      /* Bottom flourish */
+      .welcome-footer {
+        position: absolute;
+        bottom: 32px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        animation: footerFade 1s ease-out 1.8s both;
+      }
+      
+      @keyframes footerFade {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      
+      .welcome-footer-text {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.20);
+        text-transform: uppercase;
+        letter-spacing: 0.20em;
+      }
+      
+      .welcome-footer-icon {
+        animation: scrollHint 2s ease-in-out infinite;
+      }
+      
+      @keyframes scrollHint {
+        0%, 100% { transform: translateY(0); opacity: 0.3; }
+        50% { transform: translateY(4px); opacity: 0.6; }
       }
 
       /* ── RETURNING CLIENT SECTION ── */
@@ -1122,17 +1403,41 @@
       </style>
   </head>
   <body>
-    <!-- WELCOME PAGE -->
+    <!-- WELCOME PAGE — Luxury Spa Experience -->
     <div class="welcome-page" id="welcome-page">
-      <div class="welcome-logo">
-        <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty">
+      <div class="welcome-content">
+        <div class="welcome-logo">
+          <img src="https://iili.io/fpiAjBj.jpg" alt="PhenomeBeauty">
+        </div>
+        <div class="welcome-title">PhenomeBeauty</div>
+        <div class="welcome-subtitle">Mobile Beauty Studio</div>
+        <div class="welcome-subtitle-small">Premium At-Home Treatments</div>
+        <div class="welcome-divider"></div>
+        <div class="welcome-tagline">
+          "Every woman deserves to feel beautiful in the comfort of her own space."
+        </div>
+        <div class="welcome-btn-wrap">
+          <button class="welcome-btn" onclick="enterBooking()">
+            <div class="welcome-btn-ripple"></div>
+            <div class="welcome-btn-inner">
+              <span class="welcome-btn-text">Begin Your Experience</span>
+              <span class="welcome-btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </span>
+            </div>
+          </button>
+        </div>
       </div>
-      <div class="welcome-title">PhenomeBeauty</div>
-      <div class="welcome-subtitle">Mobile Beauty Studio</div>
-      <div class="welcome-tagline">
-        "Every woman deserves to feel beautiful in the comfort of her own space."
+      <div class="welcome-footer">
+        <span class="welcome-footer-text">Cape Town</span>
+        <span class="welcome-footer-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </span>
       </div>
-      <button class="welcome-btn" onclick="enterBooking()">Book Your Treatment</button>
     </div>
 
     <div class="app-frame" id="app-frame" style="display:none;">
