@@ -448,6 +448,29 @@ html,body {
 .sact:hover{background:var(--t10);color:var(--t100);}
 
 /* ═══════════════════════════════
+   REVIEWS
+═══════════════════════════════ */
+.reviews-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.reviews-summary{padding:20px;margin-bottom:16px;}
+.reviews-list{display:flex;flex-direction:column;gap:12px;}
+.review-card{padding:18px;background:var(--card);border:0.5px solid var(--border);border-radius:16px;transition:border-color 0.15s;}
+.review-card:hover{border-color:var(--border-hi);}
+.review-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.review-avatar{width:40px;height:40px;border-radius:50%;background:var(--t10);overflow:hidden;}
+.review-avatar img{width:100%;height:100%;object-fit:cover;}
+.review-author{font-weight:700;color:var(--t100);font-size:14px;}
+.review-time{font-size:11px;color:var(--t40);}
+.review-stars{color:var(--amber);font-size:14px;letter-spacing:1px;}
+.review-text{font-size:13px;color:var(--t80);line-height:1.7;}
+.review-actions{display:flex;gap:8px;margin-top:12px;}
+.review-btn{height:32px;padding:0 14px;background:var(--t06);border:0.5px solid var(--border);border-radius:99px;font-size:11px;font-weight:700;color:var(--t60);cursor:pointer;transition:all 0.15s;}
+.review-btn:hover{background:var(--t10);color:var(--t100);}
+.review-btn.primary{background:var(--t100);color:var(--black);border:none;}
+
+/* Previous Treatment Badge */
+.prev-treatment{display:inline-block;padding:4px 10px;background:rgba(139,92,246,0.12);border:0.5px solid rgba(139,92,246,0.25);border-radius:99px;font-size:10px;font-weight:700;color:rgba(167,139,250,0.9);margin-top:4px;}
+
+/* ═══════════════════════════════
    SETTINGS
 ═══════════════════════════════ */
 .settings-grid{display:grid;grid-template-columns:1fr;gap:14px;}
@@ -559,6 +582,7 @@ html,body {
   <div class="nav-item" onclick="show('loyalty',this)"><span class="nav-icon">♡</span><span class="nav-lbl">Loyalty Tracker</span><span class="nav-badge nav-lbl" id="badge-loyalty" style="display:none;"></span></div>
   <div class="nav-item" onclick="show('availability',this)"><span class="nav-icon">⊡</span><span class="nav-lbl">Availability</span></div>
   <div class="nav-item" onclick="show('stock',this)"><span class="nav-icon">◫</span><span class="nav-lbl">Stock</span><span class="nav-badge nav-lbl" id="badge-stock" style="display:none;"></span></div>
+  <div class="nav-item" onclick="show('reviews',this)"><span class="nav-icon">★</span><span class="nav-lbl">Reviews</span></div>
   <div class="sidebar-spacer"></div>
   <div class="nav-item" onclick="show('integrations',this)"><span class="nav-icon">⟡</span><span class="nav-lbl">Integrations</span></div>
   <div class="nav-item" onclick="show('settings',this)"><span class="nav-icon">⊙</span><span class="nav-lbl">Settings</span></div>
@@ -709,6 +733,32 @@ html,body {
           <tr><td colspan="5"><div class="data-note">Loading stock…</div></td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- ═══ REVIEWS ═══ -->
+  <div class="view" id="view-reviews">
+    <div class="reviews-header">
+      <div>
+        <div class="label-caps" style="margin-bottom:4px;">Customer Feedback</div>
+        <div style="font-family:var(--font-d);font-size:26px;font-weight:400;">Google Reviews</div>
+      </div>
+      <button class="add-btn" onclick="loadReviews()">↻ Refresh</button>
+    </div>
+    
+    <div class="reviews-summary card" id="reviews-summary" style="display:none;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div style="font-family:var(--font-d);font-size:48px;font-weight:300;" id="reviews-rating">—</div>
+        <div>
+          <div style="color:var(--amber);font-size:20px;letter-spacing:2px;" id="reviews-stars">★★★★★</div>
+          <div style="font-size:13px;color:var(--t40);margin-top:4px;" id="reviews-count">— reviews</div>
+        </div>
+      </div>
+      <a href="#" id="reviews-link" target="_blank" class="add-btn" style="text-decoration:none;display:inline-block;">View on Google →</a>
+    </div>
+    
+    <div class="reviews-list" id="reviews-list">
+      <div class="data-note">Loading reviews…</div>
     </div>
   </div>
 
@@ -988,6 +1038,12 @@ html,body {
   <div class="panel-title" id="panel-name">—</div>
   <div class="panel-sub" id="panel-ref">—</div>
   <div class="status-pill" id="panel-status" style="margin-bottom:20px;display:inline-block;">—</div>
+  
+  <!-- Previous Treatment Badge (for returning clients) -->
+  <div id="panel-prev-treatment" style="display:none;margin-bottom:16px;">
+    <div class="label-caps" style="margin-bottom:6px;font-size:8px;">Previous Visit</div>
+    <div class="prev-treatment" id="panel-prev-services">—</div>
+  </div>
 
   <div class="panel-section">
     <div class="panel-section-title">Appointment</div>
@@ -1018,8 +1074,28 @@ html,body {
     <button class="action-btn" onclick="panelAction('Service Complete')">✦ Service Complete</button>
     <button class="action-btn danger" onclick="panelAction('Cancelled')">✕ Cancel</button>
     <button class="action-btn primary" onclick="panelAction('requestBalance')">💳 Request Balance Payment</button>
+    <button class="action-btn" id="btn-add-service" onclick="showAddServiceModal()" style="background:rgba(139,92,246,0.15);border-color:rgba(139,92,246,0.3);color:rgba(167,139,250,0.95);">✚ Add Service</button>
   </div>
 </div><!-- /detail-panel -->
+
+<!-- ADD SERVICE MODAL -->
+<div class="modal-overlay" id="add-service-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center;">
+  <div class="card" style="width:90%;max-width:400px;padding:24px;">
+    <div style="font-family:var(--font-d);font-size:22px;font-weight:400;margin-bottom:20px;">Add Service</div>
+    <div class="setting-row">
+      <label class="setting-label">Service Name</label>
+      <input class="setting-input" id="add-svc-name" placeholder="e.g., Eyebrow Threading">
+    </div>
+    <div class="setting-row">
+      <label class="setting-label">Price (R)</label>
+      <input class="setting-input" id="add-svc-price" type="number" placeholder="0.00">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="add-btn" onclick="confirmAddService()" style="flex:1;">Add Service</button>
+      <button class="review-btn" onclick="hideAddServiceModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 </div><!-- /pg-app -->
 
@@ -1161,8 +1237,10 @@ function closeSidebar() {
 const viewTitles = {
   dashboard:'Dashboard', bookings:'Bookings', consults:'New Divas',
   loyalty:'Loyalty Tracker', availability:'Availability', stock:'Stock',
-  integrations:'Integrations', settings:'Settings'
+  reviews:'Google Reviews', integrations:'Integrations', settings:'Settings'
 };
+
+let reviewsLoaded = false;
 
 function show(view, el) {
   currentView = view;
@@ -1181,6 +1259,7 @@ function show(view, el) {
   if (view === 'dashboard')    renderDashboard();
   if (view === 'loyalty')      { if (!loyaltyLoaded) loadLoyalty(); else renderLoyalty(); }
   if (view === 'stock')        { if (!stockLoaded) loadStock(); else renderStock(); }
+  if (view === 'reviews')      { if (!reviewsLoaded) loadReviews(); }
   if (view === 'settings')     loadSettings();
 }
 
@@ -1274,6 +1353,10 @@ function openPanel(id) {
   document.getElementById('panel-balance').textContent = 'R ' + Number(b.balanceDue || 0).toLocaleString();
   document.getElementById('panel-bal-status').textContent = b.balanceStatus || '—';
   document.getElementById('detail-panel').classList.add('open');
+  
+  // Load client history to show previous treatment
+  document.getElementById('panel-prev-treatment').style.display = 'none'; // Hide until loaded
+  loadClientHistory(b.email, b.phone, id);
 }
 
 function closePanel() { document.getElementById('detail-panel').classList.remove('open'); }
@@ -1721,6 +1804,189 @@ async function init() {
       if (currentView === 'consults')   renderConsults();
     });
   }, 300000); // 5 minutes
+}
+
+// ══════════════════════════════════════════════════════
+// REVIEWS FUNCTIONS
+// ══════════════════════════════════════════════════════
+async function loadReviews() {
+  const listEl = document.getElementById('reviews-list');
+  const summaryEl = document.getElementById('reviews-summary');
+  if (listEl) listEl.innerHTML = '<div class="data-note">Loading reviews…</div>';
+  
+  try {
+    const data = await apiFetch('/api/admin/reviews');
+    reviewsLoaded = true;
+    
+    if (!data.configured) {
+      listEl.innerHTML = `<div class="card" style="padding:24px;text-align:center;">
+        <div style="font-size:36px;margin-bottom:12px;">⚙️</div>
+        <div style="font-family:var(--font-d);font-size:20px;margin-bottom:8px;">Google Reviews Not Configured</div>
+        <div style="font-size:13px;color:var(--t40);line-height:1.7;margin-bottom:16px;">
+          To display Google Reviews, add your <strong>google_place_id</strong> to the Settings sheet.<br>
+          You can find your Place ID at <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" style="color:var(--amber);">Google's Place ID Finder</a>.
+        </div>
+        <button class="add-btn" onclick="show('settings',document.querySelector('[onclick*=settings]'))">Open Settings</button>
+      </div>`;
+      summaryEl.style.display = 'none';
+      return;
+    }
+    
+    if (data.error) {
+      listEl.innerHTML = `<div class="data-note">Error: ${esc(data.error)}</div>`;
+      return;
+    }
+    
+    // Show summary
+    summaryEl.style.display = 'block';
+    document.getElementById('reviews-rating').textContent = data.rating ? data.rating.toFixed(1) : '—';
+    document.getElementById('reviews-count').textContent = data.totalReviews ? `${data.totalReviews} reviews` : 'No reviews';
+    
+    const stars = Math.round(data.rating || 0);
+    document.getElementById('reviews-stars').textContent = '★'.repeat(stars) + '☆'.repeat(5-stars);
+    
+    // Google link
+    const reviewLink = document.getElementById('reviews-link');
+    if (data.placeName) {
+      reviewLink.href = `https://search.google.com/local/reviews?placeid=${encodeURIComponent(data.placeName)}`;
+    }
+    
+    // Render reviews
+    if (!data.reviews || !data.reviews.length) {
+      listEl.innerHTML = '<div class="data-note">No reviews to display.</div>';
+      return;
+    }
+    
+    listEl.innerHTML = data.reviews.map(r => `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar">${r.profilePhoto ? `<img src="${esc(r.profilePhoto)}" alt="">` : ''}</div>
+          <div>
+            <div class="review-author">${esc(r.author)}</div>
+            <div class="review-time">${esc(r.relativeTime)}</div>
+          </div>
+          <div class="review-stars" style="margin-left:auto;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+        </div>
+        <div class="review-text">${esc(r.text || 'No comment')}</div>
+      </div>
+    `).join('');
+    
+  } catch (e) {
+    listEl.innerHTML = `<div class="data-note">Error loading reviews: ${esc(e.message)}</div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// ADD SERVICE FUNCTIONS
+// ══════════════════════════════════════════════════════
+function showAddServiceModal() {
+  const status = document.getElementById('panel-status')?.textContent || '';
+  if (!['Confirmed', 'Complete'].some(s => status.includes(s))) {
+    showToast('Can only add services to Confirmed or Complete bookings');
+    return;
+  }
+  document.getElementById('add-service-modal').style.display = 'flex';
+  document.getElementById('add-svc-name').value = '';
+  document.getElementById('add-svc-price').value = '';
+  document.getElementById('add-svc-name').focus();
+}
+
+function hideAddServiceModal() {
+  document.getElementById('add-service-modal').style.display = 'none';
+}
+
+async function confirmAddService() {
+  const name = document.getElementById('add-svc-name').value.trim();
+  const price = parseFloat(document.getElementById('add-svc-price').value) || 0;
+  
+  if (!name) {
+    showToast('Please enter a service name');
+    return;
+  }
+  
+  try {
+    const result = await apiFetch('/api/admin/add-service', {
+      method: 'POST',
+      body: JSON.stringify({
+        bookingId: currentBookingId,
+        serviceName: name,
+        servicePrice: price
+      })
+    });
+    
+    if (result.success) {
+      showToast(`Added: ${name} · R${price.toFixed(2)}`);
+      hideAddServiceModal();
+      // Refresh bookings and update panel
+      cacheInvalidate('/api/admin/bookings');
+      await loadBookings();
+      renderBookings();
+      // Update panel totals
+      document.getElementById('panel-services').textContent = result.newServices;
+      document.getElementById('panel-total').textContent = `R ${result.newTotal}`;
+      document.getElementById('panel-balance').textContent = `R ${result.newBalance}`;
+    } else {
+      showToast('Error: ' + (result.error || 'Failed'));
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// CLIENT HISTORY / PREVIOUS TREATMENT
+// ══════════════════════════════════════════════════════
+async function loadClientHistory(email, phone, currentBookingId) {
+  try {
+    const params = new URLSearchParams();
+    if (email) params.set('email', email);
+    if (phone) params.set('phone', phone);
+    
+    const history = await apiFetch(`/api/admin/client-history?${params}`);
+    
+    // Filter out current booking and get previous
+    const previous = history.filter(b => b.bookingId !== currentBookingId);
+    
+    const prevEl = document.getElementById('panel-prev-treatment');
+    const prevSvcEl = document.getElementById('panel-prev-services');
+    
+    if (previous.length > 0) {
+      const last = previous[0];
+      prevEl.style.display = 'block';
+      prevSvcEl.textContent = `${last.services} · ${fmtD(last.date)}`;
+    } else {
+      prevEl.style.display = 'none';
+    }
+  } catch (e) {
+    console.error('Client history error:', e.message);
+    document.getElementById('panel-prev-treatment').style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// EMAIL TEST FUNCTION
+// ══════════════════════════════════════════════════════
+async function testEmail() {
+  showToast('Sending test email…');
+  try {
+    const result = await apiFetch('/api/admin/test-email', { method: 'POST', body: '{}' });
+    if (result.success) {
+      showToast(result.message || 'Test email sent!');
+    } else {
+      showToast('Error: ' + (result.error || 'Failed'));
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message);
+  }
+}
+
+async function checkEmailConfig() {
+  try {
+    const config = await apiFetch('/api/admin/email-config');
+    return config;
+  } catch (e) {
+    return { ready: false, error: e.message };
+  }
 }
 </script>
 
