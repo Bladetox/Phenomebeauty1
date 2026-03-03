@@ -336,7 +336,7 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         const {
             name, email, phone, address, services, date, time,
             servicesTotal, callOutFee, totalAmount, depositAmount,
-            balanceDue, oneWayKm, roundTripKm, source, divaType, safety,
+            balanceDue, oneWayKm, roundTripKm, source, divaType, safety, returningChanges,
         } = req.body;
 
         // ── Input validation ─────────────────────────────────────────────────
@@ -398,6 +398,7 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         const pregnantNote  = safetyData ? (safetyData.pregnant     ? 'Yes' : 'No') : 'On File';
         const hairOkNote    = safetyData ? (safetyData.hairLengthOk ? 'Yes' : 'No') : '';
         const addlNotes     = safetyData ? sanitize(safetyData.additionalInfo,    500) : '';
+        const changesNote   = !isDivaNew && returningChanges ? sanitize(returningChanges, 500) : '';
 
         // ── Write to Bookings sheet ──────────────────────────────────────────
         const sheet = doc.sheetsByTitle['Bookings'];
@@ -450,6 +451,7 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
                 if (headers.includes('Environmental Exposure')) consultRow['Environmental Exposure'] = environNotes;
                 if (headers.includes('Physical Factors'))       consultRow['Physical Factors']       = physicalNotes;
                 if (headers.includes('Hair Length OK'))         consultRow['Hair Length OK']         = hairOkNote;
+                if (headers.includes('Changes Since Last Visit')) consultRow['Changes Since Last Visit'] = changesNote;
                 await consultSheet.addRow(consultRow);
             } else {
                 console.warn('Consultations tab not found — skipping');
@@ -1115,13 +1117,230 @@ app.get('/api/admin/loyalty', adminOnly, async (req, res) => {
 app.get('/api/admin/stock', adminOnly, async (req, res) => {
     try {
         const sheet = req.doc.sheetsByTitle['Stock'];
-        if (!sheet) return res.json([]);
+        if (!sheet) {
+            console.log('Stock: Sheet "Stock" not found. Available sheets:', Object.keys(req.doc.sheetsByTitle));
+            return res.json([]);
+        }
+        await sheet.loadHeaderRow();
+        const headers = sheet.headerValues || [];
+        console.log('Stock: Sheet headers:', headers);
+        
         const rows = await sheet.getRows();
-        res.json(rows.filter(r=>(r.get('Product Name')||r.get('Item')||r.get('Name')||'').trim()).map(r=>({
-            name:r.get('Product Name')||r.get('Item')||r.get('Name')||'',
-            category:r.get('Category')||'',quantity:r.get('Quantity')||r.get('Stock')||'0',
-            minStock:r.get('Min Stock')||r.get('Minimum')||'0',unit:r.get('Unit')||'',notes:r.get('Notes')||''
-        })));
-    } catch(e){res.status(500).json({error:e.message});}
+        console.log('Stock: Found', rows.length, 'rows');
+        
+        // More flexible column name matching
+        const findCol = (row, ...candidates) => {
+            for (const c of candidates) {
+                const val = row.get(c);
+                if (val !== undefined && val !== null && val !== '') return val;
+            }
+            return '';
+        };
+        
+        const items = rows.filter(r => {
+            const name = findCol(r, 'Product Name', 'Product', 'Item', 'Name', 'Item Name');
+            return name.trim() !== '';
+        }).map(r => ({
+            name: findCol(r, 'Product Name', 'Product', 'Item', 'Name', 'Item Name'),
+            category: findCol(r, 'Category', 'Type', 'Product Category'),
+            quantity: findCol(r, 'Quantity', 'Stock', 'Qty', 'In Stock', 'Current Stock') || '0',
+            minStock: findCol(r, 'Min Stock', 'Minimum', 'Min', 'Reorder Level', 'Min Level') || '0',
+            unit: findCol(r, 'Unit', 'Units', 'UOM'),
+            notes: findCol(r, 'Notes', 'Note', 'Comments', 'Description')
+        }));
+        
+        console.log('Stock: Returning', items.length, 'items');
+        res.json(items);
+    } catch(e) {
+        console.error('Stock error:', e.message);
+        res.status(500).json({ error: e.message });
+    }
 });
+
+// =============================================================================
+// GET /api/admin/client-history — Get client's previous bookings
+// =============================================================================
+app.get('/api/admin/client-history', adminOnly, async (req, res) => {
+    try {
+        const { email, phone } = req.query;
+        if (!email && !phone) return res.status(400).json({ error: 'email or phone required' });
+        
+        const sheet = req.doc.sheetsByTitle['Bookings'];
+        if (!sheet) return res.json([]);
+        
+        const rows = await sheet.getRows();
+        const history = rows.filter(r => {
+            const rowEmail = (r.get('Client Email') || '').toLowerCase().trim();
+            const rowPhone = (r.get('Client Phone') || '').replace(/\D/g, '');
+            const qEmail = (email || '').toLowerCase().trim();
+            const qPhone = (phone || '').replace(/\D/g, '');
+            return (qEmail && rowEmail === qEmail) || (qPhone && rowPhone.includes(qPhone.slice(-9)));
+        }).map(r => ({
+            bookingId: r.get('Booking ID'),
+            date: r.get('Date'),
+            time: r.get('Time'),
+            services: r.get('Service Names'),
+            status: r.get('Deposit Status'),
+            total: r.get('Total Amount (R)'),
+        })).filter(b => b.bookingId && ['Confirmed', 'Service Complete'].includes(b.status))
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        res.json(history);
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/add-service — Add service to existing booking (during service)
+// =============================================================================
+app.post('/api/admin/add-service', adminOnly, async (req, res) => {
+    try {
+        const { bookingId, serviceName, servicePrice } = req.body;
+        if (!bookingId || !serviceName) return res.status(400).json({ error: 'bookingId and serviceName required' });
+        
+        const { row } = await findRow(req.doc, bookingId);
+        if (!row) return res.status(404).json({ error: 'Booking not found' });
+        
+        const status = row.get('Deposit Status') || '';
+        if (!['Confirmed', 'Service Complete'].includes(status)) {
+            return res.status(400).json({ error: 'Booking must be Confirmed or Service Complete to add services' });
+        }
+        
+        // Update service names
+        const currentServices = row.get('Service Names') || '';
+        const newServices = currentServices ? `${currentServices}, ${serviceName}` : serviceName;
+        row.set('Service Names', newServices);
+        
+        // Update amounts
+        const price = parseFloat(servicePrice) || 0;
+        const currentServicePrice = parseFloat((row.get('Service Price (R)') || '0').replace(/[R\s]/g, '')) || 0;
+        const currentTotal = parseFloat((row.get('Total Amount (R)') || '0').replace(/[R\s]/g, '')) || 0;
+        const currentBalance = parseFloat((row.get('Balance Due (R)') || '0').replace(/[R\s]/g, '')) || 0;
+        
+        row.set('Service Price (R)', (currentServicePrice + price).toFixed(2));
+        row.set('Total Amount (R)', (currentTotal + price).toFixed(2));
+        row.set('Balance Due (R)', (currentBalance + price).toFixed(2));
+        
+        // Add note about add-on
+        const notes = row.get('Notes') || '';
+        const timestamp = new Date().toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' });
+        row.set('Notes', notes ? `${notes}\n[${timestamp}] Added: ${serviceName} R${price.toFixed(2)}` : `[${timestamp}] Added: ${serviceName} R${price.toFixed(2)}`);
+        
+        await row.save();
+        
+        res.json({
+            success: true,
+            newServices,
+            newTotal: (currentTotal + price).toFixed(2),
+            newBalance: (currentBalance + price).toFixed(2),
+        });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// GET /api/admin/reviews — Fetch Google Reviews
+// =============================================================================
+app.get('/api/admin/reviews', adminOnly, async (req, res) => {
+    try {
+        const s = req.settings;
+        const placeId = s.google_place_id || '';
+        const apiKey = s.google_maps_api_key || '';
+        
+        if (!placeId || !apiKey) {
+            return res.json({ 
+                reviews: [], 
+                error: !placeId ? 'google_place_id not configured in Settings' : 'google_maps_api_key not configured',
+                configured: false 
+            });
+        }
+        
+        // Fetch place details including reviews
+        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=reviews,rating,user_ratings_total,name&key=${encodeURIComponent(apiKey)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.status !== 'OK') {
+            return res.json({ reviews: [], error: `Google API: ${data.status}`, configured: true });
+        }
+        
+        const result = data.result || {};
+        res.json({
+            configured: true,
+            placeName: result.name || '',
+            rating: result.rating || 0,
+            totalReviews: result.user_ratings_total || 0,
+            reviews: (result.reviews || []).map(r => ({
+                author: r.author_name,
+                authorUrl: r.author_url,
+                profilePhoto: r.profile_photo_url,
+                rating: r.rating,
+                text: r.text,
+                time: r.time,
+                relativeTime: r.relative_time_description,
+            }))
+        });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/test-email — Send a test email
+// =============================================================================
+app.post('/api/admin/test-email', adminOnly, async (req, res) => {
+    try {
+        const s = req.settings;
+        const { sendAdminDepositNotification } = require('./lib/email');
+        
+        // Check email config
+        const smtpUser = s.smtp_user || s.smtpuser || s.admin_email || '';
+        const smtpPass = s.smtp_pass || s.smtppass || '';
+        
+        if (!smtpUser || !smtpPass) {
+            return res.status(400).json({ 
+                error: 'Email not configured',
+                details: {
+                    smtp_user: smtpUser ? '✓ Set' : '✗ Missing',
+                    smtp_pass: smtpPass ? '✓ Set' : '✗ Missing',
+                }
+            });
+        }
+        
+        // Send test email to admin
+        await sendAdminDepositNotification(s, {
+            bookingId: 'TEST-001',
+            name: 'Test Client',
+            email: smtpUser,
+            phone: '+27000000000',
+            address: '123 Test Street, Cape Town',
+            services: 'Test Service',
+            date: new Date().toISOString().split('T')[0],
+            time: '10:00-11:00',
+            totalAmount: '500.00',
+            deposit: '250.00',
+            balance: '250.00',
+        });
+        
+        res.json({ success: true, message: `Test email sent to ${smtpUser}` });
+    } catch (e) { 
+        res.status(500).json({ error: e.message, details: 'Check SMTP credentials and Gmail app password' }); 
+    }
+});
+
+// =============================================================================
+// GET /api/admin/email-config — Check email configuration status
+// =============================================================================
+app.get('/api/admin/email-config', adminOnly, async (req, res) => {
+    try {
+        const s = req.settings;
+        const smtpUser = s.smtp_user || s.smtpuser || process.env.SMTP_USER || '';
+        const smtpPass = s.smtp_pass || s.smtppass || process.env.SMTP_PASS || '';
+        const adminEmail = s.admin_email || s.adminemail || '';
+        
+        res.json({
+            smtp_user: smtpUser ? `✓ ${smtpUser}` : '✗ Not set',
+            smtp_pass: smtpPass ? '✓ Set (hidden)' : '✗ Not set',
+            admin_email: adminEmail ? `✓ ${adminEmail}` : '✗ Not set',
+            ready: !!(smtpUser && smtpPass),
+        });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = app;
