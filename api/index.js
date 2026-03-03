@@ -1,6 +1,6 @@
 require('dotenv').config({ override: true });
 
-// api/index.js — PhenomeBeauty Booking Server v5.2
+// api/index.js — PhenomeBeauty Booking Server v5.3
 // Vercel serverless entry point — exports Express app, never calls app.listen()
 'use strict';
 
@@ -35,7 +35,7 @@ const app = express();
 app.use((req, res, next) => {
     res.set('X-Content-Type-Options',  'nosniff');
     res.set('X-Frame-Options',          'DENY');
-    res.set('X-XSS-Protection',         '0');       // deprecated — CSP handles this
+    res.set('X-XSS-Protection',         '0');
     res.set('Referrer-Policy',          'strict-origin-when-cross-origin');
     res.set('Permissions-Policy',       'camera=(), microphone=(), geolocation=()');
     res.set('Content-Security-Policy',
@@ -50,20 +50,15 @@ app.use((req, res, next) => {
     next();
 });
 
-// Body size limit — prevent large payload attacks
-// verify captures raw bytes before JSON.parse so webhook HMAC works correctly
 app.use(express.json({
     limit: '50kb',
-    verify: (req, res, buf) => {
-        req.rawBody = buf;
-    }
+    verify: (req, res, buf) => { req.rawBody = buf; }
 }));
 
 // =============================================================================
-// RATE LIMITER (in-memory, per IP+path)
+// RATE LIMITER
 // =============================================================================
 const rateLimitMap = new Map();
-// Rate limiter GC — purge stale entries every 5 minutes
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of rateLimitMap.entries()) {
@@ -95,7 +90,7 @@ function sanitize(val, maxLen = 200) {
 }
 
 // =============================================================================
-// ADMIN AUTH — stateless HMAC tokens (survive Vercel cold starts)
+// ADMIN AUTH
 // =============================================================================
 const ADMIN_TOKEN_SECRET = (() => {
   const s = process.env.ADMIN_TOKEN_SECRET;
@@ -189,19 +184,17 @@ async function yocoCheckout({ key, cents, successUrl, cancelUrl, customer, metad
 }
 
 // =============================================================================
-// GET /api — getServices | getMonthAvailability | getCallOutFee | getConfig
+// GET /api
 // =============================================================================
 app.get('/api', async (req, res) => {
     const action = req.query.action;
     try {
         const doc = await getDoc();
 
-        // ── getServices ──────────────────────────────────────────────────────
         if (action === 'getServices') {
             return res.json(await getServices(doc));
         }
 
-        // ── getMonthAvailability ─────────────────────────────────────────────
         if (action === 'getMonthAvailability') {
             const [reqY, reqM] = (req.query.month || '').split('-').map(Number);
             const now      = new Date();
@@ -223,7 +216,6 @@ app.get('/api', async (req, res) => {
                 slotsByDow[dow].push(slot);
             });
 
-            // Build set of already-booked slots for this month
             const bSheet = doc.sheetsByTitle['Bookings'];
             const booked = {};
             if (bSheet) {
@@ -249,15 +241,13 @@ app.get('/api', async (req, res) => {
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateStr = `${year}-${pad(month)}-${pad(d)}`;
-                if (dateStr < todayStr) continue;   // skip past dates
+                if (dateStr < todayStr) continue;
 
                 const dow   = new Date(year, month - 1, d).getDay();
                 let   slots = (slotsByDow[dow] || []).slice();
 
-                // Remove already-booked slots
                 if (booked[dateStr]) slots = slots.filter(t => !booked[dateStr].has(t));
 
-                // Remove past slots for today
                 if (dateStr === todayStr) {
                     slots = slots.filter(slot => {
                         const [h, m] = (slot.split('-')[0] || '00:00').split(':').map(Number);
@@ -271,7 +261,6 @@ app.get('/api', async (req, res) => {
             return res.json(result);
         }
 
-        // ── getCallOutFee ────────────────────────────────────────────────────
         if (action === 'getCallOutFee') {
             const addr = (req.query.address || '').trim();
             if (!addr) return res.json({ fee: 0, error: 'No address' });
@@ -307,14 +296,13 @@ app.get('/api', async (req, res) => {
             });
         }
 
-        // ── getConfig ────────────────────────────────────────────────────────
         if (action === 'getConfig') {
             const full = await getSettings(doc);
             return res.json({
                 deposit_percent:     full.deposit_percent     || '50',
                 google_maps_api_key: full.google_maps_api_key || '',
                 app_base_url:        full.app_base_url        || '',
-                google_review_url:   full.google_review_url   || '',  // fix: expose for thankyou.html review button
+                google_review_url:   full.google_review_url   || '',
             });
         }
 
@@ -340,14 +328,10 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
             balanceDue, oneWayKm, roundTripKm, source, divaType, safety,
         } = req.body;
 
-        // ── Input validation ─────────────────────────────────────────────────
         const cleanName  = sanitize(name,    80);
         const cleanEmail = sanitize(email,  120);
-        // Normalize phone: strip formatting, handle leading zero + country code
         let cleanPhone = String(phone || '').replace(/[\s\-().]/g, '');
-        // Remove (0) after country code e.g. +27(0)82 → +2782
         cleanPhone = cleanPhone.replace(/^(\+\d{1,3})(0)/, '$1');
-        // If no country code, strip leading zero and prepend +27
         if (!cleanPhone.startsWith('+')) {
             cleanPhone = '+27' + cleanPhone.replace(/^0/, '');
         }
@@ -364,13 +348,11 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date))                      return res.status(400).json({ error: 'Invalid date format' });
         if (!time || !/^\d{2}:\d{2}-\d{2}:\d{2}$/.test(time))               return res.status(400).json({ error: 'Invalid time format' });
 
-        // ── Service data ─────────────────────────────────────────────────────
         const nameParts = cleanName.split(/\s+/);
         const svcNames  = services.map(x => sanitize(typeof x === 'object' ? x.name : x, 60)).filter(Boolean).join(', ');
         const svcIds    = services.map(x => (typeof x === 'object' ? x.id : '') || '').filter(Boolean).join(', ');
         const svcMins   = services.reduce((a, x) => a + parseInt((typeof x === 'object' ? x.duration : 0) || 0), 0);
 
-        // ── Server-side amount recalculation ─────────────────────────────────
         const serverServicesTotal = services.reduce((sum, x) => {
             const p = typeof x === 'object' ? parseFloat(x.price || 0) : 0;
             return sum + (isFinite(p) && p >= 0 ? p : 0);
@@ -387,7 +369,6 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         const bal       = Math.max(0, serverBalance);
         const bookingId = 'PB-' + crypto.randomBytes(6).toString('hex').toUpperCase();
 
-        // ── Safety / consultation fields ─────────────────────────────────────
         const isDivaNew     = divaType === 'new';
         const safetyData    = (isDivaNew && safety) ? safety : null;
         const skinNotes     = safetyData ? sanitize(safetyData.skinConditions,    500) : (isDivaNew ? '' : 'On File');
@@ -400,7 +381,6 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         const hairOkNote    = safetyData ? (safetyData.hairLengthOk ? 'Yes' : 'No') : '';
         const addlNotes     = safetyData ? sanitize(safetyData.additionalInfo,    500) : '';
 
-        // ── Write to Bookings sheet ──────────────────────────────────────────
         const sheet = doc.sheetsByTitle['Bookings'];
         if (!sheet) throw new Error('Bookings tab not found');
 
@@ -431,7 +411,6 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
             'Notes':                  '',
         });
 
-        // ── Write to Consultations sheet (non-fatal) ─────────────────────────
         try {
             const consultSheet = doc.sheetsByTitle['Consultations'];
             if (consultSheet) {
@@ -462,16 +441,13 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
         bustDocCache();
         console.log(`Saved ${bookingId} — ${svcNames} on ${date} ${time}`);
 
-        // ── Deposit below R2 — skip payment link ─────────────────────────────
         if (dep < 2) return res.json({
             success: true, bookingId, paymentUrl: null,
             paymentError: 'Deposit below R2 — we will contact you.',
             depositAmount: dep, balanceDue: bal,
         });
 
-        // ── Build Yoco payment URL ────────────────────────────────────────────
         const appBase    = s.app_base_url           || 'http://localhost:3000';
-        // fix: default success URL now points to thankyou-balance.html (deposit confirmation screen)
         const successUrl = s.booking_success_url    || `${appBase}/thankyou-balance.html?ref=${bookingId}`;
         const cancelUrl  = s.booking_cancel_url     || `${appBase}/?payment=cancelled&ref=${bookingId}`;
         const yocoKey    = s.yoco_secret_key        || '';
@@ -535,25 +511,16 @@ app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
 // POST /api/webhook/yoco
 // =============================================================================
 app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
-
-    // ── Verify Yoco webhook signature via Svix ──────────────────────────
     const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
-
-    // Always log headers so we can debug signature issues
     console.log('Webhook headers:', JSON.stringify(req.headers));
 
     if (webhookSecret) {
         try {
-            const rawBody = req.rawBody
-                ? req.rawBody.toString('utf8')
-                : JSON.stringify(req.body);
-
-            // Svix signs: "{webhook-id}.{webhook-timestamp}.{body}"
+            const rawBody = req.rawBody ? req.rawBody.toString('utf8') : JSON.stringify(req.body);
             const msgId        = req.headers['webhook-id'] || '';
             const msgTimestamp = req.headers['webhook-timestamp'] || '';
             const sigHeader    = req.headers['webhook-signature'] || '';
 
-            // Secret may be raw or whsec_ prefixed — decode to bytes either way
             const secretStr = webhookSecret.startsWith('whsec_')
                 ? webhookSecret.slice(6)
                 : Buffer.from(webhookSecret).toString('base64');
@@ -562,7 +529,6 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
             const toSign  = `${msgId}.${msgTimestamp}.${rawBody}`;
             const expected = crypto.createHmac('sha256', secretBytes).update(toSign).digest('base64');
 
-            // webhook-signature may contain multiple space-separated "v1,<sig>" values
             const sigs = sigHeader.split(' ').map(s => s.replace(/^v1,/, ''));
             const matched = sigs.some(sig => {
                 try {
@@ -585,19 +551,14 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
         console.warn('YOCO_WEBHOOK_SECRET not set — skipping verification');
     }
 
-    // ── Process event ─────────────────────────────────────────────────────────
-    // Return 500 on failure so Yoco retries; 200 means we handled it.
     try {
         const event   = req.body || {};
         const payment = event.payload || event;
         const meta    = payment.metadata || {};
 
         const successTypes = [
-            'payment.succeeded',
-            'payment.approved',
-            'payment_approved',
-            'payment.captured',
-            'payment_captured',
+            'payment.succeeded', 'payment.approved', 'payment_approved',
+            'payment.captured', 'payment_captured',
         ];
 
         if (!successTypes.includes(event.type)) {
@@ -617,7 +578,6 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
         }
 
         const type = meta.type || 'deposit';
-
         const doc     = await getDoc();
         const { row } = await findRow(doc, bookingId);
         if (!row) {
@@ -625,7 +585,6 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
             return res.status(200).json({ received: true });
         }
 
-        // ── Balance payment branch ────────────────────────────────────────────
         if (type === 'balance') {
             if (row.get('Balance Status') === 'Paid') {
                 console.log(`Webhook: balance already paid for ${bookingId} — idempotent skip`);
@@ -665,7 +624,6 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
             return res.status(200).json({ received: true });
         }
 
-        // ── Deposit payment branch ────────────────────────────────────────────
         const incomingPaymentId = payment.id || '';
         const webhookMsgId = req.headers['webhook-id'] || '';
         if (row.get('Deposit Status') === 'Confirmed' ||
@@ -683,7 +641,6 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
 
         const settings = await getSettings(doc);
 
-        // Create Google Calendar event (with timeout protection)
         let calId = null;
         try {
             calId = await Promise.race([
@@ -700,23 +657,18 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
                     deposit:     row.get('Deposit Amount (R)'),
                     balance:     row.get('Balance Due (R)'),
                 }),
-                new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Calendar timeout')), 5000)
-                )
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Calendar timeout')), 5000))
             ]);
 
             if (calId) {
                 row.set('Calendar Event ID', calId);
                 await row.save();
                 console.log(`Webhook: calendar event ${calId} created for ${bookingId}`);
-            } else {
-                console.log(`Webhook: calendar creation returned null for ${bookingId}`);
             }
         } catch (e) {
             console.error(`Webhook: calendar creation failed for ${bookingId}:`, e.message);
         }
 
-        // Notify admin and customer
         await Promise.all([
             sendAdminDepositNotification(settings, {
                 bookingId,
@@ -752,7 +704,6 @@ app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
         return res.status(500).json({ error: 'Internal error — will retry' });
     }
 });
-
 
 // =============================================================================
 // GET /api/check-payment
@@ -898,7 +849,6 @@ app.post('/api/admin/update-status', adminOnly, async (req, res) => {
         row.set('Deposit Status', status);
         await row.save();
 
-        // ── Manual confirm: create calendar event + send emails ──────────────
         if (status === 'Confirmed') {
             if (!row.get('Calendar Event ID')) {
                 const calId = await calCreate(req.settings, {
@@ -1042,9 +992,10 @@ app.post('/api/admin/request-balance', adminOnly, async (req, res) => {
 
         if (!paymentUrl) return res.status(500).json({ error: 'No Yoco credentials' });
 
+        // fix bug 1: set Service Complete + Requested + send balance email
+        row.set('Deposit Status',  'Service Complete');
         row.set('Balance Status',  'Requested');
         row.set('Yoco Link',       paymentUrl);
-        row.set('Deposit Status',  'Service Complete');
         await row.save();
 
         sendBalanceRequestEmail(s, {
@@ -1128,6 +1079,30 @@ app.get('/api/admin/stock', adminOnly, async (req, res) => {
 });
 
 // =============================================================================
-// Vercel serverless export — never call app.listen()
+// GET /api/admin/reviews  — fix bug 2: new endpoint to serve reviews from sheet
+// =============================================================================
+app.get('/api/admin/reviews', adminOnly, async (req, res) => {
+    try {
+        const sheet = req.doc.sheetsByTitle['Reviews'];
+        if (!sheet) {
+            // No Reviews sheet — return empty array gracefully
+            return res.json([]);
+        }
+        const rows = await sheet.getRows();
+        res.json(rows.filter(r => (
+            r.get('Client Name') || r.get('Name') || r.get('Reviewer') || ''
+        ).trim()).map(r => ({
+            clientName: r.get('Client Name') || r.get('Name') || r.get('Reviewer') || '',
+            rating:     r.get('Rating')      || r.get('Stars') || '',
+            review:     r.get('Review')      || r.get('Comment') || r.get('Feedback') || '',
+            date:       r.get('Date')        || r.get('Submitted') || '',
+            source:     r.get('Source')      || 'Google',
+            bookingId:  r.get('Booking ID')  || '',
+        })).reverse());
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// Vercel serverless export
 // =============================================================================
 module.exports = app;
