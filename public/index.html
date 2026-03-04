@@ -7,12 +7,735 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+      /* ═══════════════════════════════════════════════════════════
+         PHENOMEBEAUTY — OBSIDIAN ATELIER
+         v6.1 — Welcome Splash + Deep dark canvas
+         ═══════════════════════════════════════════════════════════ */
+
+      :root {
+        /* Core obsidian palette */
+        --obsidian:   #04040a;
+        --void:       #070710;
+        --onyx:       #0d0d1a;
+        --graphite:   #181828;
+
+        /* Glass surfaces — luminous layers over dark */
+        --glass-1:    rgba(255,255,255,0.09);
+        --glass-2:    rgba(255,255,255,0.06);
+        --glass-3:    rgba(255,255,255,0.03);
+        --glass-inv:  rgba(255,255,255,0.96);
+
+        /* Text — clear luminous hierarchy */
+        --text-pri:   rgba(255,255,255,0.96);
+        --text-sec:   rgba(255,255,255,0.65);
+        --text-ter:   rgba(255,255,255,0.38);
+        --text-quat:  rgba(255,255,255,0.20);
+
+        /* Borders */
+        --border-hi:  rgba(255,255,255,0.18);
+        --border-mid: rgba(255,255,255,0.10);
+        --border-lo:  rgba(255,255,255,0.05);
+
+        --r-xl:   28px;
+        --r-lg:   22px;
+        --r-md:   16px;
+        --r-sm:   12px;
+        --r-pill: 999px;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* ── BODY — deep obsidian with chromatic depth ── */
+      html, body {
+        margin: 0; padding: 0;
+        font-family: 'Jost', system-ui, sans-serif;
+        color: var(--text-pri);
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse at 15% 5%,  rgba(100, 60,220,0.80) 0%, transparent 36%),
+          radial-gradient(ellipse at 85% 4%,  rgba(65,  35,165,0.70) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 52%, rgba(50,  25,130,0.60) 0%, transparent 42%),
+          radial-gradient(ellipse at 8%  94%, rgba(80,  45,175,0.65) 0%, transparent 34%),
+          radial-gradient(ellipse at 92% 92%, rgba(58,  28,130,0.60) 0%, transparent 34%),
+          radial-gradient(ellipse at 50% 50%, rgba(18,  10, 55,0.92) 0%, transparent 66%),
+          var(--obsidian);
+        background-attachment: fixed;
+      }
+
+      /* ══════════════════════════════════════════════════════════════════════
+         WELCOME SPLASH — Premium entry experience
+         ══════════════════════════════════════════════════════════════════════ */
+      #welcome-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(ellipse at 50% 20%, rgba(100, 60, 220, 0.40), transparent 60%),
+          radial-gradient(ellipse at 50% 80%, rgba(80, 45, 175, 0.30), transparent 60%),
+          var(--obsidian);
+        opacity: 1;
+        transition: opacity 0.6s ease;
+      }
+      #welcome-splash.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .splash-content {
+        text-align: center;
+        padding: 40px 30px;
+        max-width: 520px;
+      }
+      .splash-logo-wrap {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 24px;
+        border-radius: 32px;
+        padding: 3px;
+        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.20) inset,
+          0 1px 0 rgba(255,255,255,0.12) inset,
+          0 20px 60px rgba(0,0,0,0.80),
+          0 0 50px rgba(120,90,220,0.15);
+        position: relative;
+      }
+      .splash-logo-wrap::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, transparent 55%);
+        pointer-events: none;
+      }
+      .splash-logo-wrap img {
+        width: 100%;
+        height: 100%;
+        border-radius: 28px;
+        object-fit: cover;
+      }
+      .splash-brand-tag {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.36em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.70);
+        font-weight: 800;
+        margin-bottom: 16px;
+        text-shadow: 0 0 20px rgba(180,160,255,0.40);
+      }
+      .splash-title {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 42px;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+        color: rgba(255,255,255,0.98);
+        margin: 0 0 18px;
+        text-shadow: 0 2px 30px rgba(200,180,255,0.25);
+      }
+      .splash-subtitle {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: italic;
+        line-height: 1.75;
+        color: rgba(255,255,255,0.65);
+        margin: 0 0 36px;
+        letter-spacing: 0.02em;
+      }
+      .splash-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 32px;
+        border-radius: var(--r-pill);
+        background: rgba(255,255,255,0.95);
+        color: var(--obsidian);
+        font-family: 'Jost', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 1px 0 rgba(255,255,255,0.50) inset,
+          0 12px 40px rgba(255,255,255,0.10),
+          0 4px 12px rgba(0,0,0,0.30);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .splash-cta:hover {
+        transform: translateY(-2px);
+        background: rgba(255,255,255,1);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.40) inset,
+          0 16px 48px rgba(255,255,255,0.14),
+          0 6px 16px rgba(0,0,0,0.35);
+      }
+
+      /* ══════════════════════════════════════════════════════════════════════
+         BOOKING APP — Main application
+         ══════════════════════════════════════════════════════════════════════ */
+      #booking-app {
+        opacity: 0;
+        transition: opacity 0.6s ease 0.3s;
+      }
+      #booking-app.active {
+        opacity: 1;
+      }
+
+      /* ── LAYOUT ── */
+      .app-frame {
+        width: 100%; min-height: 100vh;
+        padding: 14px 10px 20px;
+        display: flex; align-items: stretch; justify-content: center;
+      }
+
+      /* ── SHELL — dark glass master card ── */
+      .shell {
+        width: 100%; max-width: 520px;
+        min-height: calc(100vh - 32px);
+        border-radius: var(--r-xl);
+        padding: 20px 16px;
+        background: rgba(255,255,255,0.10);
+        backdrop-filter: blur(72px) saturate(200%);
+        -webkit-backdrop-filter: blur(72px) saturate(200%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.20) inset,
+          0 1px 0 rgba(255,255,255,0.14) inset,
+          0 0 0 0.5px rgba(255,255,255,0.06),
+          0 28px 80px rgba(0,0,0,0.70),
+          0 4px 16px rgba(0,0,0,0.50);
+        display: flex; flex-direction: column;
+        position: relative; overflow: hidden;
+      }
+      .shell::before {
+        content: '';
+        position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+        background: linear-gradient(90deg,
+          transparent,
+          rgba(255,255,255,0.45) 30%,
+          rgba(255,255,255,0.80) 50%,
+          rgba(255,255,255,0.45) 70%,
+          transparent);
+        border-radius: var(--r-pill);
+      }
+      @media(min-width:768px){
+        .app-frame { padding: 32px 16px; }
+        .shell { border-radius: 32px; padding: 28px 24px; }
+      }
+
+      /* ── HEADER ── */
+      header {
+        display: flex; flex-direction: column; align-items: center;
+        margin-bottom: 18px;
+      }
+      .logo-wrap {
+        width: 82px; height: 82px;
+        border-radius: 27px; padding: 2.5px;
+        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.18) inset,
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 12px 44px rgba(0,0,0,0.75),
+          0 2px 10px rgba(0,0,0,0.50),
+          0 0 40px rgba(120,90,220,0.10);
+        position: relative;
+      }
+      .logo-wrap::before {
+        content: '';
+        position: absolute; inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+        pointer-events: none;
+      }
+      .logo {
+        width: 100%; height: 100%; border-radius: 23px;
+        object-fit: cover;
+        border: none; display: block;
+      }
+
+      /* ── BRAND TYPOGRAPHY ── */
+      .brand-tag {
+        margin-top: 14px;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; letter-spacing: 0.36em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.70); font-weight: 800;
+      }
+      h1 {
+        margin: 6px 0 2px;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 30px; font-weight: 400;
+        letter-spacing: 0.03em; line-height: 1.1;
+        color: rgba(255,255,255,0.97);
+      }
+      .sub-heading {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; font-weight: 700;
+        letter-spacing: 0.24em; text-transform: uppercase;
+        color: rgba(255,255,255,0.38);
+        margin-bottom: 16px;
+      }
+
+      /* ── STEP PROGRESS ── */
+      .step-indicator {
+        width: 100%;
+        display: flex; flex-direction: column;
+        align-items: center; gap: 10px;
+      }
+      .step-track-row {
+        display: flex; align-items: center; gap: 5px;
+        width: 100%; padding: 0 2px;
+      }
+      .step-pill {
+        flex: 1; height: 3px; border-radius: var(--r-pill);
+        background: rgba(255,255,255,0.10);
+        overflow: visible; position: relative;
+      }
+      .step-pill-inner {
+        width: 0; height: 100%; border-radius: inherit;
+        background: linear-gradient(90deg,
+          rgba(200,180,255,0.70) 0%,
+          rgba(255,255,255,0.98) 100%);
+        box-shadow: 0 0 10px rgba(200,180,255,0.50), 0 0 3px rgba(255,255,255,0.60);
+        transition: width 0.60s cubic-bezier(0.4,0,0.2,1);
+        position: relative;
+      }
+      .step-pill-inner.pb-active::after {
+        content: '';
+        position: absolute; top: -2px; right: -20px;
+        width: 28px; height: calc(100% + 4px);
+        background: linear-gradient(90deg, transparent, rgba(220,200,255,0.90));
+        border-radius: var(--r-pill);
+        filter: blur(3px);
+        animation: pbShimmer 1.8s ease-in-out infinite;
+      }
+      @keyframes pbShimmer {
+        0%, 100% { opacity: 0; transform: translateX(-12px); }
+        50%       { opacity: 1; transform: translateX(0); }
+      }
+
+      .step-dots-row {
+        display: flex; width: 100%;
+        justify-content: space-between;
+        padding: 0 2px;
+      }
+      .step-dot {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 3px; flex: 1;
+        transition: opacity 0.3s ease;
+      }
+      .step-dot-num {
+        width: 20px; height: 20px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Jost', sans-serif;
+        font-size: 8px; font-weight: 800;
+        transition: all 0.35s ease;
+        border: 0.5px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.30);
+      }
+      .step-dot.sd-done .step-dot-num {
+        background: rgba(255,255,255,0.97);
+        color: var(--obsidian);
+        border-color: transparent;
+        box-shadow: 0 0 12px rgba(200,180,255,0.35), 0 2px 8px rgba(255,255,255,0.20);
+      }
+      .step-dot.sd-active .step-dot-num {
+        background: rgba(255,255,255,0.18);
+        color: rgba(255,255,255,0.96);
+        border-color: rgba(255,255,255,0.35);
+        box-shadow: 0 0 14px rgba(200,180,255,0.30), 0 0 0 1px rgba(255,255,255,0.10);
+      }
+      .step-dot-lbl {
+        font-family: 'Jost', sans-serif;
+        font-size: 7.5px; font-weight: 700;
+        letter-spacing: 0.10em; text-transform: uppercase;
+        color: rgba(255,255,255,0.22);
+        text-align: center; white-space: nowrap;
+        transition: color 0.3s ease;
+      }
+      .step-dot.sd-active .step-dot-lbl { color: rgba(255,255,255,0.65); }
+      .step-dot.sd-done  .step-dot-lbl  { color: rgba(255,255,255,0.35); }
+
+      /* ── SURFACE — inner dark glass pane ── */
+      .surface {
+        flex: 1; margin-top: 12px; padding: 15px;
+        border-radius: var(--r-lg);
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(36px) saturate(180%);
+        -webkit-backdrop-filter: blur(36px) saturate(180%);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.12) inset,
+          0 1px 0 rgba(255,255,255,0.07) inset,
+          0 0 0 0.5px rgba(255,255,255,0.04);
+        border: none;
+        display: flex; flex-direction: column;
+        overflow: visible;
+      }
+      .surface-inner {
+        position: relative; z-index: 1;
+        display: flex; flex-direction: column;
+        flex: 1; min-height: 0;
+      }
+      .view { display: none; height: 100%; }
+      .view.active {
+        display: flex; flex-direction: column;
+        animation: fadeSlide 0.28s ease-out;
+      }
+      @keyframes fadeSlide {
+        from { opacity: 0; transform: translateY(7px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-4px); }
+        to   { opacity: 1; transform: none; }
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes shimmer { 0%,100% { opacity:0.55; } 50% { opacity:0.85; } }
+
+      .section-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; letter-spacing: 0.30em;
+        text-transform: uppercase; color: rgba(255,255,255,0.50);
+        margin-bottom: 14px; flex-shrink: 0; font-weight: 800;
+      }
+
+      .scroll-area {
+        overflow-y: auto; overflow-x: visible;
+        padding-right: 2px; flex: 1; min-height: 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.08) transparent;
+      }
+
+      /* ── CATEGORY CHIPS ── */
+      .chip-row {
+        display: flex; flex-wrap: nowrap; gap: 7px;
+        margin-bottom: 16px;
+        overflow-x: auto; overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px 1px 8px;
+      }
+      .chip-row::-webkit-scrollbar { display: none; }
+      .chip {
+        border-radius: var(--r-pill);
+        height: 33px; padding: 0 17px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; font-weight: 600; letter-spacing: 0.10em;
+        text-transform: uppercase;
+        white-space: nowrap; flex-shrink: 0;
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.40);
+        cursor: pointer; transition: all 0.2s ease;
+      }
+      .chip:hover {
+        background: rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.70);
+        border-color: rgba(255,255,255,0.22);
+        transform: translateY(-1px);
+      }
+      .chip.active {
+        background: rgba(255,255,255,0.94);
+        border: 0.5px solid transparent;
+        color: var(--obsidian);
+        font-weight: 700; letter-spacing: 0.09em;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 4px 18px rgba(255,255,255,0.12);
+      }
+
+      /* ── SERVICE CARDS ── */
+      .category-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.20em;
+        color: rgba(255,255,255,0.40);
+        margin: 18px 0 10px; padding-left: 12px;
+        position: relative;
+      }
+      .category-title::before {
+        content: '';
+        position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+        width: 3px; height: 14px; border-radius: var(--r-pill);
+        background: linear-gradient(180deg, rgba(255,255,255,0.60), rgba(255,255,255,0.25));
+      }
+      .service-card {
+        border-radius: 18px; padding: 16px 15px;
+        margin-bottom: 9px;
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(255,255,255,0.09);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 0.5px solid rgba(255,255,255,0.13);
+        box-shadow:
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 0 0 0.5px rgba(255,255,255,0.04),
+          0 4px 20px rgba(0,0,0,0.25);
+        cursor: pointer;
+        transition: all 0.22s ease;
+      }
+      .service-card:hover {
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.18);
+        box-shadow:
+          0 1px 0 rgba(255,255,255,0.10) inset,
+          0 8px 26px rgba(0,0,0,0.30);
+        transform: translateY(-1px);
+      }
+      .service-card.selected {
+        background: rgba(255,255,255,0.94);
+        border: 0.5px solid transparent;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 1px 0 rgba(255,255,255,0.60) inset,
+          0 12px 40px rgba(0,0,0,0.50),
+          0 0 30px rgba(255,255,255,0.05);
+        transform: none;
+      }
+      .service-main { flex: 1; margin-right: 12px; }
+      .service-header {
+        display: flex; justify-content: space-between;
+        align-items: baseline; gap: 8px;
+      }
+      .service-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px; font-weight: 500;
+        letter-spacing: 0.01em; color: rgba(255,255,255,0.95);
+        line-height: 1.2;
+      }
+      .service-price {
+        font-family: 'Jost', sans-serif;
+        font-size: 14px; font-weight: 700;
+        white-space: nowrap; color: rgba(255,255,255,0.80);
+      }
+      .service-meta {
+        margin-top: 5px;
+        font-family: 'Jost', sans-serif;
+        font-size: 12.5px; color: rgba(255,255,255,0.55);
+        line-height: 1.50; letter-spacing: 0.01em;
+      }
+      .service-card.selected .service-name  { color: rgba(4,4,10,0.92); }
+      .service-card.selected .service-price { color: rgba(4,4,10,0.65); }
+      .service-card.selected .service-meta  { color: rgba(4,4,10,0.45); }
+
+      .check-circle {
+        width: 26px; height: 26px; flex-shrink: 0;
+        border-radius: 50%;
+        border: 0.5px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.22s ease;
+      }
+      .service-card.selected .check-circle {
+        background: rgba(4,4,10,0.88);
+        border-color: rgba(4,4,10,0.30);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.40);
+      }
+      .check-circle svg { display: none; }
+      .service-card.selected .check-circle svg { display: block; }
+
+      /* ── CART BAR ── */
+      .cart-bar {
+        margin-top: 10px; flex-shrink: 0;
+        border-radius: var(--r-md); padding: 11px 13px;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
+        display: none;
+      }
+      .cart-bar.visible { display: block; animation: fadeSlide 0.22s ease; }
+      .cart-bar-top {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 7px;
+      }
+      .cart-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.18em; color: rgba(255,255,255,0.50);
+      }
+      .cart-total {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px; font-weight: 400; color: rgba(255,255,255,0.90);
+      }
+      .cart-items { display: flex; flex-direction: column; gap: 3px; }
+      .cart-item {
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 11.5px; font-family: 'Jost', sans-serif;
+      }
+      .cart-item-name {
+        color: rgba(255,255,255,0.60); flex: 1; margin-right: 8px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        font-size: 11.5px;
+      }
+      .cart-item-price { color: rgba(255,255,255,0.80); white-space: nowrap; font-size: 11.5px; font-weight: 600; }
+      .cart-remove {
+        margin-left: 6px; cursor: pointer;
+        color: rgba(255,255,255,0.18); font-size: 11px; font-weight: 700;
+        transition: color 0.15s;
+      }
+      .cart-remove:hover { color: rgba(255,255,255,0.70); }
+      .cart-duration { margin-top: 6px; font-family: 'Jost', sans-serif; font-size: 10px; color: rgba(255,255,255,0.22); letter-spacing: 0.04em; }
+
+      /* ── BUTTONS ── */
+      .actions { display: flex; gap: 10px; margin-top: 14px; flex-shrink: 0; }
+      button {
+        flex: 1; border-radius: 16px; padding: 13px 0;
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 700; border: none;
+        cursor: pointer; outline: none; letter-spacing: 0.08em; text-transform: uppercase;
+        transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+      }
+      .btn-outline {
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        color: rgba(255,255,255,0.50);
+        border: 0.5px solid rgba(255,255,255,0.12);
+      }
+      .btn-outline:hover {
+        transform: translateY(-1px);
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.75);
+      }
+      .btn-primary {
+        background: rgba(255,255,255,0.95);
+        color: var(--obsidian);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 1px 0 rgba(255,255,255,0.50) inset,
+          0 10px 30px rgba(255,255,255,0.08),
+          0 3px 8px rgba(0,0,0,0.30);
+      }
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-1.5px);
+        background: rgba(255,255,255,1);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.40) inset,
+          0 14px 36px rgba(255,255,255,0.12),
+          0 4px 10px rgba(0,0,0,0.35);
+      }
+      .btn-primary:active:not(:disabled) { transform: translateY(0px); }
+      .btn-primary:disabled {
+        background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.20);
+        box-shadow: none; border: 0.5px solid rgba(255,255,255,0.06);
+        cursor: not-allowed;
+      }
+
+      /* SUCCESS, TOAST, CALENDAR, FORM - keeping rest of CSS intact */
+      .success-view { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; flex: 1; padding: 20px 0; }
+      .success-view.active { display: flex; animation: fadeSlide 0.4s ease; }
+      .success-icon { width: 66px; height: 66px; border-radius: 50%; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; box-shadow: 0 0 0 0.5px rgba(255,255,255,0.30) inset, 0 10px 36px rgba(255,255,255,0.12); }
+      .success-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; margin-bottom: 6px; color: rgba(255,255,255,0.95); letter-spacing: 0.02em; }
+      .success-totals { margin-top: 18px; width: 100%; border-radius: var(--r-md); padding: 14px; background: rgba(255,255,255,0.07); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border: 0.5px solid rgba(255,255,255,0.10); text-align: left; }
+      
+      .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(130%); min-width: 240px; max-width: 90vw; padding: 10px 18px; border-radius: var(--r-pill); font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.90); background: rgba(14,14,24,0.98); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 0.5px solid rgba(255,255,255,0.16); box-shadow: 0 0 0 0.5px rgba(255,255,255,0.06) inset, 0 16px 44px rgba(0,0,0,0.60); opacity: 0; z-index: 9999; text-align: center; transition: transform 0.28s cubic-bezier(0.18,0.89,0.32,1.28), opacity 0.28s ease; }
+      .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+      .toast.error { color: rgba(255,130,130,0.95); border-color: rgba(255,100,100,0.25); }
+      
+      .loader { display: inline-block; width: 17px; height: 17px; border-radius: 50%; border: 2px solid rgba(4,4,10,0.12); border-top-color: rgba(4,4,10,0.70); animation: spin 0.85s linear infinite; vertical-align: middle; }
+      
+      /* Include remaining CSS for calendar, forms, summary cards etc - keeping original file CSS */
+      .cal-wrap { border-radius: var(--r-md); background: rgba(255,255,255,0.06); backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px); border: 0.5px solid rgba(255,255,255,0.10); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset; overflow: hidden; margin-bottom: 14px; }
+      .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.06); }
+      .cal-month-label { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 400; letter-spacing: 0.02em; color: rgba(255,255,255,0.90); }
+      .cal-nav { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(255,255,255,0.07); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 0.5px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.60); font-size: 14px; line-height: 1; transition: all 0.18s ease; user-select: none; }
+      .cal-nav:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.22); color: rgba(255,255,255,0.90); transform: scale(1.08); }
+      .cal-nav.disabled { opacity: 0.18; cursor: not-allowed; pointer-events: none; }
+      .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 6px 10px 2px; }
+      .cal-wd { text-align: center; font-family: 'Jost', sans-serif; font-size: 9px; color: rgba(255,255,255,0.22); font-weight: 700; letter-spacing: 0.10em; padding: 2px 0; }
+      .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; padding: 4px 10px 10px; }
+      .cal-day { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Jost', sans-serif; font-size: 12px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease; position: relative; user-select: none; color: rgba(255,255,255,0.40); }
+      .cal-day.empty { pointer-events: none; }
+      .cal-day.past { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
+      .cal-day.no-slots { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
+      .cal-day.has-slots { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.75); }
+      .cal-day.has-slots:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.20); color: rgba(255,255,255,0.95); transform: scale(1.08); box-shadow: 0 4px 14px rgba(0,0,0,0.30); }
+      .cal-day.loading-month { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); pointer-events: none; animation: shimmer 1.6s ease-in-out infinite; }
+      .cal-day.selected { background: rgba(255,255,255,0.96) !important; border-color: transparent !important; color: var(--obsidian) !important; font-weight: 700; box-shadow: 0 4px 18px rgba(255,255,255,0.14); transform: scale(1.10); }
+      .cal-day.today:not(.selected):not(.past) { border-color: rgba(255,255,255,0.24); font-weight: 600; color: rgba(255,255,255,0.90); }
+      .cal-day-dot { width: 3.5px; height: 3.5px; border-radius: 50%; background: rgba(255,255,255,0.30); position: absolute; bottom: 4px; }
+      .cal-day.selected .cal-day-dot { background: rgba(4,4,10,0.35); }
+
+      .time-section-label { font-family: 'Jost', sans-serif; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.50); margin-bottom: 9px; font-weight: 800; }
+      .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 7px; }
+      .time-slot { border-radius: var(--r-sm); padding: 9px 4px; font-family: 'Jost', sans-serif; font-size: 12px; text-align: center; cursor: pointer; background: rgba(255,255,255,0.07); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 0.5px solid rgba(255,255,255,0.10); color: rgba(255,255,255,0.65); transition: all 0.15s ease; user-select: none; animation: fadeSlide 0.2s ease; }
+      .time-slot:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.20); color: rgba(255,255,255,0.90); transform: translateY(-1px); }
+      .time-slot.selected { background: rgba(255,255,255,0.94); border-color: transparent; box-shadow: 0 4px 16px rgba(255,255,255,0.10); color: var(--obsidian); font-weight: 600; }
+
+      /* Form styles */
+      .form-group { margin-bottom: 11px; position: relative; }
+      label { display: block; font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 5px; color: rgba(255,255,255,0.45); }
+      .input-wrap { position: relative; display: flex; align-items: center; }
+      .input-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.22); pointer-events: none; line-height: 1; font-size: 14px; }
+      input[type="text"], input[type="email"], input[type="tel"] { width: 100%; border-radius: var(--r-sm); padding: 11px 12px; border: 0.5px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.90); font-family: 'Jost', sans-serif; font-size: 13px; outline: none; transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease; }
+      input.has-icon { padding-left: 34px; }
+      input::placeholder { color: rgba(255,255,255,0.22); }
+      input:focus { border-color: rgba(255,255,255,0.22); box-shadow: 0 0 0 1px rgba(255,255,255,0.06); background: rgba(255,255,255,0.10); }
+      input.input-valid { border-color: rgba(255,255,255,0.14); }
+      input.input-error { border-color: rgba(255,100,100,0.55); box-shadow: 0 0 0 1px rgba(255,100,100,0.16); }
+      .field-hint { font-family: 'Jost', sans-serif; font-size: 10px; color: rgba(255,255,255,0.22); margin-top: 4px; padding-left: 2px; }
+
+      .addr-suggestions { position: absolute; top: 100%; left: 0; right: 0; z-index: 9999; background: rgba(12,12,22,0.98); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 0.5px solid rgba(255,255,255,0.16); border-radius: 13px; box-shadow: 0 14px 36px rgba(0,0,0,0.60); margin-top: 4px; overflow: hidden; display: none; }
+      .addr-suggestions.open { display: block; }
+      .addr-suggestion-item { padding: 9px 13px; font-family: 'Jost', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.65); border-top: 0.5px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.12s; line-height: 1.4; }
+      .addr-suggestion-item:first-child { border-top: none; }
+      .addr-suggestion-item:hover, .addr-suggestion-item.active { background: rgba(255,255,255,0.07); }
+      .addr-suggestion-main { font-weight: 500; color: rgba(255,255,255,0.88); }
+      .addr-suggestion-sec { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+      /* Summary cards */
+      .summary-card { border-radius: 18px; padding: 15px 14px; margin-bottom: 8px; background: rgba(255,255,255,0.07); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border: 0.5px solid rgba(255,255,255,0.10); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset; }
+      .summary-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12.5px; margin-bottom: 7px; }
+      .summary-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 11px; }
+      .summary-value { font-family: 'Jost', sans-serif; text-align: right; font-size: 12px; max-width: 58%; color: rgba(255,255,255,0.70); }
+      .summary-divider { margin: 10px 0; border-top: 0.5px solid rgba(255,255,255,0.06); }
+      .summary-grand-total { display: flex; justify-content: space-between; align-items: baseline; margin: 4px 0 6px; }
+      .summary-grand-total .gtl { font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.30); }
+      .summary-grand-total .gtv { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; color: rgba(255,255,255,0.95); }
+      .deposit-box { border-radius: 12px; padding: 11px 13px; margin: 10px 0; background: rgba(255,255,255,0.06); border: 0.5px solid rgba(255,255,255,0.10); display: flex; justify-content: space-between; align-items: center; }
+      .deposit-box-label { font-family: 'Jost', sans-serif; font-size: 11px; color: rgba(255,255,255,0.35); }
+      .deposit-box-amount { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; color: rgba(255,255,255,0.95); }
+      .balance-note { font-family: 'Jost', sans-serif; font-size: 10px; color: rgba(255,255,255,0.28); text-align: right; margin-top: 3px; }
+      .fee-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; }
+      .fee-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 12px; }
+      .fee-value { font-family: 'Jost', sans-serif; font-size: 13px; color: rgba(255,255,255,0.70); }
+      .fee-calculating { font-family: 'Jost', sans-serif; font-size: 11px; color: rgba(255,255,255,0.28); display: flex; align-items: center; gap: 5px; }
+
+      /* Safety forms */
+      .safety-q-wrap { border-bottom: 0.5px solid rgba(255,255,255,0.06); padding-bottom: 12px; }
+      .safety-q-label { font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.80); margin-bottom: 10px; line-height: 1.55; }
+      .safety-q-label small { display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+      .safety-yn { display: flex; gap: 8px; margin-bottom: 0; }
+      .syn-btn { flex: 1; padding: 9px; border-radius: 10px; border: 0.5px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.40); font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+      .syn-btn:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.70); }
+      .syn-btn[data-v="no"].active, .syn-btn[data-v="yes"].active { background: rgba(255,255,255,0.92); border-color: transparent; color: var(--obsidian); box-shadow: 0 2px 8px rgba(255,255,255,0.10); }
+      .safety-detail { width: 100%; margin-top: 10px; padding: 10px 13px; background: rgba(255,255,255,0.06); border: 0.5px solid rgba(255,255,255,0.12); border-radius: var(--r-sm); color: rgba(255,255,255,0.85); font-family: 'Jost', sans-serif; font-size: 13px; outline: none; resize: vertical; min-height: 56px; animation: fadeIn 0.15s ease; }
+      .safety-detail::placeholder { color: rgba(255,255,255,0.22); }
+      .safety-detail:focus { border-color: rgba(255,255,255,0.22); }
+
+      .skel { border-radius:16px;padding:14px;margin-bottom:8px; background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.06); animation:shimmer 1.6s ease-in-out infinite; }
+      .skel-line { height:10px;border-radius:5px;background:rgba(255,255,255,0.06);margin-bottom:8px; }
+    </style>
   </head>
   <body>
-    <!-- ═════════════════════════════════════════════════════════
-         WELCOME SPLASH — Premium entry experience
-         ═════════════════════════════════════════════════════════ -->
+    <!-- WELCOME SPLASH -->
     <div id="welcome-splash">
       <div class="splash-content">
         <div class="splash-logo-wrap">
@@ -37,9 +760,7 @@
       </div>
     </div>
 
-    <!-- ═════════════════════════════════════════════════════════
-         BOOKING APP — Full booking flow
-         ═════════════════════════════════════════════════════════ -->
+    <!-- BOOKING APP -->
     <div id="booking-app">
       <div class="app-frame">
         <div class="shell">
@@ -74,7 +795,9 @@
                 <div class="scroll-area" id="services-scroll">
                   <div class="chip-row" id="category-chips"></div>
                   <div id="services-list">
-                    <!-- Services will load here via JavaScript -->
+                    <div class="skel"><div class="skel-line" style="width:65%;"></div><div class="skel-line" style="width:40%;margin-bottom:0;"></div></div>
+                    <div class="skel" style="animation-delay:.18s;"><div class="skel-line" style="width:55%;"></div><div class="skel-line" style="width:35%;margin-bottom:0;"></div></div>
+                    <div class="skel" style="animation-delay:.36s;"><div class="skel-line" style="width:70%;"></div><div class="skel-line" style="width:45%;margin-bottom:0;"></div></div>
                   </div>
                 </div>
                 <div class="cart-bar" id="cart-bar">
@@ -114,7 +837,7 @@
               <div id="step-details" class="view">
                 <div class="section-label">Your details</div>
                 <div class="scroll-area">
-                  <!-- Client details form will be here -->
+                  <!-- Client details form will be loaded by main.js -->
                 </div>
               </div>
 
@@ -147,7 +870,13 @@
 
     <div id="toast" class="toast"></div>
 
-    <!-- Load JavaScript modules -->
     <script type="module" src="/js/main.js"></script>
+    <script>
+      // Welcome splash controller
+      document.getElementById('enter-booking-btn').addEventListener('click', () => {
+        document.getElementById('welcome-splash').classList.add('hidden');
+        document.getElementById('booking-app').classList.add('active');
+      });
+    </script>
   </body>
 </html>
