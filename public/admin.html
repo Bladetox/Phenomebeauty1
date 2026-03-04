@@ -359,6 +359,24 @@ html,body {
 .review-time{font-size:10.5px;color:var(--t60);}
 .review-rating{font-size:16px;color:var(--amber);}
 .review-text{font-size:12.5px;color:var(--t80);line-height:1.6;}
+
+/* Stock Settings Button - Responsive */
+@media (max-width: 768px) {
+  .icon-btn {
+    padding: 6px 10px !important;
+    font-size: 14px !important;
+  }
+}
+
+.icon-btn:hover {
+  background: var(--hover) !important;
+  border-color: var(--t20) !important;
+}
+
+.icon-btn:active {
+  transform: scale(0.98);
+}
+
 </style>
 </head>
 <body>
@@ -908,11 +926,12 @@ async function loadStock() {
           const stockQty = parseInt(s.stockOnHand) || 0;
           const threshold = parseInt(localStorage.getItem('stockThreshold') || '5');
           const lowStock = stockQty <= threshold;
+          const goodStock = stockQty > threshold;
           return `
-          <tr style="${lowStock ? 'background:rgba(248,113,113,0.08);' : ''}">
+          <tr style="${lowStock ? 'background:rgba(248,113,113,0.08);' : goodStock ? 'background:rgba(74,222,128,0.08);' : ''}">
             <td style="font-weight:700;color:var(--t100);">${s.item || '—'}</td>
             <td>R ${(parseFloat(s.cost) || 0).toFixed(2)}</td>
-            <td style="${lowStock ? 'color:var(--red);font-weight:700;' : ''}">${s.stockOnHand || '0'}</td>
+            <td style="${lowStock ? 'color:#ef4444;font-weight:700;' : goodStock ? 'color:#16a34a;font-weight:700;' : ''}">${s.stockOnHand || '0'}</td>
             <td>R ${(parseFloat(s.totalCost) || 0).toFixed(2)}</td>
             <td style="font-size:11px;color:var(--t60);">${s.notes || ''}</td>
           </tr>
