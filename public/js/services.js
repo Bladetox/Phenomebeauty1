@@ -10,7 +10,7 @@ import { showToast, updateNextBtn, setLoading } from './ui.js';
  * Load services from API and render
  */
 export async function loadServices() {
-  setLoading(true, 'Loading services...');
+  setLoading(true, 'Loading...');
   
   try {
     const services = await fetchServices();
@@ -232,6 +232,15 @@ export function updateCart() {
       removeServiceFromCart(serviceId);
     });
   });
+}
+
+/**
+ * Get selected services as comma-separated string
+ */
+export function getSelectedServicesSummary() {
+  return (bookingState.selectedServices || [])
+    .map(s => s.name)
+    .join(', ') || 'No services selected';
 }
 
 /**
