@@ -10,7 +10,8 @@
     <style>
       /* ═══════════════════════════════════════════════════════════
          PHENOMEBEAUTY — OBSIDIAN ATELIER
-         v6.1 — Welcome Splash + Deep dark canvas
+         v6.0 — Deep dark canvas. Liquid glass over obsidian.
+         Cormorant Garamond (display) + Jost (UI)
          ═══════════════════════════════════════════════════════════ */
 
       :root {
@@ -36,6 +37,18 @@
         --border-hi:  rgba(255,255,255,0.18);
         --border-mid: rgba(255,255,255,0.10);
         --border-lo:  rgba(255,255,255,0.05);
+
+        /* Legacy compat aliases */
+        --ink:        #04040a;
+        --ink-2:      #0d0d1a;
+        --ink-soft:   rgba(255,255,255,0.38);
+        --text:       rgba(255,255,255,0.96);
+        --text-muted: rgba(255,255,255,0.38);
+        --text-faint: rgba(255,255,255,0.22);
+        --glass-hi:   rgba(255,255,255,0.96);
+        --glass-mid:  rgba(255,255,255,0.12);
+        --glass-low:  rgba(255,255,255,0.07);
+        --glass-ink:  rgba(255,255,255,0.92);
 
         --r-xl:   28px;
         --r-lg:   22px;
@@ -181,7 +194,7 @@
       }
 
       /* ══════════════════════════════════════════════════════════════════════
-         BOOKING APP — Main application
+         BOOKING APP — Initially hidden, fades in after splash
          ══════════════════════════════════════════════════════════════════════ */
       #booking-app {
         opacity: 0;
@@ -216,6 +229,7 @@
         display: flex; flex-direction: column;
         position: relative; overflow: hidden;
       }
+      /* Prismatic top-edge highlight */
       .shell::before {
         content: '';
         position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
@@ -237,6 +251,8 @@
         display: flex; flex-direction: column; align-items: center;
         margin-bottom: 18px;
       }
+
+      /* Logo — dark glass ring with inner glow */
       .logo-wrap {
         width: 82px; height: 82px;
         border-radius: 27px; padding: 2.5px;
@@ -249,6 +265,7 @@
           0 0 40px rgba(120,90,220,0.10);
         position: relative;
       }
+      /* Inner glass shine */
       .logo-wrap::before {
         content: '';
         position: absolute; inset: 0;
@@ -262,7 +279,7 @@
         border: none; display: block;
       }
 
-      /* ── BRAND TYPOGRAPHY ── */
+      /* ── BRAND TYPOGRAPHY — luxury hierarchy ── */
       .brand-tag {
         margin-top: 14px;
         font-family: 'Jost', sans-serif;
@@ -285,7 +302,11 @@
         margin-bottom: 16px;
       }
 
-      /* ── STEP PROGRESS ── */
+      /* ══ STEP PROGRESS — animated fill system ══════════════════════════════
+         Each segment fills left-to-right. Completed = solid white.
+         Current step = 60% fill with trailing shimmer pulse.
+         Future = empty track.
+         ═══════════════════════════════════════════════════════════════════ */
       .step-indicator {
         width: 100%;
         display: flex; flex-direction: column;
@@ -295,6 +316,7 @@
         display: flex; align-items: center; gap: 5px;
         width: 100%; padding: 0 2px;
       }
+      /* Individual segment tracks */
       .step-pill {
         flex: 1; height: 3px; border-radius: var(--r-pill);
         background: rgba(255,255,255,0.10);
@@ -309,6 +331,7 @@
         transition: width 0.60s cubic-bezier(0.4,0,0.2,1);
         position: relative;
       }
+      /* Active shimmer — only on current step's bar */
       .step-pill-inner.pb-active::after {
         content: '';
         position: absolute; top: -2px; right: -20px;
@@ -323,6 +346,7 @@
         50%       { opacity: 1; transform: translateX(0); }
       }
 
+      /* Step dot row — labels under each segment */
       .step-dots-row {
         display: flex; width: 100%;
         justify-content: space-between;
@@ -365,6 +389,14 @@
       }
       .step-dot.sd-active .step-dot-lbl { color: rgba(255,255,255,0.65); }
       .step-dot.sd-done  .step-dot-lbl  { color: rgba(255,255,255,0.35); }
+
+      /* Legacy: small text label below whole bar */
+      .step-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.25);
+        margin-top: 2px; letter-spacing: 0.04em;
+        display: none; /* replaced by dot labels */
+      }
 
       /* ── SURFACE — inner dark glass pane ── */
       .surface {
@@ -511,6 +543,7 @@
         display: flex; justify-content: space-between;
         align-items: baseline; gap: 8px;
       }
+      /* Service name — Cormorant for elegance, legible size */
       .service-name {
         font-family: 'Cormorant Garamond', serif;
         font-size: 18px; font-weight: 500;
@@ -522,16 +555,19 @@
         font-size: 14px; font-weight: 700;
         white-space: nowrap; color: rgba(255,255,255,0.80);
       }
+      /* Meta — boosted contrast for legibility */
       .service-meta {
         margin-top: 5px;
         font-family: 'Jost', sans-serif;
         font-size: 12.5px; color: rgba(255,255,255,0.55);
         line-height: 1.50; letter-spacing: 0.01em;
       }
+      /* Selected state — dark text on white card */
       .service-card.selected .service-name  { color: rgba(4,4,10,0.92); }
       .service-card.selected .service-price { color: rgba(4,4,10,0.65); }
       .service-card.selected .service-meta  { color: rgba(4,4,10,0.45); }
 
+      /* ── CHECK CIRCLE ── */
       .check-circle {
         width: 26px; height: 26px; flex-shrink: 0;
         border-radius: 50%;
@@ -592,6 +628,344 @@
       .cart-remove:hover { color: rgba(255,255,255,0.70); }
       .cart-duration { margin-top: 6px; font-family: 'Jost', sans-serif; font-size: 10px; color: rgba(255,255,255,0.22); letter-spacing: 0.04em; }
 
+      /* ── CALENDAR ── */
+      .cal-wrap {
+        border-radius: var(--r-md);
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(26px);
+        -webkit-backdrop-filter: blur(26px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
+        overflow: hidden; margin-bottom: 14px;
+      }
+      .cal-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 14px;
+        border-bottom: 0.5px solid rgba(255,255,255,0.06);
+      }
+      .cal-month-label {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 15px; font-weight: 400; letter-spacing: 0.02em;
+        color: rgba(255,255,255,0.90);
+      }
+      .cal-nav {
+        width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.60); font-size: 14px; line-height: 1;
+        transition: all 0.18s ease; user-select: none;
+      }
+      .cal-nav:hover {
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.22);
+        color: rgba(255,255,255,0.90);
+        transform: scale(1.08);
+      }
+      .cal-nav.disabled { opacity: 0.18; cursor: not-allowed; pointer-events: none; }
+      .cal-weekdays {
+        display: grid; grid-template-columns: repeat(7, 1fr);
+        padding: 6px 10px 2px;
+      }
+      .cal-wd {
+        text-align: center; font-family: 'Jost', sans-serif;
+        font-size: 9px; color: rgba(255,255,255,0.22);
+        font-weight: 700; letter-spacing: 0.10em; padding: 2px 0;
+      }
+      .cal-days {
+        display: grid; grid-template-columns: repeat(7, 1fr);
+        gap: 3px; padding: 4px 10px 10px;
+      }
+      .cal-day {
+        aspect-ratio: 1; border-radius: 10px;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+        position: relative; user-select: none;
+        color: rgba(255,255,255,0.40);
+      }
+      .cal-day.empty    { pointer-events: none; }
+      .cal-day.past     { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
+      .cal-day.no-slots { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
+      .cal-day.has-slots {
+        background: rgba(255,255,255,0.07);
+        border-color: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.75);
+      }
+      .cal-day.has-slots:hover {
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.95);
+        transform: scale(1.08);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.30);
+      }
+      .cal-day.loading-month {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.06);
+        pointer-events: none;
+        animation: shimmer 1.6s ease-in-out infinite;
+      }
+      .cal-day.selected {
+        background: rgba(255,255,255,0.96) !important;
+        border-color: transparent !important;
+        color: var(--obsidian) !important; font-weight: 700;
+        box-shadow: 0 4px 18px rgba(255,255,255,0.14);
+        transform: scale(1.10);
+      }
+      .cal-day.today:not(.selected):not(.past) {
+        border-color: rgba(255,255,255,0.24); font-weight: 600; color: rgba(255,255,255,0.90);
+      }
+      .cal-day-dot {
+        width: 3.5px; height: 3.5px; border-radius: 50%;
+        background: rgba(255,255,255,0.30);
+        position: absolute; bottom: 4px;
+      }
+      .cal-day.selected .cal-day-dot { background: rgba(4,4,10,0.35); }
+
+      /* ── TIME SLOTS ── */
+      .time-section-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+        color: rgba(255,255,255,0.50); margin-bottom: 9px; font-weight: 800;
+      }
+      .time-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 7px;
+      }
+      .time-slot {
+        border-radius: var(--r-sm); padding: 9px 4px;
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; text-align: center; cursor: pointer;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        color: rgba(255,255,255,0.65);
+        transition: all 0.15s ease; user-select: none;
+        animation: fadeSlide 0.2s ease;
+      }
+      .time-slot:hover {
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.20);
+        color: rgba(255,255,255,0.90);
+        transform: translateY(-1px);
+      }
+      .time-slot.selected {
+        background: rgba(255,255,255,0.94);
+        border-color: transparent;
+        box-shadow: 0 4px 16px rgba(255,255,255,0.10);
+        color: var(--obsidian); font-weight: 600;
+      }
+
+      /* ── FORM ── */
+      .form-group { margin-bottom: 11px; position: relative; }
+      .safety-q-wrap { border-bottom: 0.5px solid rgba(255,255,255,0.06); padding-bottom: 12px; }
+      .safety-q-label {
+        font-family: 'Jost', sans-serif;
+        font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.80);
+        margin-bottom: 10px; line-height: 1.55;
+      }
+      .safety-q-label small {
+        display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px;
+      }
+      .safety-yn { display: flex; gap: 8px; margin-bottom: 0; }
+      .syn-btn {
+        flex: 1; padding: 9px; border-radius: 10px;
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.40);
+        font-family: 'Jost', sans-serif;
+        font-size: 13px; font-weight: 600;
+        cursor: pointer; transition: all 0.15s;
+      }
+      .syn-btn:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.70); }
+      .syn-btn[data-v="no"].active,
+      .syn-btn[data-v="yes"].active {
+        background: rgba(255,255,255,0.92);
+        border-color: transparent; color: var(--obsidian);
+        box-shadow: 0 2px 8px rgba(255,255,255,0.10);
+      }
+      .safety-detail {
+        width: 100%; margin-top: 10px; padding: 10px 13px;
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        border-radius: var(--r-sm); color: rgba(255,255,255,0.85);
+        font-family: 'Jost', sans-serif; font-size: 13px; outline: none;
+        resize: vertical; min-height: 56px;
+        animation: fadeIn 0.15s ease;
+      }
+      .safety-detail::placeholder { color: rgba(255,255,255,0.22); }
+      .safety-detail:focus { border-color: rgba(255,255,255,0.22); }
+      label {
+        display: block; font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 800;
+        letter-spacing: 0.18em; text-transform: uppercase;
+        margin-bottom: 5px; color: rgba(255,255,255,0.45);
+      }
+      .input-wrap { position: relative; display: flex; align-items: center; }
+      .input-icon {
+        position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+        color: rgba(255,255,255,0.22); pointer-events: none; line-height: 1; font-size: 14px;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"] {
+        width: 100%; border-radius: var(--r-sm); padding: 11px 12px;
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.90);
+        font-family: 'Jost', sans-serif; font-size: 13px; outline: none;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      }
+      input.has-icon { padding-left: 34px; }
+      input::placeholder { color: rgba(255,255,255,0.22); }
+      input:focus {
+        border-color: rgba(255,255,255,0.22);
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.10);
+      }
+      input.input-valid { border-color: rgba(255,255,255,0.14); }
+      input.input-error {
+        border-color: rgba(255,100,100,0.55);
+        box-shadow: 0 0 0 1px rgba(255,100,100,0.16);
+      }
+      .field-hint {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.22); margin-top: 4px; padding-left: 2px;
+      }
+
+      /* ── ADDRESS DROPDOWN ── */
+      .addr-suggestions {
+        position: absolute; top: 100%; left: 0; right: 0; z-index: 9999;
+        background: rgba(12,12,22,0.98);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border: 0.5px solid rgba(255,255,255,0.16);
+        border-radius: 13px;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.60);
+        margin-top: 4px; overflow: hidden; display: none;
+      }
+      .addr-suggestions.open { display: block; }
+      .addr-suggestion-item {
+        padding: 9px 13px; font-family: 'Jost', sans-serif;
+        font-size: 12.5px; color: rgba(255,255,255,0.65);
+        border-top: 0.5px solid rgba(255,255,255,0.05);
+        cursor: pointer; transition: background 0.12s; line-height: 1.4;
+      }
+      .addr-suggestion-item:first-child { border-top: none; }
+      .addr-suggestion-item:hover,
+      .addr-suggestion-item.active { background: rgba(255,255,255,0.07); }
+      .addr-suggestion-main { font-weight: 500; color: rgba(255,255,255,0.88); }
+      .addr-suggestion-sec { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+      /* ── SUMMARY CARD ── */
+      .summary-card {
+        border-radius: 18px; padding: 15px 14px; margin-bottom: 8px;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
+      }
+      .summary-row {
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 8px; font-size: 12.5px; margin-bottom: 7px;
+      }
+      .summary-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 11px; }
+      .summary-value { font-family: 'Jost', sans-serif; text-align: right; font-size: 12px; max-width: 58%; color: rgba(255,255,255,0.70); }
+      .summary-divider { margin: 10px 0; border-top: 0.5px solid rgba(255,255,255,0.06); }
+      .summary-total-row {
+        display: flex; justify-content: space-between; align-items: baseline;
+        font-size: 15px; font-weight: 700; margin-bottom: 5px;
+      }
+      .summary-deposit-note {
+        font-family: 'Jost', sans-serif;
+        font-size: 11.5px; color: rgba(255,255,255,0.30); margin-bottom: 4px;
+      }
+      .summary-deposit-note strong { color: rgba(255,255,255,0.75); }
+      .fee-row {
+        display: flex; justify-content: space-between; align-items: center;
+        gap: 8px; margin-bottom: 7px;
+      }
+      .fee-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 12px; }
+      .fee-value { font-family: 'Jost', sans-serif; font-size: 13px; color: rgba(255,255,255,0.70); }
+      .fee-calculating {
+        font-family: 'Jost', sans-serif;
+        font-size: 11px; color: rgba(255,255,255,0.28);
+        display: flex; align-items: center; gap: 5px;
+      }
+      .summary-grand-total {
+        display: flex; justify-content: space-between; align-items: baseline;
+        margin: 4px 0 6px;
+      }
+      .summary-grand-total .gtl {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.30);
+      }
+      .summary-grand-total .gtv {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 24px; font-weight: 400; color: rgba(255,255,255,0.95);
+      }
+      .deposit-box {
+        border-radius: 12px; padding: 11px 13px; margin: 10px 0;
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        display: flex; justify-content: space-between; align-items: center;
+      }
+      .deposit-box-label { font-family: 'Jost', sans-serif; font-size: 11px; color: rgba(255,255,255,0.35); }
+      .deposit-box-amount {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 20px; font-weight: 400; color: rgba(255,255,255,0.95);
+      }
+      .balance-note {
+        font-family: 'Jost', sans-serif;
+        font-size: 10px; color: rgba(255,255,255,0.28); text-align: right; margin-top: 3px;
+      }
+
+      /* ── DIVA TOGGLE ── */
+      .diva-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+      .diva-btn {
+        flex: 1; padding: 11px 8px;
+        border-radius: var(--r-md);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.40);
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 600;
+        cursor: pointer; transition: all 0.18s; letter-spacing: 0.02em;
+      }
+      .diva-btn:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.70); }
+      .diva-btn.active {
+        background: rgba(255,255,255,0.92);
+        border-color: transparent; color: var(--obsidian);
+        box-shadow: 0 4px 18px rgba(255,255,255,0.10);
+      }
+
+      /* Safety banner */
+      .safety-banner {
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        border-radius: var(--r-md); padding: 13px 15px; margin-bottom: 14px;
+      }
+      .safety-banner-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.55);
+        text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 5px;
+      }
+      .safety-banner-body {
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.55;
+      }
+      .safety-banner a {
+        color: rgba(255,255,255,0.55); font-weight: 600;
+        text-decoration: underline; text-underline-offset: 2px;
+        font-size: 11px; display: inline-block; margin-top: 8px;
+      }
+
       /* ── BUTTONS ── */
       .actions { display: flex; gap: 10px; margin-top: 14px; flex-shrink: 0; }
       button {
@@ -638,104 +1012,93 @@
         cursor: not-allowed;
       }
 
-      /* SUCCESS, TOAST, CALENDAR, FORM - keeping rest of CSS intact */
-      .success-view { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; flex: 1; padding: 20px 0; }
-      .success-view.active { display: flex; animation: fadeSlide 0.4s ease; }
-      .success-icon { width: 66px; height: 66px; border-radius: 50%; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; box-shadow: 0 0 0 0.5px rgba(255,255,255,0.30) inset, 0 10px 36px rgba(255,255,255,0.12); }
-      .success-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; margin-bottom: 6px; color: rgba(255,255,255,0.95); letter-spacing: 0.02em; }
-      .success-totals { margin-top: 18px; width: 100%; border-radius: var(--r-md); padding: 14px; background: rgba(255,255,255,0.07); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border: 0.5px solid rgba(255,255,255,0.10); text-align: left; }
-      
-      .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(130%); min-width: 240px; max-width: 90vw; padding: 10px 18px; border-radius: var(--r-pill); font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.90); background: rgba(14,14,24,0.98); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 0.5px solid rgba(255,255,255,0.16); box-shadow: 0 0 0 0.5px rgba(255,255,255,0.06) inset, 0 16px 44px rgba(0,0,0,0.60); opacity: 0; z-index: 9999; text-align: center; transition: transform 0.28s cubic-bezier(0.18,0.89,0.32,1.28), opacity 0.28s ease; }
+      /* ── TOAST ── */
+      .toast {
+        position: fixed; left: 50%; bottom: 24px;
+        transform: translateX(-50%) translateY(130%);
+        min-width: 240px; max-width: 90vw;
+        padding: 10px 18px; border-radius: var(--r-pill);
+        font-family: 'Jost', sans-serif;
+        font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.90);
+        background: rgba(14,14,24,0.98);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border: 0.5px solid rgba(255,255,255,0.16);
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.06) inset,
+          0 16px 44px rgba(0,0,0,0.60);
+        opacity: 0; z-index: 9999; text-align: center;
+        transition: transform 0.28s cubic-bezier(0.18,0.89,0.32,1.28), opacity 0.28s ease;
+      }
       .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
       .toast.error { color: rgba(255,130,130,0.95); border-color: rgba(255,100,100,0.25); }
-      
-      .loader { display: inline-block; width: 17px; height: 17px; border-radius: 50%; border: 2px solid rgba(4,4,10,0.12); border-top-color: rgba(4,4,10,0.70); animation: spin 0.85s linear infinite; vertical-align: middle; }
-      
-      /* Include remaining CSS for calendar, forms, summary cards etc - keeping original file CSS */
-      .cal-wrap { border-radius: var(--r-md); background: rgba(255,255,255,0.06); backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px); border: 0.5px solid rgba(255,255,255,0.10); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset; overflow: hidden; margin-bottom: 14px; }
-      .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.06); }
-      .cal-month-label { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 400; letter-spacing: 0.02em; color: rgba(255,255,255,0.90); }
-      .cal-nav { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(255,255,255,0.07); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 0.5px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.60); font-size: 14px; line-height: 1; transition: all 0.18s ease; user-select: none; }
-      .cal-nav:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.22); color: rgba(255,255,255,0.90); transform: scale(1.08); }
-      .cal-nav.disabled { opacity: 0.18; cursor: not-allowed; pointer-events: none; }
-      .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 6px 10px 2px; }
-      .cal-wd { text-align: center; font-family: 'Jost', sans-serif; font-size: 9px; color: rgba(255,255,255,0.22); font-weight: 700; letter-spacing: 0.10em; padding: 2px 0; }
-      .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; padding: 4px 10px 10px; }
-      .cal-day { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Jost', sans-serif; font-size: 12px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease; position: relative; user-select: none; color: rgba(255,255,255,0.40); }
-      .cal-day.empty { pointer-events: none; }
-      .cal-day.past { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
-      .cal-day.no-slots { opacity: 0.14; cursor: not-allowed; pointer-events: none; }
-      .cal-day.has-slots { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.75); }
-      .cal-day.has-slots:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.20); color: rgba(255,255,255,0.95); transform: scale(1.08); box-shadow: 0 4px 14px rgba(0,0,0,0.30); }
-      .cal-day.loading-month { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); pointer-events: none; animation: shimmer 1.6s ease-in-out infinite; }
-      .cal-day.selected { background: rgba(255,255,255,0.96) !important; border-color: transparent !important; color: var(--obsidian) !important; font-weight: 700; box-shadow: 0 4px 18px rgba(255,255,255,0.14); transform: scale(1.10); }
-      .cal-day.today:not(.selected):not(.past) { border-color: rgba(255,255,255,0.24); font-weight: 600; color: rgba(255,255,255,0.90); }
-      .cal-day-dot { width: 3.5px; height: 3.5px; border-radius: 50%; background: rgba(255,255,255,0.30); position: absolute; bottom: 4px; }
-      .cal-day.selected .cal-day-dot { background: rgba(4,4,10,0.35); }
 
-      .time-section-label { font-family: 'Jost', sans-serif; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.50); margin-bottom: 9px; font-weight: 800; }
-      .time-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 7px; }
-      .time-slot { border-radius: var(--r-sm); padding: 9px 4px; font-family: 'Jost', sans-serif; font-size: 12px; text-align: center; cursor: pointer; background: rgba(255,255,255,0.07); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 0.5px solid rgba(255,255,255,0.10); color: rgba(255,255,255,0.65); transition: all 0.15s ease; user-select: none; animation: fadeSlide 0.2s ease; }
-      .time-slot:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.20); color: rgba(255,255,255,0.90); transform: translateY(-1px); }
-      .time-slot.selected { background: rgba(255,255,255,0.94); border-color: transparent; box-shadow: 0 4px 16px rgba(255,255,255,0.10); color: var(--obsidian); font-weight: 600; }
+      /* ── LOADER ── */
+      .loader {
+        display: inline-block; width: 17px; height: 17px; border-radius: 50%;
+        border: 2px solid rgba(4,4,10,0.12);
+        border-top-color: rgba(4,4,10,0.70);
+        animation: spin 0.85s linear infinite; vertical-align: middle;
+      }
+      .btn-outline .loader, .toast .loader {
+        border-color: rgba(255,255,255,0.14);
+        border-top-color: rgba(255,255,255,0.70);
+      }
 
-      /* Form styles */
-      .form-group { margin-bottom: 11px; position: relative; }
-      label { display: block; font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 5px; color: rgba(255,255,255,0.45); }
-      .input-wrap { position: relative; display: flex; align-items: center; }
-      .input-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.22); pointer-events: none; line-height: 1; font-size: 14px; }
-      input[type="text"], input[type="email"], input[type="tel"] { width: 100%; border-radius: var(--r-sm); padding: 11px 12px; border: 0.5px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.90); font-family: 'Jost', sans-serif; font-size: 13px; outline: none; transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease; }
-      input.has-icon { padding-left: 34px; }
-      input::placeholder { color: rgba(255,255,255,0.22); }
-      input:focus { border-color: rgba(255,255,255,0.22); box-shadow: 0 0 0 1px rgba(255,255,255,0.06); background: rgba(255,255,255,0.10); }
-      input.input-valid { border-color: rgba(255,255,255,0.14); }
-      input.input-error { border-color: rgba(255,100,100,0.55); box-shadow: 0 0 0 1px rgba(255,100,100,0.16); }
-      .field-hint { font-family: 'Jost', sans-serif; font-size: 10px; color: rgba(255,255,255,0.22); margin-top: 4px; padding-left: 2px; }
+      /* ── SUCCESS ── */
+      .success-view {
+        display: none; flex-direction: column; align-items: center;
+        justify-content: center; text-align: center; flex: 1; padding: 20px 0;
+      }
+      .success-view.active { display: flex; animation: fadeSlide 0.4s ease; }
+      .success-icon {
+        width: 66px; height: 66px; border-radius: 50%;
+        background: rgba(255,255,255,0.95);
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 18px;
+        box-shadow:
+          0 0 0 0.5px rgba(255,255,255,0.30) inset,
+          0 10px 36px rgba(255,255,255,0.12);
+      }
+      .success-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 24px; font-weight: 300; margin-bottom: 6px;
+        color: rgba(255,255,255,0.95); letter-spacing: 0.02em;
+      }
+      .success-sub { font-family: 'Jost', sans-serif; font-size: 12px; color: rgba(255,255,255,0.38); line-height: 1.6; }
+      .success-totals {
+        margin-top: 18px; width: 100%;
+        border-radius: var(--r-md); padding: 14px;
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 0.5px solid rgba(255,255,255,0.10);
+        text-align: left;
+      }
+      .success-total-row {
+        display: flex; justify-content: space-between;
+        font-family: 'Jost', sans-serif;
+        font-size: 12.5px; margin-bottom: 5px; color: rgba(255,255,255,0.38);
+      }
+      .success-total-row.highlight {
+        color: rgba(255,255,255,0.90); font-weight: 700; font-size: 14px;
+      }
 
-      .addr-suggestions { position: absolute; top: 100%; left: 0; right: 0; z-index: 9999; background: rgba(12,12,22,0.98); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 0.5px solid rgba(255,255,255,0.16); border-radius: 13px; box-shadow: 0 14px 36px rgba(0,0,0,0.60); margin-top: 4px; overflow: hidden; display: none; }
-      .addr-suggestions.open { display: block; }
-      .addr-suggestion-item { padding: 9px 13px; font-family: 'Jost', sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.65); border-top: 0.5px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.12s; line-height: 1.4; }
-      .addr-suggestion-item:first-child { border-top: none; }
-      .addr-suggestion-item:hover, .addr-suggestion-item.active { background: rgba(255,255,255,0.07); }
-      .addr-suggestion-main { font-weight: 500; color: rgba(255,255,255,0.88); }
-      .addr-suggestion-sec { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
-
-      /* Summary cards */
-      .summary-card { border-radius: 18px; padding: 15px 14px; margin-bottom: 8px; background: rgba(255,255,255,0.07); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border: 0.5px solid rgba(255,255,255,0.10); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset; }
-      .summary-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12.5px; margin-bottom: 7px; }
-      .summary-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 11px; }
-      .summary-value { font-family: 'Jost', sans-serif; text-align: right; font-size: 12px; max-width: 58%; color: rgba(255,255,255,0.70); }
-      .summary-divider { margin: 10px 0; border-top: 0.5px solid rgba(255,255,255,0.06); }
-      .summary-grand-total { display: flex; justify-content: space-between; align-items: baseline; margin: 4px 0 6px; }
-      .summary-grand-total .gtl { font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.30); }
-      .summary-grand-total .gtv { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; color: rgba(255,255,255,0.95); }
-      .deposit-box { border-radius: 12px; padding: 11px 13px; margin: 10px 0; background: rgba(255,255,255,0.06); border: 0.5px solid rgba(255,255,255,0.10); display: flex; justify-content: space-between; align-items: center; }
-      .deposit-box-label { font-family: 'Jost', sans-serif; font-size: 11px; color: rgba(255,255,255,0.35); }
-      .deposit-box-amount { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; color: rgba(255,255,255,0.95); }
-      .balance-note { font-family: 'Jost', sans-serif; font-size: 10px; color: rgba(255,255,255,0.28); text-align: right; margin-top: 3px; }
-      .fee-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; }
-      .fee-label { font-family: 'Jost', sans-serif; color: rgba(255,255,255,0.35); font-size: 12px; }
-      .fee-value { font-family: 'Jost', sans-serif; font-size: 13px; color: rgba(255,255,255,0.70); }
-      .fee-calculating { font-family: 'Jost', sans-serif; font-size: 11px; color: rgba(255,255,255,0.28); display: flex; align-items: center; gap: 5px; }
-
-      /* Safety forms */
-      .safety-q-wrap { border-bottom: 0.5px solid rgba(255,255,255,0.06); padding-bottom: 12px; }
-      .safety-q-label { font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.80); margin-bottom: 10px; line-height: 1.55; }
-      .safety-q-label small { display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
-      .safety-yn { display: flex; gap: 8px; margin-bottom: 0; }
-      .syn-btn { flex: 1; padding: 9px; border-radius: 10px; border: 0.5px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.40); font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-      .syn-btn:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.70); }
-      .syn-btn[data-v="no"].active, .syn-btn[data-v="yes"].active { background: rgba(255,255,255,0.92); border-color: transparent; color: var(--obsidian); box-shadow: 0 2px 8px rgba(255,255,255,0.10); }
-      .safety-detail { width: 100%; margin-top: 10px; padding: 10px 13px; background: rgba(255,255,255,0.06); border: 0.5px solid rgba(255,255,255,0.12); border-radius: var(--r-sm); color: rgba(255,255,255,0.85); font-family: 'Jost', sans-serif; font-size: 13px; outline: none; resize: vertical; min-height: 56px; animation: fadeIn 0.15s ease; }
-      .safety-detail::placeholder { color: rgba(255,255,255,0.22); }
-      .safety-detail:focus { border-color: rgba(255,255,255,0.22); }
-
-      .skel { border-radius:16px;padding:14px;margin-bottom:8px; background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.06); animation:shimmer 1.6s ease-in-out infinite; }
-      .skel-line { height:10px;border-radius:5px;background:rgba(255,255,255,0.06);margin-bottom:8px; }
+      /* ── SKELETON SHIMMER ── */
+      .skel {
+        border-radius:16px;padding:14px;margin-bottom:8px;
+        background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.06);
+        animation:shimmer 1.6s ease-in-out infinite;
+      }
+      .skel-line {
+        height:10px;border-radius:5px;background:rgba(255,255,255,0.06);margin-bottom:8px;
+      }
     </style>
   </head>
   <body>
-    <!-- WELCOME SPLASH -->
+    <!-- ══════════════════════════════════════════════════════════════════════
+         WELCOME SPLASH — Premium entry experience
+         ══════════════════════════════════════════════════════════════════════ -->
     <div id="welcome-splash">
       <div class="splash-content">
         <div class="splash-logo-wrap">
@@ -747,12 +1110,12 @@
         <h1 class="splash-title">Phenomebeauty</h1>
         
         <p class="splash-subtitle">
-          Where luxury meets convenience.<br>
-          Your journey to radiance begins here.
+          Premium services, in the quiet comfort<br>
+          of your own space.
         </p>
         
         <button class="splash-cta" id="enter-booking-btn">
-          Begin Your Booking
+          Reserve Your Moment
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
@@ -760,7 +1123,9 @@
       </div>
     </div>
 
-    <!-- BOOKING APP -->
+    <!-- ══════════════════════════════════════════════════════════════════════
+         BOOKING APP — Main application (hidden until splash dismisses)
+         ══════════════════════════════════════════════════════════════════════ -->
     <div id="booking-app">
       <div class="app-frame">
         <div class="shell">
@@ -790,6 +1155,8 @@
 
           <div class="surface">
             <div class="surface-inner">
+
+              <!-- Step 1: Services + Cart -->
               <div id="step-services" class="view active">
                 <div class="section-label">Select your treatments</div>
                 <div class="scroll-area" id="services-scroll">
@@ -809,7 +1176,8 @@
                   <div class="cart-duration" id="cart-duration"></div>
                 </div>
               </div>
-              
+
+              <!-- Step 2: Date & Time -->
               <div id="step-datetime" class="view">
                 <div class="section-label">Choose date &amp; time</div>
                 <div class="scroll-area">
@@ -834,13 +1202,15 @@
                 </div>
               </div>
 
+              <!-- Step 3: Details -->
               <div id="step-details" class="view">
                 <div class="section-label">Your details</div>
                 <div class="scroll-area">
-                  <!-- Client details form will be loaded by main.js -->
+                  <!-- Form will be loaded by main.js -->
                 </div>
               </div>
 
+              <!-- Step 4: Review + Payment -->
               <div id="step-summary" class="view">
                 <div class="section-label">Review booking</div>
                 <div class="scroll-area">
@@ -848,6 +1218,7 @@
                 </div>
               </div>
 
+              <!-- Success screen -->
               <div class="success-view" id="success-view">
                 <div class="success-icon" id="success-icon">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -857,6 +1228,7 @@
                 <div class="success-title" id="success-title">You're booked!</div>
                 <div class="success-totals" id="success-totals"></div>
               </div>
+
             </div>
           </div>
 
@@ -870,9 +1242,11 @@
 
     <div id="toast" class="toast"></div>
 
+    <!-- Load JavaScript modules -->
     <script type="module" src="/js/main.js"></script>
+    
+    <!-- Welcome splash transition controller -->
     <script>
-      // Welcome splash controller
       document.getElementById('enter-booking-btn').addEventListener('click', () => {
         document.getElementById('welcome-splash').classList.add('hidden');
         document.getElementById('booking-app').classList.add('active');
