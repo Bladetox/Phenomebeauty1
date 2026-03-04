@@ -1,40 +1,42 @@
-// public/js/main.js — Main application entry point
+// public/js/main.js — Main application entry point with welcome splash
 'use strict';
 
 (async () => {
   try {
-    // Import all required modules
+    // Import modules
     const { bookingState, updateState, subscribe } = await import('./state.js');
     const { fetchAppConfig } = await import('./api.js');
-    const { updateStepUI, setLoading, showToast } = await import('./ui.js');
+    const { updateStepUI, showToast } = await import('./ui.js');
     const { loadServices, toggleService, removeServiceFromCart } = await import('./services.js');
     const { nextStep: navNextStep, prevStep: navPrevStep } = await import('./navigation.js');
     const { initAccessibility } = await import('./accessibility.js');
     const { initPerformance, logPerformanceMetrics, setupCacheCleanup } = await import('./performance.js');
     
-    // Optional modules (won't break if they fail)
+    // Optional modules
     let initCalendar, initClientDetails, toggleDiva, safetyToggle;
     try {
       const calendar = await import('./calendar.js');
       initCalendar = calendar.initCalendar;
-    } catch (e) { console.warn('Calendar module not available'); }
+    } catch (e) { console.warn('Calendar module optional'); }
     
     try {
       const clientDetails = await import('./client-details.js');
       initClientDetails = clientDetails.initClientDetails;
       toggleDiva = clientDetails.toggleDiva;
       safetyToggle = clientDetails.safetyToggle;
-    } catch (e) { console.warn('Client details module not available'); }
+    } catch (e) { console.warn('Client details module optional'); }
 
     /**
      * Initialize booking application
      */
     async function init() {
       try {
-        setLoading(true, 'Loading...');
+        // Load config and services in parallel (silently in background)
+        const [config] = await Promise.all([
+          fetchAppConfig(),
+          loadServices(), // This loads while splash is showing
+        ]);
         
-        // Load app configuration
-        const config = await fetchAppConfig();
         updateState({ config });
         
         // Initialize features
@@ -42,14 +44,12 @@
         initPerformance();
         setupCacheCleanup();
         
-        // Load services (critical)
-        await loadServices();
-        
         // Initialize optional modules
         if (initCalendar) initCalendar();
         if (initClientDetails) initClientDetails();
         
-        // Show Step 1
+        // Hide splash and show Step 1
+        hideSplash();
         updateStepUI(1);
         
         // Setup event listeners
@@ -63,9 +63,21 @@
         
       } catch (error) {
         console.error('Init error:', error);
+        hideSplash();
         showToast('Please refresh the page', true);
-      } finally {
-        setLoading(false);
+      }
+    }
+
+    /**
+     * Hide splash screen with fade animation
+     */
+    function hideSplash() {
+      const splash = document.getElementById('welcome-splash');
+      if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(() => {
+          splash.style.display = 'none';
+        }, 300);
       }
     }
 
@@ -80,18 +92,14 @@
       if (btnBack) btnBack.addEventListener('click', navPrevStep);
     }
 
-    /**
-     * Handle page visibility
-     */
+    // Handle page visibility
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && bookingState.currentStep === 2) {
-        console.log('Page visible, calendar will refresh');
+        console.log('Page visible');
       }
     });
 
-    /**
-     * Keyboard shortcuts (dev mode)
-     */
+    // Keyboard shortcuts (dev)
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
         e.preventDefault();
@@ -108,13 +116,13 @@
     // Export for debugging
     window.__PHENOM_STATE__ = bookingState;
 
-    // Expose functions for inline handlers (temporary)
+    // Expose functions for inline handlers
     window.nextStep = navNextStep;
     window.prevStep = navPrevStep;
     if (toggleDiva) window.toggleDiva = toggleDiva;
     if (safetyToggle) window.safetyToggle = safetyToggle;
 
-    // Initialize when ready
+    // Initialize
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
@@ -122,20 +130,8 @@
     }
     
   } catch (error) {
-    // Silent fallback - just show loading spinner
     console.error('Module loading failed:', error);
-    
-    // Keep the page showing loading state
-    const btn = document.getElementById('btn-next');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Loading...';
-    }
-    
-    // Try to reload after 2 seconds
-    setTimeout(() => {
-      console.log('Auto-reloading page...');
-      location.reload();
-    }, 2000);
+    // Silent fallback - just reload
+    setTimeout(() => location.reload(), 2000);
   }
 })();
