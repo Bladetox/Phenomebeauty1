@@ -1069,10 +1069,12 @@ app.get('/api/admin/stock', adminOnly, async (req, res) => {
         const sheet = req.doc.sheetsByTitle['Stock'];
         if (!sheet) return res.json([]);
         const rows = await sheet.getRows();
-        res.json(rows.filter(r=>(r.get('Product Name')||r.get('Item')||r.get('Name')||'').trim()).map(r=>({
-            name:r.get('Product Name')||r.get('Item')||r.get('Name')||'',
-            category:r.get('Category')||'',quantity:r.get('Quantity')||r.get('Stock')||'0',
-            minStock:r.get('Min Stock')||r.get('Minimum')||'0',unit:r.get('Unit')||'',notes:r.get('Notes')||''
+        res.json(rows.filter(r=>(r.get('ITEM')||'').trim()).map(r=>({
+            item: r.get('ITEM') || '',
+            cost: r.get('COST') || '0',
+            stockOnHand: r.get('STOCK ON HAND') || '0',
+            totalCost: r.get('TOTAL COST') || '0',
+            notes: r.get('NOTES') || ''
         })));
     } catch(e){res.status(500).json({error:e.message});}
 });
