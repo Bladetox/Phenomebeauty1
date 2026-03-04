@@ -10,7 +10,7 @@
 <title>PhenomeBeauty — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family:Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
@@ -258,7 +258,7 @@ html,body {
 .action-btn.primary{background:var(--t100);color:var(--black);border-color:transparent;grid-column:1/-1;}
 .action-btn.danger{border-color:rgba(248,113,113,0.30);color:var(--red);}
 
-/* Service dropdown styling (Phase 2) */
+/* Service dropdown styling */
 .setting-dropdown {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -451,11 +451,14 @@ html,body {
   <div class="panel-section">
     <div class="panel-section-title">Add Service</div>
     <div class="setting-row">
-      <label class="setting-label">Service</label>
-      <select class="setting-input setting-dropdown" id="add-svc-name" onchange="prefillServicePrice()">
-        <option value="">Select a service...</option>
-        <!-- Populated via loadServicesForModal() -->
+      <label class="setting-label">Quick Select</label>
+      <select class="setting-input setting-dropdown" id="add-svc-dropdown" onchange="prefillServiceFromDropdown()">
+        <option value="">Choose from services...</option>
       </select>
+    </div>
+    <div class="setting-row">
+      <label class="setting-label">Service Name</label>
+      <input class="setting-input" id="add-svc-name" placeholder="Or type manually...">
     </div>
     <div class="setting-row">
       <label class="setting-label">Price (R)</label>
@@ -476,9 +479,9 @@ html,body {
 <!-- ── TOAST ── -->
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ═══════════════════════════════════════════════════════════
-// PHENOMEBEAUTY ADMIN v6.0 — Phase 2 Complete
+// PHENOMEBEAUTY ADMIN v6.1 — Fixed Service Dropdown
 // ═══════════════════════════════════════════════════════════
 
 let ADMIN_TOKEN = '';
@@ -649,7 +652,7 @@ function updateBadges() {
 
 // ── DETAIL PANEL ──
 function showPanel(bookingId) {
-  loadServicesForModal(); // Phase 2: Load services when panel opens
+  loadServicesForModal();
   
   currentBookingId = bookingId;
   const booking = ALL_BOOKINGS.find(b => b.bookingId === bookingId);
@@ -673,6 +676,10 @@ function showPanel(bookingId) {
 function closePanel() {
   document.getElementById('detail-panel').classList.remove('open');
   currentBookingId = null;
+  // Reset form
+  document.getElementById('add-svc-dropdown').value = '';
+  document.getElementById('add-svc-name').value = '';
+  document.getElementById('add-svc-price').value = '';
 }
 
 async function panelAction(action) {
@@ -709,7 +716,7 @@ async function panelAction(action) {
   }
 }
 
-// ── SERVICE DROPDOWN FUNCTIONS (Phase 2) ──
+// ── SERVICE DROPDOWN FUNCTIONS ──
 async function loadServicesForModal() {
   if (SERVICES_CACHE) {
     populateServiceDropdown(SERVICES_CACHE);
@@ -725,12 +732,11 @@ async function loadServicesForModal() {
     populateServiceDropdown(SERVICES_CACHE);
   } catch (e) {
     console.error('loadServicesForModal:', e);
-    showToast('⚠️ Could not load services');
   }
 }
 
 function populateServiceDropdown(services) {
-  const select = document.getElementById('add-svc-name');
+  const select = document.getElementById('add-svc-dropdown');
   if (!select) return;
   
   // Clear existing options (except first placeholder)
@@ -738,7 +744,7 @@ function populateServiceDropdown(services) {
     select.remove(1);
   }
   
-  // Group services by category for better UX
+  // Group services by category
   const categories = {};
   services.forEach(s => {
     const cat = s.category || 'Other';
@@ -762,55 +768,43 @@ function populateServiceDropdown(services) {
   });
 }
 
-function prefillServicePrice() {
-  const select = document.getElementById('add-svc-name');
+function prefillServiceFromDropdown() {
+  const dropdown = document.getElementById('add-svc-dropdown');
+  const nameInput = document.getElementById('add-svc-name');
   const priceInput = document.getElementById('add-svc-price');
   
-  if (!select || !priceInput) return;
+  if (!dropdown || !nameInput || !priceInput) return;
   
-  if (!select.value) {
+  if (!dropdown.value) {
+    nameInput.value = '';
     priceInput.value = '';
     priceInput.classList.remove('price-filled');
     return;
   }
   
   try {
-    const svcData = JSON.parse(select.value);
+    const svcData = JSON.parse(dropdown.value);
+    nameInput.value = svcData.name;
     priceInput.value = parseFloat(svcData.price || 0).toFixed(2);
     priceInput.classList.add('price-filled');
     
-    // Remove animation class after animation completes
     setTimeout(() => priceInput.classList.remove('price-filled'), 400);
   } catch (e) {
-    console.error('prefillServicePrice:', e);
+    console.error('prefillServiceFromDropdown:', e);
   }
 }
 
 async function addServiceRow(bookingId) {
-  const select = document.getElementById('add-svc-name');
+  const nameInput = document.getElementById('add-svc-name');
   const priceInput = document.getElementById('add-svc-price');
   
-  if (!select || !priceInput) return;
+  if (!nameInput || !priceInput) return;
   
-  let serviceName = '';
-  let servicePrice = parseFloat(priceInput.value) || 0;
+  const serviceName = nameInput.value.trim();
+  const servicePrice = parseFloat(priceInput.value) || 0;
   
-  try {
-    if (select.value) {
-      const svcData = JSON.parse(select.value);
-      serviceName = svcData.name;
-      // Use dropdown price if input wasn't manually changed
-      if (priceInput.value === parseFloat(svcData.price || 0).toFixed(2)) {
-        servicePrice = parseFloat(svcData.price || 0);
-      }
-    }
-  } catch (e) {
-    // Fallback: treat select.value as plain text
-    serviceName = select.value;
-  }
-  
-  if (!serviceName || serviceName === 'Select a service...') {
-    showToast('⚠️ Please select a service');
+  if (!serviceName) {
+    showToast('⚠️ Please enter service name');
     return;
   }
   
@@ -858,4 +852,4 @@ function saveSettings(section) {
 }
 </script>
 </body>
-</html>
+</html
