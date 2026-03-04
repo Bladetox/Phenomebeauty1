@@ -5,8 +5,11 @@
 import { bookingState, updateState, subscribe } from './state.js';
 import { fetchAppConfig } from './api.js';
 import { updateStepUI, setLoading, showToast } from './ui.js';
-import { loadServices } from './services.js';
-import { setupNavigation } from './navigation.js';
+import { loadServices, toggleService, removeServiceFromCart } from './services.js';
+import { initCalendar, selectDate, selectTime } from './calendar.js';
+import { initClientDetails, validateDetails, toggleDiva, safetyToggle } from './client-details.js';
+import { renderSummary, submitBooking } from './payment.js';
+import { nextStep as navNextStep, prevStep as navPrevStep } from './navigation.js';
 import { initAccessibility } from './accessibility.js';
 import { initPerformance, logPerformanceMetrics, setupCacheCleanup } from './performance.js';
 
@@ -24,9 +27,6 @@ async function init() {
     const config = await fetchAppConfig();
     updateState({ config });
     
-    // Setup navigation listeners
-    setupNavigation();
-    
     // Initialize accessibility features
     initAccessibility();
     
@@ -39,11 +39,20 @@ async function init() {
     // Initialize Step 1 (services)
     await loadServices();
     
+    // Initialize calendar (will be shown on step 2)
+    initCalendar();
+    
+    // Initialize client details form (will be shown on step 3)
+    initClientDetails();
+    
     // Update UI to show Step 1
     updateStepUI(1);
     
     // Setup global error handlers
     setupErrorHandlers();
+    
+    // Setup event listeners for buttons
+    setupEventListeners();
     
     // Subscribe to state changes for debugging (remove in production)
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -68,6 +77,100 @@ async function init() {
     showToast('Failed to load booking system. Please refresh the page.', true);
   } finally {
     setLoading(false);
+  }
+}
+
+/**
+ * Setup event listeners for navigation buttons and form elements
+ */
+function setupEventListeners() {
+  // Navigation buttons
+  const btnNext = document.getElementById('btn-next');
+  const btnBack = document.getElementById('btn-back');
+  
+  if (btnNext) {
+    btnNext.addEventListener('click', navNextStep);
+  }
+  
+  if (btnBack) {
+    btnBack.addEventListener('click', navPrevStep);
+  }
+  
+  // Diva toggle buttons
+  const btnExisting = document.getElementById('diva-existing');
+  const btnNew = document.getElementById('diva-new');
+  
+  if (btnExisting) {
+    btnExisting.addEventListener('click', () => toggleDiva('existing'));
+  }
+  
+  if (btnNew) {
+    btnNew.addEventListener('click', () => toggleDiva('new'));
+  }
+  
+  // Safety question buttons (delegated)
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.classList.contains('syn-btn')) {
+      const key = target.closest('.safety-yn')?.dataset.q;
+      const value = target.dataset.v;
+      if (key && value) {
+        safetyToggle(key, value, target);
+      }
+    }
+  });
+  
+  // Input validation listeners
+  const emailInput = document.getElementById('client-email');
+  const phoneInput = document.getElementById('client-phone');
+  const nameInput = document.getElementById('client-name');
+  const addressInput = document.getElementById('client-address');
+  
+  if (emailInput) {
+    emailInput.addEventListener('input', (e) => validateEmail(e.target));
+  }
+  
+  if (phoneInput) {
+    phoneInput.addEventListener('input', (e) => formatPhone(e.target));
+  }
+  
+  if (nameInput) {
+    nameInput.addEventListener('input', updateNextButton);
+  }
+  
+  if (addressInput) {
+    addressInput.addEventListener('input', updateNextButton);
+  }
+}
+
+/**
+ * Validation helpers (exposed for inline handlers if still needed)
+ */
+function validateEmail(input) {
+  const v = input.value.trim();
+  const ok = v.length > 4 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  input.classList.toggle('input-valid', ok);
+  input.classList.toggle('input-error', v.includes('@') && v.split('@')[1]?.includes('.') && !ok);
+  updateNextButton();
+}
+
+function formatPhone(input) {
+  // Allow digits, spaces, hyphens, parens, plus
+  let val = input.value.replace(/[^\d\s\-().+]/g, '');
+  input.value = val;
+  
+  // Validate format
+  const digitsOnly = val.replace(/\D/g, '');
+  const ok = digitsOnly.length >= 7 && digitsOnly.length <= 15;
+  input.classList.toggle('input-valid', ok);
+  input.classList.toggle('input-error', val.length > 4 && !ok);
+  updateNextButton();
+}
+
+function updateNextButton() {
+  // This will be handled by navigation module
+  if (window.updateNextBtn) {
+    window.updateNextBtn();
   }
 }
 
@@ -140,5 +243,15 @@ setupKeyboardShortcuts();
 
 // Export for debugging (remove in production)
 window.__PHENOM_STATE__ = bookingState;
+
+// TEMPORARY: Expose functions for inline event handlers in HTML
+// TODO: Remove these once HTML is fully migrated to event listeners
+window.nextStep = navNextStep;
+window.prevStep = navPrevStep;
+window.toggleDiva = toggleDiva;
+window.safetyToggle = safetyToggle;
+window.validateEmail = validateEmail;
+window.formatPhone = formatPhone;
+window.updateNextBtn = updateNextButton;
 
 console.log('📦 PhenomeBeauty Booking System modules loaded');
