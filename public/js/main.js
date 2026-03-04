@@ -7,6 +7,8 @@ import { fetchAppConfig } from './api.js';
 import { updateStepUI, setLoading, showToast } from './ui.js';
 import { loadServices } from './services.js';
 import { setupNavigation } from './navigation.js';
+import { initAccessibility } from './accessibility.js';
+import { initPerformance, logPerformanceMetrics, setupCacheCleanup } from './performance.js';
 
 /**
  * Initialize booking application
@@ -25,6 +27,15 @@ async function init() {
     // Setup navigation listeners
     setupNavigation();
     
+    // Initialize accessibility features
+    initAccessibility();
+    
+    // Initialize performance optimizations
+    initPerformance();
+    
+    // Setup cache cleanup
+    setupCacheCleanup();
+    
     // Initialize Step 1 (services)
     await loadServices();
     
@@ -39,9 +50,18 @@ async function init() {
       subscribe((state) => {
         console.log('State updated:', state);
       });
+      
+      // Log performance metrics in development
+      logPerformanceMetrics();
     }
     
     console.log('✅ Booking system ready');
+    console.log('📊 Features enabled:');
+    console.log('  ✅ State management');
+    console.log('  ✅ API retry logic');
+    console.log('  ✅ Secure address autocomplete');
+    console.log('  ♿ Accessibility (ARIA, keyboard nav)');
+    console.log('  ⚡ Performance (prefetch, cache)');
     
   } catch (error) {
     console.error('Failed to initialize booking system:', error);
@@ -96,6 +116,13 @@ function setupKeyboardShortcuts() {
         Name: bookingState.client.name || 'Not entered',
         'Total Amount': `R${bookingState.pricing.totalAmount}`,
       });
+      console.log('Full state:', bookingState);
+    }
+    
+    // Ctrl/Cmd + Shift + P = Show performance metrics
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
+      e.preventDefault();
+      logPerformanceMetrics();
     }
   });
 }
