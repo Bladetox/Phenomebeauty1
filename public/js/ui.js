@@ -10,24 +10,16 @@ import { bookingState, getCurrentStep } from './state.js';
  * @param {Boolean} isError - Whether this is an error toast
  */
 export function showToast(message, isError = false) {
-  const existing = document.getElementById('toast');
-  if (existing) existing.remove();
+  const toast = document.getElementById('toast');
+  if (!toast) return;
   
-  const toast = document.createElement('div');
-  toast.id = 'toast';
-  toast.className = 'toast' + (isError ? ' error' : '');
   toast.textContent = message;
-  
-  document.body.appendChild(toast);
-  
-  requestAnimationFrame(() => {
-    toast.classList.add('show');
-  });
+  toast.className = 'toast' + (isError ? ' error' : '');
+  toast.classList.add('show');
   
   setTimeout(() => {
     toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  }, isError ? 5000 : 3000);
+  }, isError ? 4000 : 2500);
 }
 
 /**
@@ -43,49 +35,75 @@ export function escHtml(str) {
 }
 
 /**
- * Update step progress UI (progress bars and dots)
+ * Update step progress UI (progress bars, dots, and views)
  * @param {Number} step - Current step (1-4)
  */
 export function updateStepUI(step) {
+  // Update title
+  const titles = ['Choose Services', 'Pick Date & Time', 'Your Details', 'Review Booking'];
+  const titleEl = document.getElementById('view-title');
+  if (titleEl) {
+    titleEl.textContent = titles[step - 1] || '';
+  }
+  
   // Update progress bars
-  const bars = document.querySelectorAll('.step-pill-inner');
-  bars.forEach((bar, idx) => {
-    const barStep = idx + 1;
+  for (let i = 1; i <= 4; i++) {
+    const bar = document.getElementById(`step-bar-${i}`);
+    if (!bar) continue;
+    
     bar.classList.remove('pb-active');
     
-    if (barStep < step) {
-      // Completed step
+    if (i < step) {
       bar.style.width = '100%';
-    } else if (barStep === step) {
-      // Current step
+    } else if (i === step) {
       bar.style.width = '60%';
       bar.classList.add('pb-active');
     } else {
-      // Future step
       bar.style.width = '0';
     }
-  });
+  }
   
   // Update step dots
-  const dots = document.querySelectorAll('.step-dot');
-  dots.forEach((dot, idx) => {
-    const dotStep = idx + 1;
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById(`sdot-${i}`);
+    if (!dot) continue;
+    
     dot.classList.remove('sd-done', 'sd-active');
     
-    if (dotStep < step) {
+    if (i < step) {
       dot.classList.add('sd-done');
-    } else if (dotStep === step) {
+    } else if (i === step) {
       dot.classList.add('sd-active');
+    }
+  }
+  
+  // Update view visibility
+  const views = {
+    1: 'step-services',
+    2: 'step-datetime',
+    3: 'step-details',
+    4: 'step-summary'
+  };
+  
+  Object.keys(views).forEach(s => {
+    const viewId = views[s];
+    const view = document.getElementById(viewId);
+    if (view) {
+      view.classList.toggle('active', parseInt(s) === step);
     }
   });
   
-  // Update step panel visibility
-  document.querySelectorAll('.step-panel').forEach((panel, idx) => {
-    panel.style.display = (idx + 1 === step) ? 'block' : 'none';
-  });
+  // Hide success view
+  const successView = document.getElementById('success-view');
+  if (successView) {
+    successView.classList.remove('active');
+  }
   
   // Update navigation buttons
   updateNavigationButtons(step);
+  
+  // Update next button state
+  updateNextBtn();
 }
 
 /**
@@ -95,6 +113,7 @@ export function updateStepUI(step) {
 function updateNavigationButtons(step) {
   const backBtn = document.getElementById('btn-back');
   const nextBtn = document.getElementById('btn-next');
+  const actionsBar = document.getElementById('actions-bar');
   
   if (backBtn) {
     backBtn.style.display = step > 1 ? 'inline-flex' : 'none';
@@ -102,18 +121,20 @@ function updateNavigationButtons(step) {
   
   if (nextBtn) {
     if (step === 4) {
-      nextBtn.textContent = 'Confirm Booking';
-      nextBtn.classList.add('pulse');
+      nextBtn.textContent = 'Confirm & Pay';
     } else {
-      nextBtn.textContent = 'Next Step';
-      nextBtn.classList.remove('pulse');
+      nextBtn.textContent = 'Next';
     }
+  }
+  
+  // Show/hide actions bar
+  if (actionsBar) {
+    actionsBar.style.display = step <= 4 ? 'flex' : 'none';
   }
 }
 
 /**
  * Update next button enabled/disabled state
- * Call this after state changes to reflect validation
  */
 export function updateNextBtn() {
   const btn = document.getElementById('btn-next');
@@ -124,27 +145,30 @@ export function updateNextBtn() {
   
   switch (step) {
     case 1:
-      canProceed = bookingState.selectedServices.length > 0;
+      canProceed = (bookingState.selectedServices || []).length > 0;
       break;
+      
     case 2:
-      canProceed = bookingState.calendar.selectedDate && bookingState.calendar.selectedTime;
+      canProceed = !!(bookingState.calendar?.selectedDate && bookingState.calendar?.selectedTime);
       break;
+      
     case 3:
+      const c = bookingState.client || {};
+      const ui = bookingState.ui || {};
       canProceed = (
-        bookingState.client.name.length >= 2 &&
-        bookingState.client.phone.length >= 10 &&
-        bookingState.client.email.includes('@') &&
-        bookingState.client.address.length >= 5 &&
-        bookingState.ui.addressConfirmed
+        c.name?.length >= 2 &&
+        c.phone?.length >= 7 &&
+        c.email?.includes('@') &&
+        c.address?.length >= 5
       );
       break;
+      
     case 4:
       canProceed = true;
       break;
   }
   
   btn.disabled = !canProceed;
-  btn.classList.toggle('disabled', !canProceed);
 }
 
 /**
@@ -153,31 +177,17 @@ export function updateNextBtn() {
  * @param {String} message - Optional loading message
  */
 export function setLoading(isLoading, message = 'Loading...') {
-  const loader = document.getElementById('global-loader');
-  const loaderText = document.getElementById('loader-text');
+  const btn = document.getElementById('btn-next');
+  if (!btn) return;
   
-  if (!loader) {
-    // Create loader if it doesn't exist
-    const div = document.createElement('div');
-    div.id = 'global-loader';
-    div.className = 'global-loader';
-    div.innerHTML = `
-      <div class="loader-content">
-        <div class="loader"></div>
-        <p id="loader-text">${escHtml(message)}</p>
-      </div>
-    `;
-    document.body.appendChild(div);
+  if (isLoading) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="loader"></span> ${escHtml(message)}`;
   } else {
-    if (loaderText) loaderText.textContent = message;
+    updateNextBtn();
+    const step = getCurrentStep();
+    btn.textContent = step === 4 ? 'Confirm & Pay' : 'Next';
   }
-  
-  const loaderEl = document.getElementById('global-loader');
-  if (loaderEl) {
-    loaderEl.style.display = isLoading ? 'flex' : 'none';
-  }
-  
-  bookingState.ui.isLoading = isLoading;
 }
 
 /**
@@ -206,12 +216,12 @@ export function formatDate(dateStr) {
 
 /**
  * Format time range for display
- * @param {String} timeStr - Time string (HH:MM-HH:MM)
+ * @param {String} timeStr - Time string (HH:MM)
  * @returns {String} - Formatted time
  */
 export function formatTime(timeStr) {
   if (!timeStr) return '';
-  return timeStr;  // Already in good format
+  return timeStr;
 }
 
 /**
