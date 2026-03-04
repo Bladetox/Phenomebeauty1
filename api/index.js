@@ -1136,6 +1136,23 @@ app.get('/api/admin/reviews', adminOnly, rateLimit(10, 60000), async (req, res) 
 });
 
 // =============================================================================
+// GET /api/admin/availability — NEW: Read raw Availability sheet data
+// =============================================================================
+app.get('/api/admin/availability', adminOnly, async (req, res) => {
+    try {
+        const avRows = await getAvailabilityRows(req.doc);
+        const slots = avRows.map(r => ({
+            weekday:   r.get('Weekday/Date')      || '',
+            timeSlot:  r.get('Time Slot')         || '',
+            available: r.get('Available (YES/NO)') || '',
+        })).filter(s => s.weekday && s.timeSlot);
+        res.json(slots);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// =============================================================================
 // GET /api/admin/client-history
 // =============================================================================
 app.get('/api/admin/client-history', adminOnly, async (req, res) => {
