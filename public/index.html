@@ -1074,14 +1074,14 @@
                 <div class="form-group" style="margin-bottom:14px;">
                   <label style="margin-bottom:8px;display:block;">Have you booked with us before?</label>
                   <div style="display:flex;gap:8px;">
-                    <button type="button" id="diva-existing" onclick="toggleDiva('existing')"
+                    <button type="button" id="diva-existing"
                       style="flex:1;padding:10px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.18);
                              background:rgba(255,255,255,0.92);color:var(--obsidian);font-weight:700;
                              font-size:13px;cursor:pointer;transition:all 0.15s;font-family:'Jost',sans-serif;
                              box-shadow:0 2px 8px rgba(255,255,255,0.10);">
                       ✨ Existing Diva
                     </button>
-                    <button type="button" id="diva-new" onclick="toggleDiva('new')"
+                    <button type="button" id="diva-new"
                       style="flex:1;padding:10px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.10);
                              background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);font-weight:600;
                              font-size:13px;cursor:pointer;transition:all 0.15s;font-family:'Jost',sans-serif;">
@@ -1096,13 +1096,13 @@
                     <span class="input-icon">👤</span>
                     <input type="text" id="client-name" class="has-icon"
                            placeholder="Jane Smith" autocomplete="name"
-                           maxlength="80" oninput="updateNextBtn()">
+                           maxlength="80">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="client-phone">Phone Number</label>
                   <div class="input-wrap phone-wrap">
-                    <select id="phone-country" class="phone-country-select" onchange="formatPhone(document.getElementById('client-phone'))">
+                    <select id="phone-country" class="phone-country-select">
                       <option value="+27" data-flag="🇿🇦">🇿🇦 +27</option>
                       <option value="+1"  data-flag="🇺🇸">🇺🇸 +1</option>
                       <option value="+44" data-flag="🇬🇧">🇬🇧 +44</option>
@@ -1117,8 +1117,7 @@
                     </select>
                     <input type="tel" id="client-phone" class="has-country"
                            placeholder="82 123 4567" autocomplete="tel"
-                           inputmode="tel" maxlength="20"
-                           oninput="formatPhone(this)">
+                           inputmode="tel" maxlength="20">
                   </div>
                   <div class="field-hint">e.g. 082 123 4567 or +44 7911 123456</div>
                 </div>
@@ -1128,8 +1127,7 @@
                     <span class="input-icon">✉️</span>
                     <input type="email" id="client-email" class="has-icon"
                            placeholder="jane@example.com" autocomplete="email"
-                           inputmode="email" maxlength="120"
-                           oninput="validateEmail(this)">
+                           inputmode="email" maxlength="120">
                   </div>
                 </div>
                 <div class="form-group">
@@ -1190,8 +1188,8 @@
                       <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Rashes, cuts, sunburn, eczema, acne, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="skin">
-                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'skin')">No</button>
-                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'skin')">Yes</button>
+                      <button type="button" class="syn-btn" data-v="no">No</button>
+                      <button type="button" class="syn-btn" data-v="yes">Yes</button>
                     </div>
                     <textarea id="safety-skin" class="safety-detail" maxlength="500" placeholder="Please describe…" style="display:none;"></textarea>
                   </div>
@@ -1200,8 +1198,8 @@
                       <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Retinoids, blood thinners, chemical peels, laser, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="meds">
-                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'meds')">No</button>
-                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'meds')">Yes</button>
+                      <button type="button" class="syn-btn" data-v="no">No</button>
+                      <button type="button" class="syn-btn" data-v="yes">Yes</button>
                     </div>
                     <textarea id="safety-meds" class="safety-detail" maxlength="500" placeholder="Please list…" style="display:none;"></textarea>
                   </div>
@@ -1210,16 +1208,16 @@
                       <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Resins, latex, fragrances, oils, creams, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="allergies">
-                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'allergies')">No</button>
-                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'allergies')">Yes</button>
+                      <button type="button" class="syn-btn" data-v="no">No</button>
+                      <button type="button" class="syn-btn" data-v="yes">Yes</button>
                     </div>
                     <textarea id="safety-allergies" class="safety-detail" maxlength="500" placeholder="Please describe your allergy…" style="display:none;"></textarea>
                   </div>
                   <div class="form-group safety-q-wrap">
                     <div class="safety-q-label">4. Are you currently pregnant?</div>
                     <div class="safety-yn" data-q="pregnant">
-                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'pregnant')">No</button>
-                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'pregnant')">Yes</button>
+                      <button type="button" class="syn-btn" data-v="no">No</button>
+                      <button type="button" class="syn-btn" data-v="yes">Yes</button>
                     </div>
                   </div>
                   <div class="form-group safety-q-wrap">
@@ -1227,8 +1225,8 @@
                       <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Diabetes, varicose veins, immune conditions, recent surgery, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="health">
-                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'health')">No</button>
-                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'health')">Yes</button>
+                      <button type="button" class="syn-btn" data-v="no">No</button>
+                      <button type="button" class="syn-btn" data-v="yes">Yes</button>
                     </div>
                     <textarea id="safety-health" class="safety-detail" maxlength="500" placeholder="Please explain…" style="display:none;"></textarea>
                   </div>
@@ -1237,8 +1235,8 @@
                       <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Sun, heat, chemicals, frequent water or sweat contact in the area.</span>
                     </div>
                     <div class="safety-yn" data-q="enviro">
-                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'enviro')">No</button>
-                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'enviro')">Yes</button>
+                      <button type="button" class="syn-btn" data-v="no">No</button>
+                      <button type="button" class="syn-btn" data-v="yes">Yes</button>
                     </div>
                     <textarea id="safety-enviro" class="safety-detail" maxlength="300" placeholder="Please describe…" style="display:none;"></textarea>
                   </div>
@@ -1247,8 +1245,8 @@
                       <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">Due to work, sport, tight clothing, etc.</span>
                     </div>
                     <div class="safety-yn" data-q="physical">
-                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'physical')">No</button>
-                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'physical')">Yes</button>
+                      <button type="button" class="syn-btn" data-v="no">No</button>
+                      <button type="button" class="syn-btn" data-v="yes">Yes</button>
                     </div>
                     <textarea id="safety-physical" class="safety-detail" maxlength="300" placeholder="Please describe…" style="display:none;"></textarea>
                   </div>
@@ -1257,8 +1255,8 @@
                       <span style="color:rgba(255,255,255,0.32);font-weight:400;display:block;font-size:11px;margin-top:2px;">This is required for effective waxing results.</span>
                     </div>
                     <div class="safety-yn" data-q="hair">
-                      <button type="button" class="syn-btn" data-v="no" onclick="safetyToggle(this,'hair')">No</button>
-                      <button type="button" class="syn-btn" data-v="yes" onclick="safetyToggle(this,'hair')">Yes</button>
+                      <button type="button" class="syn-btn" data-v="no">No</button>
+                      <button type="button" class="syn-btn" data-v="yes">Yes</button>
                     </div>
                   </div>
                   <div class="form-group" style="margin-top:10px;">
@@ -1331,776 +1329,14 @@
         </div>
 
         <div class="actions" id="actions-bar">
-          <button class="btn-outline" id="btn-back" style="display:none;" onclick="prevStep()">Back</button>
-          <button class="btn-primary" id="btn-next" onclick="nextStep()" disabled>Next</button>
+          <button class="btn-outline" id="btn-back" style="display:none;">Back</button>
+          <button class="btn-primary" id="btn-next" disabled>Next</button>
         </div>
       </div>
     </div>
 
     <div id="toast" class="toast"></div>
 
-    <script>
-      window.servicesLoaded = false;
-      window.servicesLoaded = false;
-      loadServices();
-      
-      // PhenomeBeauty Booking — v5.0 (Luxury B&W)
-      // ── STATE ──────────────────────────────────────────────────────────────
-      let currentStep      = 1;
-      let services         = [];
-      let selectedServices = [];
-      let selectedDate     = '';
-      let selectedTime     = '';
-      let activeCategory   = null;
-      let appConfig        = {};
-      let lastFeeData      = { fee: 0, oneWayKm: 0, roundTripKm: 0 };
-      let addressConfirmed = false;
-      let addrDebounceTimer = null;
-
-      // ── INIT ───────────────────────────────────────────────────────────────
-      window.onload = () => {
-        const params = new URLSearchParams(window.location.search);
-        const pStatus = params.get('payment');
-        const pRef    = params.get('ref');
-        if (pStatus) {
-          window.history.replaceState({}, '', window.location.pathname);
-          if (pStatus === 'success' && pRef) {
-            fetch('/api/check-payment?ref=' + encodeURIComponent(pRef))
-              .then(r => r.json())
-              .then(data => showDepositThankYou(data))
-              .catch(() => showDepositThankYou(null));
-          } else if (pStatus === 'balance-success' && pRef) {
-            fetch('/api/check-payment?ref=' + encodeURIComponent(pRef))
-              .then(r => r.json())
-              .then(data => showBalanceThankYou(data))
-              .catch(() => showBalanceThankYou(null));
-          } else if (pStatus === 'cancelled' || pStatus === 'balance-cancelled') {
-            showBanner('Payment cancelled — your slot is still held. You can pay anytime.', false);
-          }
-        }
-        fetch('/api?action=getConfig')
-          .then(r => r.json())
-          .then(cfg => { appConfig = cfg || {}; })
-          .catch(() => {})
-          .finally(() => {  calInit(); updateStepUI(); });
-      };
-
-      // ── THANK YOU SCREENS ────────────────────────────────────────────────────
-      function hideBookingUI() {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('actions-bar').style.display = 'none';
-        document.getElementById('step-label').textContent = '';
-        for (let i = 1; i <= 4; i++)
-          document.getElementById('step-bar-' + i).style.width = '100%';
-        document.getElementById('success-icon').style.display = '';
-        document.getElementById('success-title').textContent = "You're booked!";
-        document.getElementById('success-title').style.display = '';
-      }
-
-      function showDepositThankYou(data) {
-        hideBookingUI();
-        document.getElementById('view-title').textContent = 'Booking Confirmed';
-        document.getElementById('success-title').textContent = "You're booked!";
-        const firstName = data && data.name ? data.name.split(' ')[0] : 'Beautiful';
-        document.getElementById('success-totals').innerHTML = `
-          <div style="text-align:center;padding:4px 0 18px;">
-            <div style="font-size:42px;margin-bottom:10px;">🌸</div>
-            <p style="margin:0 0 18px;font-family:'Cormorant Garamond',serif;font-size:15px;color:rgba(255,255,255,0.55);line-height:1.80;font-style:italic;">
-              Your deposit is confirmed and your stylist<br>is looking forward to pampering you.
-            </p>
-          </div>
-          ${data ? `
-          <div style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:15px 17px;margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:8px;">
-              <span style="color:rgba(255,255,255,0.35);">📅 Date</span>
-              <strong style="color:rgba(255,255,255,0.90);">${escHtml(fmtDateDisplay(data.date))}</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:8px;">
-              <span style="color:rgba(255,255,255,0.35);">🕐 Time</span>
-              <strong style="color:rgba(255,255,255,0.90);">${escHtml(data.time||'')}</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;">
-              <span style="color:rgba(255,255,255,0.35);">💅 Service</span>
-              <span style="text-align:right;max-width:55%;font-size:11px;color:rgba(255,255,255,0.65);">${escHtml(data.services||'')}</span>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:15px 17px;margin-bottom:14px;">
-            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;margin-bottom:6px;">
-              <span style="color:rgba(255,255,255,0.35);">Deposit Paid ✅</span>
-              <strong style="color:rgba(255,255,255,0.90);">R${escHtml(String(data.deposit||'0'))}</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:12px;">
-              <span style="color:rgba(255,255,255,0.35);">Balance (after service)</span>
-              <strong style="color:rgba(255,255,255,0.90);">R${escHtml(String(data.balance||'0'))}</strong>
-            </div>
-          </div>
-          <p style="font-family:'Jost',sans-serif;font-size:11px;color:rgba(255,255,255,0.28);text-align:center;margin:0 0 4px;">
-            A confirmation email is on its way 📧
-          </p>
-          <p style="font-family:'Jost',sans-serif;font-size:10px;color:rgba(255,255,255,0.18);text-align:center;margin:0;letter-spacing:0.04em;">
-            Ref: ${escHtml(data.bookingId||'')}
-          </p>` : `
-          <p style="font-family:'Jost',sans-serif;font-size:13px;color:rgba(255,255,255,0.38);text-align:center;">
-            A confirmation email is on its way 📧
-          </p>`}
-        `;
-        document.getElementById('success-view').classList.add('active');
-      }
-
-      function showBalanceThankYou(data) {
-        hideBookingUI();
-        document.getElementById('success-icon').style.display = 'none';
-        document.getElementById('success-title').style.display = 'none';
-        const firstName  = data && data.name ? data.name.split(' ')[0] : 'Beautiful';
-        const appBase    = (data && data.appBase) ? data.appBase : window.location.origin;
-        const isPaid     = data && data.balanceStatus === 'Paid';
-        document.getElementById('view-title').textContent = isPaid ? 'Thank You' : 'Payment Received';
-        document.getElementById('success-totals').innerHTML = isPaid ? `
-          <div style="text-align:center;padding:8px 0 18px;">
-            <div style="font-size:46px;margin-bottom:10px;">💅</div>
-            <h2 style="margin:0 0 8px;font-size:18px;font-weight:400;color:#1d1d1f;font-family:'Playfair Display',Georgia,serif;">
-              Thank you, ${escHtml(firstName)}
-            </h2>
-            <p style="margin:0 0 20px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.75;">
-              Your full payment is in and we are so grateful<br>for your trust in PhenomeBeauty.
-            </p>
-          </div>
-          <div style="background:rgba(0,0,0,0.04);border:0.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:16px 18px;margin-bottom:18px;text-align:center;">
-            <div style="font-family:'Jost',sans-serif;font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:5px;text-transform:uppercase;letter-spacing:.14em;">Total Paid</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:rgba(255,255,255,0.95);">R${escHtml(String(data.total||'0'))} ✅</div>
-          </div>
-          <div style="background:rgba(0,0,0,0.03);border:0.5px solid rgba(0,0,0,0.06);border-radius:14px;padding:18px;margin-bottom:16px;text-align:center;">
-            <p style="margin:0 0 14px;font-family:'Cormorant Garamond',serif;font-size:14px;color:rgba(255,255,255,0.50);line-height:1.80;font-style:italic;">
-              Beauty is a lifestyle, not a luxury.<br>We'd love to see you again soon.
-            </p>
-            <a href="${escHtml(appBase)}" style="display:inline-block;background:linear-gradient(160deg,#1c1c1e,#0a0a0a);color:#ffffff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:.01em;">
-              Book Your Next Appointment →
-            </a>
-          </div>
-          <p style="font-family:'Jost',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin:0;">
-            A receipt has been sent to your email 📧
-          </p>` : `
-          <div style="text-align:center;padding:8px 0 18px;">
-            <div style="font-size:46px;margin-bottom:10px;">💳</div>
-            <h2 style="margin:0 0 8px;font-size:18px;font-weight:400;color:#1d1d1f;font-family:'Playfair Display',Georgia,serif;">
-              Payment is being processed
-            </h2>
-            <p style="margin:0 0 20px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.75;">
-              Thank you, ${escHtml(firstName)}! Your payment is on its way.<br>
-              We'll send you a confirmation email shortly.
-            </p>
-          </div>
-          <div style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:16px 18px;margin-bottom:16px;text-align:center;font-family:'Jost',sans-serif;font-size:13px;color:rgba(255,255,255,0.50);">
-            ⏳ Payments can take a moment — please don't pay again.
-          </div>`;
-        document.getElementById('success-view').classList.add('active');
-      }
-
-      function fmtDateDisplay(ds) {
-        if (!ds) return '';
-        const [y,m,d] = ds.split('-').map(Number);
-        const dt = new Date(y, m-1, d);
-        const D = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-        const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        return D[dt.getDay()] + ', ' + d + ' ' + M[m-1] + ' ' + y;
-      }
-
-      // ── TOAST / BANNER ──────────────────────────────────────────────────────
-      function showToast(msg, isError) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast show' + (isError ? ' error' : '');
-        clearTimeout(t._t);
-        t._t = setTimeout(() => t.classList.remove('show'), 3500);
-      }
-
-      function showBanner(msg, success) {
-        const b = document.createElement('div');
-        b.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:99999;' +
-          'max-width:92vw;padding:13px 18px;border-radius:14px;font-size:13px;font-weight:600;' +
-          'text-align:center;box-shadow:0 16px 40px rgba(0,0,0,.2);cursor:pointer;' +
-          'background:rgba(255,255,255,0.92);color:var(--obsidian);border:0.5px solid transparent;' +
-          'backdrop-filter:blur(20px);';
-        b.textContent = msg;
-        document.body.appendChild(b);
-        setTimeout(() => b.remove(), 7000);
-        b.onclick = () => b.remove();
-      }
-
-      // ── SERVICES ───────────────────────────────────────────────────────────
-      function loadServices() {
-        fetch('/api?action=getServices')
-          .then(r => r.json())
-          .then(data => { services = Array.isArray(data) ? data : []; renderServices(); })
-          .catch(() => showToast('Unable to load services — please refresh', true));
-      }
-
-      function renderServices() {
-        const grouped = {};
-        services.forEach(s => {
-          const c = s.category || 'Other';
-          if (!grouped[c]) grouped[c] = [];
-          grouped[c].push(s);
-        });
-        const cats = Object.keys(grouped);
-        if (!activeCategory && cats.length) activeCategory = cats[0];
-        const chips = document.getElementById('category-chips');
-        chips.innerHTML = cats.map(c =>
-          `<button type="button" class="chip ${c === activeCategory ? 'active' : ''}" data-cat="${escHtml(c)}">${escHtml(c)}</button>`
-        ).join('');
-        chips.querySelectorAll('.chip').forEach(btn =>
-          btn.addEventListener('click', () => { activeCategory = btn.dataset.cat; renderServices(); }));
-        const list = grouped[activeCategory] || [];
-        const el   = document.getElementById('services-list');
-        el.innerHTML = list.map(s => {
-          const sel = selectedServices.some(x => String(x.id) === String(s.id));
-          return `<div class="service-card ${sel ? 'selected' : ''}" data-id="${escHtml(String(s.id))}">
-            <div class="service-main">
-              <div class="service-header">
-                <div class="service-name">${escHtml(s.name)}</div>
-                <div class="service-price">R${Number(s.price).toFixed(0)}</div>
-              </div>
-              <div class="service-meta">${escHtml(s.description||'')} · ${s.duration||0} min</div>
-            </div>
-            <div class="check-circle">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-          </div>`;
-        }).join('');
-        el.querySelectorAll('.service-card').forEach(card =>
-          card.addEventListener('click', () => {
-            const id = String(card.dataset.id);
-            const svc = services.find(x => String(x.id) === id);
-            if (!svc) return;
-            const idx = selectedServices.findIndex(x => String(x.id) === id);
-            if (idx > -1) selectedServices.splice(idx, 1);
-            else          selectedServices.push(svc);
-            renderServices();
-          }));
-        renderCart();
-        updateNextBtn();
-      }
-
-      // ── CART ───────────────────────────────────────────────────────────────
-      function renderCart() {
-        const bar = document.getElementById('cart-bar');
-        if (!selectedServices.length) { bar.classList.remove('visible'); return; }
-        bar.classList.add('visible');
-        const total    = selectedServices.reduce((a, s) => a + Number(s.price), 0);
-        const duration = selectedServices.reduce((a, s) => a + (Number(s.duration)||0), 0);
-        document.getElementById('cart-total-price').textContent = 'R' + total.toFixed(0);
-        const cartList = document.getElementById('cart-items-list');
-        cartList.innerHTML = selectedServices.map(s =>
-          `<div class="cart-item" data-id="${escHtml(String(s.id))}">
-            <span class="cart-item-name">${escHtml(s.name)}</span>
-            <span class="cart-item-price">R${Number(s.price).toFixed(0)}</span>
-            <span class="cart-remove">✕</span>
-          </div>`
-        ).join('');
-        cartList.querySelectorAll('.cart-remove').forEach(btn =>
-          btn.addEventListener('click', e => {
-            e.stopPropagation();
-            const id = String(btn.closest('.cart-item').dataset.id);
-            const idx = selectedServices.findIndex(x => String(x.id) === id);
-            if (idx > -1) { selectedServices.splice(idx, 1); renderServices(); }
-          }));
-        document.getElementById('cart-duration').textContent =
-          `${selectedServices.length} service${selectedServices.length > 1 ? 's' : ''} · ${duration} min total`;
-      }
-
-      // ── CALENDAR ───────────────────────────────────────────────────────────
-      const monthCache = {};
-      let calYear, calMonth;
-
-      function calInit() {
-        const now = new Date();
-        calYear  = now.getFullYear();
-        calMonth = now.getMonth();
-        document.getElementById('cal-prev').addEventListener('click', () => {
-          const now2 = new Date(); const cy = now2.getFullYear(); const cm = now2.getMonth();
-          if (calYear < cy || (calYear === cy && calMonth <= cm)) return;
-          calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
-          calRender();
-        });
-        document.getElementById('cal-next').addEventListener('click', () => {
-          calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
-          calRender();
-        });
-        calRender();
-      }
-
-      function calPad(n) { return String(n).padStart(2,'0'); }
-      function calKey()  { return `${calYear}-${calPad(calMonth+1)}`; }
-
-      function calRender() {
-        const now = new Date();
-        const isPast = calYear < now.getFullYear() ||
-                       (calYear === now.getFullYear() && calMonth < now.getMonth());
-        document.getElementById('cal-prev').classList.toggle('disabled', isPast);
-        const MONTHS = ['January','February','March','April','May','June',
-                        'July','August','September','October','November','December'];
-        document.getElementById('cal-month-label').textContent = MONTHS[calMonth] + ' ' + calYear;
-        const key = calKey();
-        if (monthCache[key] && monthCache[key].loaded) { calDrawDays(); }
-        else {
-          if (!monthCache[key]) monthCache[key] = { loaded: false, slots: {} };
-          calDrawDays('loading');
-          fetch('/api?action=getMonthAvailability&month=' + encodeURIComponent(key))
-            .then(r => r.json())
-            .then(slots => {
-              monthCache[key] = { loaded: true, slots: slots || {} };
-              if (calKey() === key) calDrawDays();
-            })
-            .catch(() => { monthCache[key] = { loaded: true, slots: {} }; calDrawDays(); });
-        }
-      }
-
-      function calDrawDays(state) {
-        const today = new Date(); today.setHours(0,0,0,0);
-        const key   = calKey();
-        const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-        const firstDow    = new Date(calYear, calMonth, 1).getDay();
-        let html = '';
-        for (let i = 0; i < firstDow; i++) html += '<div class="cal-day empty"></div>';
-        for (let d = 1; d <= daysInMonth; d++) {
-          const dateStr = `${calYear}-${calPad(calMonth+1)}-${calPad(d)}`;
-          const dt      = new Date(calYear, calMonth, d);
-          const isPast  = dt < today;
-          const isToday = dt.getTime() === today.getTime();
-          const isSel   = dateStr === selectedDate;
-          let cls = 'cal-day', dot = '';
-          if (isSel)       cls += ' selected';
-          else if (isPast) cls += ' past';
-          else if (state === 'loading') cls += ' loading-month';
-          else {
-            const times = (monthCache[key] && monthCache[key].slots[dateStr]) || [];
-            if (times.length) { cls += ' has-slots'; dot = '<div class="cal-day-dot"></div>'; }
-            else              cls += ' no-slots';
-          }
-          if (isToday && !isSel && !isPast) cls += ' today';
-          html += `<div class="${cls}" data-date="${dateStr}">${d}${dot}</div>`;
-        }
-        const container = document.getElementById('cal-days');
-        container.innerHTML = html;
-        container.querySelectorAll('.cal-day.has-slots, .cal-day.selected').forEach(el =>
-          el.addEventListener('click', () => {
-            if (selectedDate === el.dataset.date) return;
-            selectedDate = el.dataset.date;
-            selectedTime = '';
-            calDrawDays();
-            const times = (monthCache[calKey()] && monthCache[calKey()].slots[selectedDate]) || [];
-            renderTimeSlots(times);
-            updateNextBtn();
-          }));
-      }
-
-      function renderTimeSlots(times) {
-        const section = document.getElementById('time-section');
-        const grid    = document.getElementById('time-grid');
-        const label   = document.getElementById('time-section-label');
-        if (!times || !times.length) { section.style.display = 'none'; return; }
-        const dt = new Date(selectedDate + 'T00:00:00');
-        const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        const MTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        label.textContent = DAYS[dt.getDay()] + ', ' + dt.getDate() + ' ' + MTHS[dt.getMonth()];
-        grid.innerHTML = times.map(t =>
-          `<div class="time-slot ${selectedTime === t ? 'selected' : ''}" data-time="${escHtml(t)}">${escHtml(t)}</div>`
-        ).join('');
-        grid.querySelectorAll('.time-slot').forEach(el =>
-          el.addEventListener('click', () => {
-            selectedTime = el.dataset.time;
-            grid.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
-            updateNextBtn();
-          }));
-        section.style.display = 'block';
-      }
-
-      // ── NAVIGATION ─────────────────────────────────────────────────────────
-      function nextStep() {
-        if (currentStep === 3 && (!validateDetails() || !safetyComplete())) return;
-        if (currentStep === 4) { submitBooking(); return; }
-        currentStep++;
-        updateStepUI();
-      }
-      function prevStep() {
-        if (currentStep <= 1) return;
-        currentStep--;
-        updateStepUI();
-      }
-      function updateStepUI() {
-        const views  = ['services','datetime','details','summary'];
-        const titles = ['Choose Services','Select Date & Time','Your Details','Review Booking'];
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('step-' + views[currentStep - 1]).classList.add('active');
-        document.getElementById('view-title').textContent  = 'PhenomeBeauty';
-        document.getElementById('btn-back').style.display  = currentStep === 1 ? 'none' : 'block';
-        document.getElementById('btn-next').textContent    = currentStep === 4 ? 'Proceed to Payment' : 'Next';
-
-        /* ── ANIMATED PROGRESS BAR ──────────────────────────────────────
-           Each segment fills to 100% when that step is completed.
-           The current step's bar fills to 55% with a shimmer active pulse.
-           Future bars stay empty (0%).
-           ────────────────────────────────────────────────────────────── */
-        const CHECK_SVG = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-        for (let i = 1; i <= 4; i++) {
-          const bar  = document.getElementById('step-bar-' + i);
-          const dot  = document.getElementById('sdot-' + i);
-          const num  = document.getElementById('sdot-num-' + i);
-          if (i < currentStep) {
-            // Completed — full bar, white filled dot with checkmark
-            bar.style.width = '100%';
-            bar.classList.remove('pb-active');
-            dot.className = 'step-dot sd-done';
-            num.innerHTML = CHECK_SVG;
-          } else if (i === currentStep) {
-            // Active — 55% fill with trailing shimmer
-            bar.style.width = '55%';
-            bar.classList.add('pb-active');
-            dot.className = 'step-dot sd-active';
-            num.textContent = i;
-          } else {
-            // Future — empty
-            bar.style.width = '0%';
-            bar.classList.remove('pb-active');
-            dot.className = 'step-dot';
-            num.textContent = i;
-          }
-        }
-
-        if (currentStep === 2) {
-          calDrawDays();
-          if (selectedDate) {
-            const _k = calKey();
-            if (monthCache[_k] && monthCache[_k].slots && monthCache[_k].slots[selectedDate]) {
-              renderTimeSlots(monthCache[_k].slots[selectedDate]);
-            }
-          }
-          const k = calKey();
-          if (!monthCache[k] || !monthCache[k].loaded) calRender();
-        }
-        if (currentStep === 3) initPlacesAutocomplete();
-        if (currentStep === 4) renderSummary();
-        updateNextBtn();
-      }
-
-      const SAFETY_KEYS = ['skin','meds','allergies','pregnant','health','enviro','physical','hair'];
-      function safetyComplete() {
-        if (divaType !== 'new') return true;
-        return SAFETY_KEYS.every(k => safetyAnswers[k] === 'yes' || safetyAnswers[k] === 'no');
-      }
-      function updateNextBtn() {
-        const btn = document.getElementById('btn-next');
-        if (currentStep === 1) btn.disabled = selectedServices.length === 0;
-        else if (currentStep === 2) btn.disabled = !selectedDate || !selectedTime;
-        else if (currentStep === 3) {
-          const name  = document.getElementById('client-name').value.trim();
-          const phone = document.getElementById('client-phone').value.replace(/\D/g,'');
-          const email = document.getElementById('client-email').value.trim();
-          const addr  = document.getElementById('client-address').value.trim();
-          btn.disabled = name.length < 2 || (() => { const d = normalizePhone().replace(/\D/g,''); return d.length < 7 || d.length > 15; })() ||
-                         !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || addr.length < 5 || !safetyComplete();
-        } else { btn.disabled = false; }
-      }
-
-      // ── PHONE / EMAIL ───────────────────────────────────────────────────────
-      function normalizePhone() {
-        const select = document.getElementById('phone-country');
-        const input  = document.getElementById('client-phone');
-        const countryCode = select ? select.value : '+27';
-        // Strip everything except digits and leading +
-        let raw = input.value.replace(/[\s\-().]/g, '');
-        // Remove leading zeros after country code e.g. +27(0)82 → +2782
-        // If user typed full number with country code, use as-is
-        if (raw.startsWith('+')) {
-          // Remove (0) pattern: +27082 → +2782
-          raw = raw.replace(/^(\+\d{1,3})(0)/, '$1');
-          return raw;
-        }
-        // Remove leading zero then prepend country code
-        raw = raw.replace(/^0/, '');
-        return countryCode + raw;
-      }
-
-      function formatPhone(input) {
-        if (!input) input = document.getElementById('client-phone');
-        // Allow digits, spaces, hyphens, parens, plus
-        let val = input.value.replace(/[^\d\s\-().+]/g, '');
-        input.value = val;
-        const normalized = normalizePhone();
-        // Valid if normalized is 7-15 digits (after stripping non-digits)
-        const digitsOnly = normalized.replace(/\D/g, '');
-        const ok = digitsOnly.length >= 7 && digitsOnly.length <= 15;
-        input.classList.toggle('input-valid', ok);
-        input.classList.toggle('input-error', val.length > 4 && !ok);
-        updateNextBtn();
-      }
-      function validateEmail(input) {
-        const v = input.value.trim();
-        const ok = v.length > 4 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-        input.classList.toggle('input-valid', ok);
-        input.classList.toggle('input-error', v.includes('@') && v.split('@')[1]?.includes('.') && !ok);
-        updateNextBtn();
-      }
-
-      // ── ADDRESS AUTOCOMPLETE ────────────────────────────────────────────────
-      function initPlacesAutocomplete() {
-        const key = appConfig.google_maps_api_key || appConfig.mapsApiKey;
-        const input    = document.getElementById('client-address');
-        const dropdown = document.getElementById('addr-suggestions');
-        if (!key || !input || !dropdown || input.dataset.acAttached) return;
-        input.dataset.acAttached = '1';
-        input.addEventListener('input', () => {
-          addressConfirmed = false;
-          input.classList.remove('input-valid','input-error');
-          updateNextBtn();
-          clearTimeout(addrDebounceTimer);
-          const q = input.value.trim();
-          if (q.length < 3) { closeDropdown(); return; }
-          addrDebounceTimer = setTimeout(async () => {
-            try {
-              const r = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': key },
-                body: JSON.stringify({ input: q, includedRegionCodes: ['za'], languageCode: 'en' }),
-              });
-              const data = await r.json();
-              const sugs = data.suggestions || [];
-              if (!sugs.length) { closeDropdown(); return; }
-              dropdown.innerHTML = sugs.slice(0,5).map(s => {
-                const p    = s.placePrediction;
-                const main = p?.structuredFormat?.mainText?.text || p?.text?.text || '';
-                const sec  = p?.structuredFormat?.secondaryText?.text || '';
-                const full = p?.text?.text || main;
-                return `<div class="addr-suggestion-item" data-full="${escHtml(full)}">
-                  <div class="addr-suggestion-main">${escHtml(main)}</div>
-                  ${sec ? `<div class="addr-suggestion-sec">${escHtml(sec)}</div>` : ''}
-                </div>`;
-              }).join('');
-              dropdown.querySelectorAll('.addr-suggestion-item').forEach(item => {
-                item.addEventListener('mousedown', e => e.preventDefault());
-                item.addEventListener('click', () => {
-                  input.value = item.dataset.full;
-                  addressConfirmed = true;
-                  input.classList.add('input-valid');
-                  input.classList.remove('input-error');
-                  closeDropdown(); updateNextBtn();
-                });
-              });
-              dropdown.classList.add('open');
-            } catch(e) { closeDropdown(); }
-          }, 220);
-        });
-        input.addEventListener('keydown', e => {
-          const items  = [...dropdown.querySelectorAll('.addr-suggestion-item')];
-          const active = dropdown.querySelector('.addr-suggestion-item.active');
-          let idx = items.indexOf(active);
-          if (e.key === 'ArrowDown') { e.preventDefault(); idx=(idx+1)%items.length; }
-          else if (e.key === 'ArrowUp') { e.preventDefault(); idx=(idx-1+items.length)%items.length; }
-          else if (e.key === 'Enter' && active) { e.preventDefault(); active.click(); return; }
-          else if (e.key === 'Escape') { closeDropdown(); return; }
-          items.forEach(i=>i.classList.remove('active')); items[idx]?.classList.add('active');
-        });
-        document.addEventListener('click', e => {
-          if (!input.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
-        });
-      }
-      function closeDropdown() {
-        const d = document.getElementById('addr-suggestions');
-        if (d) { d.classList.remove('open'); d.innerHTML=''; }
-      }
-
-      // ── VALIDATION ──────────────────────────────────────────────────────────
-      function validateDetails() {
-        const name  = document.getElementById('client-name').value.trim();
-        const phone = document.getElementById('client-phone').value.replace(/\D/g,'');
-        const email = document.getElementById('client-email').value.trim();
-        const addr  = document.getElementById('client-address').value.trim();
-        if (name.length < 2)                       { showToast('Please enter your full name', true);            return false; }
-        if (!/^[+]?[\d\s\-().]{7,20}$/.test(phone.replace(/\s/g,''))) { showToast('Enter a valid phone number', true); return false; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showToast('Enter a valid email address', true);    return false; }
-        if (addr.length < 5)                       { showToast('Please enter your full address', true);         return false; }
-        return true;
-      }
-
-      // ── SUMMARY ─────────────────────────────────────────────────────────────
-      function fmtDate(ds) {
-        if (!ds) return '—';
-        const [y,m,d] = ds.split('-').map(Number);
-        const dt = new Date(y, m-1, d);
-        const D = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-        const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        return D[dt.getDay()] + ', ' + d + ' ' + M[m-1] + ' ' + y;
-      }
-      function renderSummary() {
-        const sTotal   = selectedServices.reduce((a, s) => a + Number(s.price), 0);
-        const sDur     = selectedServices.reduce((a, s) => a + (Number(s.duration)||0), 0);
-        const name     = document.getElementById('client-name').value.trim();
-        const rawPhone = document.getElementById('client-phone').value.replace(/\D/g,'');
-        const phone    = rawPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-        const address  = document.getElementById('client-address').value.trim();
-        document.getElementById('summary-block').innerHTML = `
-          <div class="summary-row"><span class="summary-label">Date</span><span class="summary-value">${fmtDate(selectedDate)}</span></div>
-          <div class="summary-row"><span class="summary-label">Time</span><span class="summary-value">${escHtml(selectedTime)||'—'}</span></div>
-          <div class="summary-row"><span class="summary-label">Services (${selectedServices.length})</span>
-            <span class="summary-value" style="font-size:11.5px;">${selectedServices.map(s=>escHtml(s.name)).join(', ')}</span></div>
-          <div class="summary-row"><span class="summary-label">Duration</span><span class="summary-value">${sDur} min</span></div>
-          <div class="summary-divider"></div>
-          <div class="summary-row"><span class="summary-label">Client</span><span class="summary-value">${escHtml(name)}</span></div>
-          <div class="summary-row"><span class="summary-label">Phone</span><span class="summary-value">${escHtml(phone)}</span></div>
-          <div class="summary-row"><span class="summary-label">Address</span><span class="summary-value" style="font-size:11.5px;">${escHtml(address)}</span></div>`;
-        document.getElementById('sum-services-total').textContent = 'R' + sTotal.toFixed(2);
-        document.getElementById('sum-callout-fee').innerHTML =
-          '<span class="fee-calculating"><span class="loader" style="width:11px;height:11px;border-width:1.5px;border-color:rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.60);"></span> Calculating…</span>';
-        document.getElementById('sum-total').textContent   = '—';
-        document.getElementById('sum-deposit').textContent = '—';
-        document.getElementById('sum-balance-note').textContent = 'Balance due on the day';
-        document.getElementById('btn-next').disabled = true;
-        fetch('/api?action=getCallOutFee&address=' + encodeURIComponent(address))
-          .then(r => r.json())
-          .then(result => {
-            const pct     = parseFloat(appConfig.deposit_percent || 50) / 100;
-            const fee     = typeof result.fee === 'number' ? result.fee : 0;
-            const total   = sTotal + fee;
-            const deposit = Math.round(total * pct * 100) / 100;
-            const balance = Math.round((total - deposit) * 100) / 100;
-            lastFeeData   = { fee, oneWayKm: result.oneWayKm||0, roundTripKm: result.roundTripKm||0 };
-            if (fee === 0 && result.error) {
-              document.getElementById('sum-callout-fee').innerHTML =
-                'R0.00 <span style="font-size:10px;color:rgba(180,60,60,.8);" title="'+escHtml(result.error)+'">⚠</span>';
-            } else {
-              document.getElementById('sum-callout-fee').textContent = 'R' + fee.toFixed(2);
-            }
-            document.getElementById('sum-total').textContent        = 'R' + total.toFixed(2);
-            document.getElementById('sum-deposit').textContent      = 'R' + deposit.toFixed(2);
-            document.getElementById('sum-balance-note').textContent = 'Balance on the day: R' + balance.toFixed(2);
-            document.getElementById('btn-next').disabled = false;
-          })
-          .catch(() => {
-            const pct = parseFloat(appConfig.deposit_percent || 50) / 100;
-            const dep = Math.round(sTotal * pct * 100) / 100;
-            document.getElementById('sum-callout-fee').innerHTML =
-              'R0.00 <span style="font-size:10px;color:rgba(180,60,60,.8);">⚠</span>';
-            document.getElementById('sum-total').textContent        = 'R' + sTotal.toFixed(2);
-            document.getElementById('sum-deposit').textContent      = 'R' + dep.toFixed(2);
-            document.getElementById('sum-balance-note').textContent = 'Balance on the day: R' + (sTotal - dep).toFixed(2);
-            document.getElementById('btn-next').disabled = false;
-          });
-      }
-
-      // ── SAFETY TOGGLES ──────────────────────────────────────────────────────
-      const safetyAnswers = {};
-      function safetyToggle(btn, key) {
-        const val = btn.dataset.v;
-        safetyAnswers[key] = val;
-        btn.closest('.safety-yn').querySelectorAll('.syn-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const detail = document.getElementById('safety-' + key);
-        if (detail) {
-          detail.style.display = val === 'yes' ? 'block' : 'none';
-          if (val === 'no') detail.value = '';
-        }
-        updateNextBtn();
-      }
-      let divaType = 'existing';
-      function toggleDiva(type) {
-        divaType = type;
-        const safetySection = document.getElementById('safety-section');
-        const btnExisting   = document.getElementById('diva-existing');
-        const btnNew        = document.getElementById('diva-new');
-        if (type === 'new') {
-          safetySection.style.display = 'block';
-          btnNew.style.background      = 'rgba(0,0,0,0.07)';
-          btnNew.style.color           = '#0a0a0a';
-          btnNew.style.borderColor     = 'rgba(0,0,0,0.18)';
-          btnExisting.style.background = 'rgba(255,255,255,0.40)';
-          btnExisting.style.color      = 'rgba(255,255,255,0.40)';
-          btnExisting.style.borderColor= 'rgba(0,0,0,0.08)';
-        } else {
-          safetySection.style.display = 'none';
-          Object.keys(safetyAnswers).forEach(k => delete safetyAnswers[k]);
-          document.querySelectorAll('.syn-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.safety-detail').forEach(t => { t.style.display='none'; t.value=''; });
-          btnExisting.style.background = 'rgba(0,0,0,0.07)';
-          btnExisting.style.color      = '#0a0a0a';
-          btnExisting.style.borderColor= 'rgba(0,0,0,0.18)';
-          btnNew.style.background      = 'rgba(255,255,255,0.40)';
-          btnNew.style.color           = 'rgba(255,255,255,0.40)';
-          btnNew.style.borderColor     = 'rgba(0,0,0,0.08)';
-        }
-        updateNextBtn();
-      }
-
-      // ── SUBMIT ──────────────────────────────────────────────────────────────
-      function submitBooking() {
-        const btn = document.getElementById('btn-next');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="loader"></span> Saving…';
-        const sTotal  = selectedServices.reduce((a, s) => a + Number(s.price), 0);
-        const pct     = parseFloat(appConfig.deposit_percent || 50) / 100;
-        const fee     = lastFeeData.fee || 0;
-        const total   = Math.round((sTotal + fee) * 100) / 100;
-        const deposit = Math.round(total * pct * 100) / 100;
-        const balance = Math.round((total - deposit) * 100) / 100;
-        const safety = divaType === 'new' ? {
-          skinConditions:   safetyAnswers.skin === 'yes' ? (document.getElementById('safety-skin')?.value||'').trim().slice(0,500) : (safetyAnswers.skin === 'no' ? 'None' : ''),
-          medications:      safetyAnswers.meds === 'yes' ? (document.getElementById('safety-meds')?.value||'').trim().slice(0,500) : (safetyAnswers.meds === 'no' ? 'None' : ''),
-          allergies:        safetyAnswers.allergies === 'yes' ? (document.getElementById('safety-allergies')?.value||'').trim().slice(0,500) : (safetyAnswers.allergies === 'no' ? 'None' : ''),
-          pregnant:         safetyAnswers.pregnant === 'yes',
-          healthConditions: safetyAnswers.health === 'yes' ? (document.getElementById('safety-health')?.value||'').trim().slice(0,500) : (safetyAnswers.health === 'no' ? 'None' : ''),
-          environmental:    safetyAnswers.enviro === 'yes' ? (document.getElementById('safety-enviro')?.value||'').trim().slice(0,300) : (safetyAnswers.enviro === 'no' ? 'None' : ''),
-          physical:         safetyAnswers.physical === 'yes' ? (document.getElementById('safety-physical')?.value||'').trim().slice(0,300) : (safetyAnswers.physical === 'no' ? 'None' : ''),
-          hairLengthOk:     safetyAnswers.hair === 'yes',
-          additionalInfo:   (document.getElementById('safety-notes')?.value||'').trim().slice(0,500),
-        } : null;
-        const body = {
-          services: selectedServices, date: selectedDate, time: selectedTime,
-          name:    document.getElementById('client-name').value.trim().slice(0,80),
-          phone:   document.getElementById('client-phone').value.replace(/\D/g,'').slice(0,15),
-          email:   document.getElementById('client-email').value.trim().slice(0,120),
-          address: document.getElementById('client-address').value.trim().slice(0,200),
-          source:  document.getElementById('client-source').value || '',
-          divaType, safety, policyAgreed: true,
-          servicesTotal: sTotal, callOutFee: fee, totalAmount: total,
-          depositAmount: deposit, balanceDue: balance,
-          oneWayKm: lastFeeData.oneWayKm, roundTripKm: lastFeeData.roundTripKm,
-        };
-        fetch('/api/book', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
-          .then(r => r.json())
-          .then(result => {
-            if (!result || !result.success) {
-              showToast((result && result.error) || 'Booking failed — please try again', true);
-              btn.disabled = false; btn.textContent = 'Proceed to Payment'; return;
-            }
-            if (result.paymentUrl) {
-              btn.innerHTML = '<span class="loader"></span> Redirecting to payment…';
-              window.location.href = result.paymentUrl;
-            } else {
-              btn.style.display = 'none';
-              document.getElementById('btn-back').style.display = 'none';
-              showDepositThankYou({
-                bookingId: result.bookingId || '',
-                name:      document.getElementById('client-name').value.trim(),
-                date:      selectedDate, time: selectedTime,
-                services:  selectedServices.map(s => s.name).join(', '),
-                deposit:   String(result.depositAmount || '0'),
-                balance:   String(result.balanceDue    || '0'),
-              });
-            }
-          })
-          .catch(() => {
-            showToast('Network error — please try again', true);
-            btn.disabled = false; btn.textContent = 'Proceed to Payment';
-          });
-      }
-
-      function showSuccessScreen(data) { showDepositThankYou(data); }
-
-      // ── UTILS ───────────────────────────────────────────────────────────────
-      function escHtml(s) {
-        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
-          .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-      }
-    </script>
+    <script type="module" src="/js/main.js"></script>
   </body>
 </html>
