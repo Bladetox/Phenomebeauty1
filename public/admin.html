@@ -910,9 +910,9 @@ async function loadStock() {
           return `
           <tr style="${lowStock ? 'background:rgba(248,113,113,0.08);' : ''}">
             <td style="font-weight:700;color:var(--t100);">${s.item || '—'}</td>
-            <td>${parseFloat(s.cost || 0).toFixed(2)}</td>
+            <td>R ${(parseFloat(s.cost) || 0).toFixed(2)}</td>
             <td style="${lowStock ? 'color:var(--red);font-weight:700;' : ''}">${s.stockOnHand || '0'}</td>
-            <td>${parseFloat(s.totalCost || 0).toFixed(2)}</td>
+            <td>R ${(parseFloat(s.totalCost) || 0).toFixed(2)}</td>
             <td style="font-size:11px;color:var(--t60);">${s.notes || ''}</td>
           </tr>
         `}).join('')}</tbody>
