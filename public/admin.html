@@ -113,6 +113,8 @@ html,body {
     position:fixed; top:0; left:0; bottom:0; z-index:200;
     transform:translateX(-100%); transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
     width:220px !important; align-items:stretch !important; padding:16px 10px !important;
+    min-height:100vh; min-height:100dvh;
+    overflow-y:auto;
   }
   .sidebar.mobile-open { transform:translateX(0); }
   .sidebar-brand { display:block !important; }
