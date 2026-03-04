@@ -549,7 +549,7 @@ html,body {
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// PHENOMEBEAUTY ADMIN v7.0 — Full Data Integration
+// PHENOMEBEAUTY ADMIN v7.1 — Real Availability Data
 // ═══════════════════════════════════════════════════════════
 
 let ADMIN_TOKEN = '';
@@ -643,6 +643,7 @@ function show(viewName, el) {
   // Load data for view if not already loaded
   if (viewName === 'consults' && !document.getElementById('consults-container').dataset.loaded) loadConsultations();
   if (viewName === 'loyalty' && !document.getElementById('loyalty-container').dataset.loaded) loadLoyalty();
+  if (viewName === 'availability' && !document.getElementById('availability-container').dataset.loaded) loadAvailability();
   if (viewName === 'stock' && !document.getElementById('stock-container').dataset.loaded) loadStock();
   if (viewName === 'reviews' && !document.getElementById('reviews-container').dataset.loaded) loadReviews();
   if (viewName === 'integrations' && !document.getElementById('integrations-container').dataset.loaded) loadIntegrations();
@@ -827,6 +828,62 @@ async function loadLoyalty() {
   } catch (e) {
     container.innerHTML = '<div class="data-note">Failed to load loyalty data</div>';
     console.error('loadLoyalty:', e);
+  }
+}
+
+// ── AVAILABILITY ──
+async function loadAvailability() {
+  const container = document.getElementById('availability-container');
+  try {
+    const data = await apiFetch('/api/admin/availability');
+    container.dataset.loaded = 'true';
+    
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="data-note">No availability data in sheet</div>';
+      return;
+    }
+    
+    // Group by weekday for better display
+    const byDay = {};
+    data.forEach(slot => {
+      const day = slot.weekday.trim();
+      if (!byDay[day]) byDay[day] = [];
+      byDay[day].push(slot);
+    });
+    
+    const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    
+    container.innerHTML = `
+      <div class="card card-grad-1" style="padding:24px;margin-bottom:16px;">
+        <div class="label-caps" style="margin-bottom:12px;">Weekly Schedule</div>
+        <div style="font-size:13px;color:var(--t60);">Showing availability from Google Sheet — Availability tab</div>
+      </div>
+      
+      <table class="data-table">
+        <thead><tr>
+          <th>Weekday/Date</th>
+          <th>Time Slot</th>
+          <th>Available</th>
+        </tr></thead>
+        <tbody>${data.map(slot => {
+          const isAvailable = slot.available.toUpperCase() === 'YES';
+          return `
+          <tr style="${isAvailable ? '' : 'opacity:0.5;'}">
+            <td style="font-weight:700;color:var(--t100);text-transform:capitalize;">${slot.weekday}</td>
+            <td>${slot.timeSlot}</td>
+            <td>
+              <span class="status-pill ${isAvailable ? 's-confirmed' : 's-cancelled'}">
+                ${isAvailable ? 'YES' : 'NO'}
+              </span>
+            </td>
+          </tr>
+        `}).join('')}</tbody>
+      </table>
+    `;
+    
+  } catch (e) {
+    container.innerHTML = '<div class="data-note">Failed to load availability data</div>';
+    console.error('loadAvailability:', e);
   }
 }
 
