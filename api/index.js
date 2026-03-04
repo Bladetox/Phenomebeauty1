@@ -1,6 +1,6 @@
 require('dotenv').config({ override: true });
 
-// api/index.js — PhenomeBeauty Booking Server v5.5 — Full Sheet Mapping
+// api/index.js — PhenomeBeauty Booking Server v5.4
 // Vercel serverless entry point — exports Express app, never calls app.listen()
 'use strict';
 
@@ -314,14 +314,738 @@ app.get('/api', async (req, res) => {
     }
 });
 
-// (continuing with POST /api/book and other existing endpoints - keeping them exactly as they are)
-// Due to character limits, I'm showing the key NEW endpoints below
+// =============================================================================
+// POST /api/book
+// =============================================================================
+app.post('/api/book', rateLimit(10, 60000), async (req, res) => {
+    try {
+        const doc = await getDoc();
+        const s   = await getSettings(doc);
 
-// All existing endpoints from POST /api/book through GET /api/admin/consultations remain UNCHANGED
-// ... (keeping all webhook, payment, booking, consultation endpoints as-is)
+        const {
+            name, email, phone, address, services, date, time,
+            servicesTotal, callOutFee, totalAmount, depositAmount,
+            balanceDue, oneWayKm, roundTripKm, source, divaType, safety,
+        } = req.body;
+
+        const cleanName  = sanitize(name,    80);
+        const cleanEmail = sanitize(email,  120);
+        let cleanPhone = String(phone || '').replace(/[\s\-().]/g, '');
+        cleanPhone = cleanPhone.replace(/^(\+\d{1,3})(0)/, '$1');
+        if (!cleanPhone.startsWith('+')) {
+            cleanPhone = '+27' + cleanPhone.replace(/^0/, '');
+        }
+        cleanPhone = cleanPhone.slice(0, 16);
+        const cleanAddr  = sanitize(address, 200);
+        const cleanSrc   = sanitize(source,   50);
+
+        if (cleanName.length < 2)                                              return res.status(400).json({ error: 'Invalid name' });
+        if (!/^\+\d{7,15}$/.test(cleanPhone))                                 return res.status(400).json({ error: 'Invalid phone number' });
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail))               return res.status(400).json({ error: 'Invalid email' });
+        if (cleanAddr.length < 5)                                              return res.status(400).json({ error: 'Invalid address' });
+        if (!Array.isArray(services) || services.length === 0)                return res.status(400).json({ error: 'No services selected' });
+        if (services.length > 20)                                              return res.status(400).json({ error: 'Too many services' });
+        if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date))                      return res.status(400).json({ error: 'Invalid date format' });
+        if (!time || !/^\d{2}:\d{2}-\d{2}:\d{2}$/.test(time))               return res.status(400).json({ error: 'Invalid time format' });
+
+        const nameParts = cleanName.split(/\s+/);
+        const svcNames  = services.map(x => sanitize(typeof x === 'object' ? x.name : x, 60)).filter(Boolean).join(', ');
+        const svcIds    = services.map(x => (typeof x === 'object' ? x.id : '') || '').filter(Boolean).join(', ');
+        const svcMins   = services.reduce((a, x) => a + parseInt((typeof x === 'object' ? x.duration : 0) || 0), 0);
+
+        const serverServicesTotal = services.reduce((sum, x) => {
+            const p = typeof x === 'object' ? parseFloat(x.price || 0) : 0;
+            return sum + (isFinite(p) && p >= 0 ? p : 0);
+        }, 0);
+        const serverCallOut = Math.max(0, parseFloat(callOutFee) || 0);
+        const serverTotal   = serverServicesTotal + serverCallOut;
+        const settingPct    = parseFloat(s.deposit_percent || '50') / 100;
+        const serverDeposit = serverTotal > 0
+            ? Math.round(serverTotal * settingPct * 100) / 100
+            : Math.round(Number(depositAmount) * 100) / 100;
+        const serverBalance = Math.round((serverTotal - serverDeposit) * 100) / 100;
+
+        const dep       = Math.max(0, serverDeposit);
+        const bal       = Math.max(0, serverBalance);
+        const bookingId = 'PB-' + crypto.randomBytes(6).toString('hex').toUpperCase();
+
+        const isDivaNew     = divaType === 'new';
+        const safetyData    = (isDivaNew && safety) ? safety : null;
+        const skinNotes     = safetyData ? sanitize(safetyData.skinConditions,    500) : (isDivaNew ? '' : 'On File');
+        const medsNotes     = safetyData ? sanitize(safetyData.medications,       500) : (isDivaNew ? '' : 'On File');
+        const allergyNotes  = safetyData ? sanitize(safetyData.allergies,         500) : (isDivaNew ? '' : 'On File');
+        const healthNotes   = safetyData ? sanitize(safetyData.healthConditions,  500) : (isDivaNew ? '' : 'On File');
+        const environNotes  = safetyData ? sanitize(safetyData.environmental,     300) : '';
+        const physicalNotes = safetyData ? sanitize(safetyData.physical,          300) : '';
+        const pregnantNote  = safetyData ? (safetyData.pregnant     ? 'Yes' : 'No') : 'On File';
+        const hairOkNote    = safetyData ? (safetyData.hairLengthOk ? 'Yes' : 'No') : '';
+        const addlNotes     = safetyData ? sanitize(safetyData.additionalInfo,    500) : '';
+
+        const sheet = doc.sheetsByTitle['Bookings'];
+        if (!sheet) throw new Error('Bookings tab not found');
+
+        await sheet.addRow({
+            'Booking ID':             bookingId,
+            'Date':                   date,
+            'Time':                   time,
+            'Client Name':            cleanName,
+            'Client Phone':           cleanPhone,
+            'Client Email':           cleanEmail,
+            'Client Address':         cleanAddr,
+            'Service IDs':            svcIds,
+            'Service Names':          svcNames,
+            'Service Duration (min)': svcMins || '',
+            'One Way Km':             Number(oneWayKm)    || '',
+            'Round Trip Km':          Number(roundTripKm) || '',
+            'Call Out Fee (R)':       Number(callOutFee).toFixed(2),
+            'Service Price (R)':      Number(servicesTotal).toFixed(2),
+            'Total Amount (R)':       Number(totalAmount).toFixed(2),
+            'Deposit Amount (R)':     dep.toFixed(2),
+            'Balance Due (R)':        bal.toFixed(2),
+            'Deposit Status':         'Pending Payment',
+            'Balance Status':         'Pending',
+            'Yoco Link':              '',
+            'Calendar Event ID':      '',
+            'Created At':             new Date().toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' }),
+            'Yoco Checkout ID':       '',
+            'Notes':                  '',
+        });
+
+        try {
+            const consultSheet = doc.sheetsByTitle['Consultations'];
+            if (consultSheet) {
+                const consultRow = {
+                    'Booking ID':        bookingId,
+                    'Client Type':       isDivaNew ? 'New' : 'Existing',
+                    'Lead Source':       cleanSrc,
+                    'Skin Conditions':   skinNotes,
+                    'Medications':       medsNotes,
+                    'Allergies':         allergyNotes,
+                    'Health Conditions': healthNotes,
+                    'Pregnancy':         pregnantNote,
+                };
+                await consultSheet.loadHeaderRow();
+                const headers = consultSheet.headerValues || [];
+                if (headers.includes('Additional Notes'))       consultRow['Additional Notes']       = addlNotes;
+                if (headers.includes('Environmental Exposure')) consultRow['Environmental Exposure'] = environNotes;
+                if (headers.includes('Physical Factors'))       consultRow['Physical Factors']       = physicalNotes;
+                if (headers.includes('Hair Length OK'))         consultRow['Hair Length OK']         = hairOkNote;
+                await consultSheet.addRow(consultRow);
+            } else {
+                console.warn('Consultations tab not found — skipping');
+            }
+        } catch (consultErr) {
+            console.warn('Consultation row write failed (non-fatal):', consultErr.message);
+        }
+
+        bustDocCache();
+        console.log(`Saved ${bookingId} — ${svcNames} on ${date} ${time}`);
+
+        if (dep < 2) return res.json({
+            success: true, bookingId, paymentUrl: null,
+            paymentError: 'Deposit below R2 — we will contact you.',
+            depositAmount: dep, balanceDue: bal,
+        });
+
+        const appBase    = s.app_base_url           || 'http://localhost:3000';
+        const successUrl = s.booking_success_url    || `${appBase}/thankyou-balance.html?ref=${bookingId}`;
+        const cancelUrl  = s.booking_cancel_url     || `${appBase}/?payment=cancelled&ref=${bookingId}`;
+        const yocoKey    = s.yoco_secret_key        || '';
+        const rawSlug    = s.yoco_payment_page_slug || '';
+        const yocoSlug   = rawSlug.replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
+
+        let paymentUrl = null, paymentError = null;
+
+        if (yocoKey) {
+            const { ok, data } = await yocoCheckout({
+                key: yocoKey, cents: Math.round(dep * 100), successUrl, cancelUrl,
+                customer: {
+                    email:     cleanEmail,
+                    firstName: nameParts[0]  || '',
+                    lastName:  nameParts.slice(1).join(' ') || '',
+                    phone:     cleanPhone,
+                },
+                metadata: { bookingId, serviceDate: date, serviceTime: time },
+                desc:     `PhenomeBeauty deposit — ${svcNames}`,
+            });
+            if (ok && data.redirectUrl) {
+                paymentUrl = data.redirectUrl;
+                const { row } = await findRow(doc, bookingId);
+                if (row) {
+                    row.set('Yoco Checkout ID', data.id || '');
+                    row.set('Yoco Link', paymentUrl);
+                    await row.save();
+                }
+            } else {
+                paymentError = data.displayMessage || data.message || 'Yoco API error';
+            }
+        }
+
+        if (!paymentUrl && yocoSlug) {
+            const p = new URLSearchParams({
+                amount:                   dep.toFixed(2),
+                reference:                bookingId,
+                firstName:                nameParts[0] || '',
+                lastName:                 nameParts.slice(1).join(' ') || '',
+                email,
+                redirectOnPaymentSuccess: successUrl,
+            });
+            paymentUrl = `https://pay.yoco.com/${yocoSlug}?${p}`;
+            const { row } = await findRow(doc, bookingId);
+            if (row) { row.set('Yoco Link', paymentUrl); await row.save(); }
+        }
+
+        return res.json({
+            success: true, bookingId, paymentUrl,
+            paymentError: paymentUrl ? null : (paymentError || 'No Yoco credentials in Settings'),
+            depositAmount: dep, balanceDue: bal,
+        });
+
+    } catch (e) {
+        console.error('POST /api/book:', e.message);
+        res.status(500).json({ error: 'Failed to save booking — please try again' });
+    }
+});
 
 // =============================================================================
-// GET /api/admin/loyalty — UPDATED: Return ALL 13 columns
+// POST /api/webhook/yoco
+// =============================================================================
+app.post('/api/webhook/yoco', rateLimit(60, 60000), async (req, res) => {
+    const webhookSecret = process.env.YOCO_WEBHOOK_SECRET || '';
+    console.log('Webhook headers:', JSON.stringify(req.headers));
+
+    if (webhookSecret) {
+        try {
+            const rawBody = req.rawBody ? req.rawBody.toString('utf8') : JSON.stringify(req.body);
+            const msgId        = req.headers['webhook-id'] || '';
+            const msgTimestamp = req.headers['webhook-timestamp'] || '';
+            const sigHeader    = req.headers['webhook-signature'] || '';
+
+            const secretStr = webhookSecret.startsWith('whsec_')
+                ? webhookSecret.slice(6)
+                : Buffer.from(webhookSecret).toString('base64');
+            const secretBytes = Buffer.from(secretStr, 'base64');
+
+            const toSign  = `${msgId}.${msgTimestamp}.${rawBody}`;
+            const expected = crypto.createHmac('sha256', secretBytes).update(toSign).digest('base64');
+
+            const sigs = sigHeader.split(' ').map(s => s.replace(/^v1,/, ''));
+            const matched = sigs.some(sig => {
+                try {
+                    const eBuf = Buffer.from(expected);
+                    const sBuf = Buffer.from(sig);
+                    return eBuf.length === sBuf.length && crypto.timingSafeEqual(eBuf, sBuf);
+                } catch { return false; }
+            });
+
+            if (!matched) {
+                console.error('Webhook signature mismatch');
+                return res.status(401).json({ error: 'Invalid signature' });
+            }
+            console.log('Webhook: signature verified ✓');
+        } catch (err) {
+            console.error('Webhook signature verification failed:', err.message);
+            return res.status(401).json({ error: 'Invalid signature' });
+        }
+    } else {
+        console.warn('YOCO_WEBHOOK_SECRET not set — skipping verification');
+    }
+
+    try {
+        const event   = req.body || {};
+        const payment = event.payload || event;
+        const meta    = payment.metadata || {};
+
+        const successTypes = [
+            'payment.succeeded', 'payment.approved', 'payment_approved',
+            'payment.captured', 'payment_captured',
+        ];
+
+        if (!successTypes.includes(event.type)) {
+            console.log(`Webhook: ignoring event type "${event.type}"`);
+            return res.status(200).json({ received: true });
+        }
+
+        if (payment.status && payment.status !== 'succeeded') {
+            console.log(`Webhook: ignoring payment status "${payment.status}"`);
+            return res.status(200).json({ received: true });
+        }
+
+        const bookingId = meta.bookingId || '';
+        if (!bookingId) {
+            console.warn('Webhook: no bookingId in metadata — ignoring');
+            return res.status(200).json({ received: true });
+        }
+
+        const type = meta.type || 'deposit';
+        const doc     = await getDoc();
+        const { row } = await findRow(doc, bookingId);
+        if (!row) {
+            console.warn(`Webhook: booking ${bookingId} not found in sheet`);
+            return res.status(200).json({ received: true });
+        }
+
+        if (type === 'balance') {
+            if (row.get('Balance Status') === 'Paid') {
+                console.log(`Webhook: balance already paid for ${bookingId} — idempotent skip`);
+                return res.status(200).json({ received: true });
+            }
+
+            row.set('Balance Status', 'Paid');
+            await row.save();
+            console.log(`Webhook: balance paid for ${bookingId}`);
+
+            const settings = await getSettings(doc);
+
+            await Promise.all([
+                sendRebookEmail(settings, {
+                    bookingId,
+                    name:     row.get('Client Name'),
+                    email:    row.get('Client Email'),
+                    total:    row.get('Total Amount (R)'),
+                    services: row.get('Service Names'),
+                }).then(() => console.log('Rebook email sent')).catch((e) => console.error('Rebook email error:', e.message)),
+
+                sendAdminBalancePaidNotification(settings, {
+                    bookingId,
+                    name:        row.get('Client Name'),
+                    email:       row.get('Client Email'),
+                    phone:       row.get('Client Phone'),
+                    address:     row.get('Client Address'),
+                    services:    row.get('Service Names'),
+                    date:        row.get('Date'),
+                    time:        row.get('Time'),
+                    totalAmount: row.get('Total Amount (R)'),
+                    deposit:     row.get('Deposit Amount (R)'),
+                    balance:     row.get('Balance Due (R)'),
+                }).then(() => console.log('Admin balance-paid email sent')).catch((e) => console.error('Admin balance-paid email error:', e.message)),
+            ]);
+
+            return res.status(200).json({ received: true });
+        }
+
+        const incomingPaymentId = payment.id || '';
+        const webhookMsgId = req.headers['webhook-id'] || '';
+        if (row.get('Deposit Status') === 'Confirmed' ||
+            (incomingPaymentId && row.get('Yoco Checkout ID') === incomingPaymentId) ||
+            (webhookMsgId && row.get('Last Webhook ID') === webhookMsgId)) {
+            console.log(`Webhook: deposit already confirmed for ${bookingId} — idempotent skip`);
+            return res.status(200).json({ received: true });
+        }
+        if (webhookMsgId) row.set('Last Webhook ID', webhookMsgId);
+
+        row.set('Deposit Status',   'Confirmed');
+        row.set('Yoco Checkout ID', incomingPaymentId || row.get('Yoco Checkout ID') || '');
+        await row.save();
+        console.log(`Webhook: deposit confirmed for ${bookingId}`);
+
+        const settings = await getSettings(doc);
+
+        let calId = null;
+        try {
+            calId = await Promise.race([
+                calCreate(settings, {
+                    bookingId,
+                    name:        row.get('Client Name'),
+                    email:       row.get('Client Email'),
+                    phone:       row.get('Client Phone'),
+                    address:     row.get('Client Address'),
+                    services:    row.get('Service Names'),
+                    date:        row.get('Date'),
+                    time:        row.get('Time'),
+                    totalAmount: row.get('Total Amount (R)'),
+                    deposit:     row.get('Deposit Amount (R)'),
+                    balance:     row.get('Balance Due (R)'),
+                }),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Calendar timeout')), 5000))
+            ]);
+
+            if (calId) {
+                row.set('Calendar Event ID', calId);
+                await row.save();
+                console.log(`Webhook: calendar event ${calId} created for ${bookingId}`);
+            }
+        } catch (e) {
+            console.error(`Webhook: calendar creation failed for ${bookingId}:`, e.message);
+        }
+
+        await Promise.all([
+            sendAdminDepositNotification(settings, {
+                bookingId,
+                name:        row.get('Client Name'),
+                email:       row.get('Client Email'),
+                phone:       row.get('Client Phone'),
+                address:     row.get('Client Address'),
+                services:    row.get('Service Names'),
+                date:        row.get('Date'),
+                time:        row.get('Time'),
+                totalAmount: row.get('Total Amount (R)'),
+                deposit:     row.get('Deposit Amount (R)'),
+                balance:     row.get('Balance Due (R)'),
+            }).then(() => console.log('Admin deposit email sent')).catch((e) => console.error('Admin deposit email error:', e.message)),
+
+            sendCustomerConfirmationEmail(settings, {
+                bookingId,
+                name:     row.get('Client Name'),
+                email:    row.get('Client Email'),
+                address:  row.get('Client Address'),
+                services: row.get('Service Names'),
+                date:     row.get('Date'),
+                time:     row.get('Time'),
+                deposit:  row.get('Deposit Amount (R)'),
+                balance:  row.get('Balance Due (R)'),
+            }).then(() => console.log('Customer confirmation email sent')).catch((e) => console.error('Customer confirmation email error:', e.message)),
+        ]);
+
+        return res.status(200).json({ received: true });
+
+    } catch (e) {
+        console.error('Webhook processing error:', e.message);
+        return res.status(500).json({ error: 'Internal error — will retry' });
+    }
+});
+
+// =============================================================================
+// GET /api/check-payment
+// =============================================================================
+app.get('/api/check-payment', rateLimit(30, 60000), async (req, res) => {
+    const ref = (req.query.ref || '').trim();
+    if (!ref) return res.status(400).json({ error: 'ref required' });
+    try {
+        const doc = await getDoc();
+        const s   = await getSettings(doc);
+        const { row } = await findRow(doc, ref);
+        if (!row) return res.status(404).json({ error: 'Not found' });
+        res.json({
+            bookingId:     ref,
+            depositStatus: row.get('Deposit Status')     || '',
+            balanceStatus: row.get('Balance Status')     || '',
+            name:          row.get('Client Name')        || '',
+            services:      row.get('Service Names')      || '',
+            date:          row.get('Date')               || '',
+            time:          row.get('Time')               || '',
+            total:         row.get('Total Amount (R)')   || '',
+            deposit:       row.get('Deposit Amount (R)') || '',
+            balance:       row.get('Balance Due (R)')    || '',
+            appBase:       s.app_base_url || '',
+        });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/login
+// =============================================================================
+app.post('/api/admin/login', rateLimit(5, 60000), async (req, res) => {
+    try {
+        const doc      = await getDoc();
+        const s        = await getSettings(doc);
+        const provided = String(req.body.password || '');
+        const expected = String(s.admin_password  || '');
+        const pBuf     = Buffer.alloc(Math.max(provided.length, expected.length));
+        const eBuf     = Buffer.alloc(Math.max(provided.length, expected.length));
+        Buffer.from(provided).copy(pBuf);
+        Buffer.from(expected).copy(eBuf);
+        const match = expected.length > 0 && provided.length === expected.length &&
+                      crypto.timingSafeEqual(pBuf, eBuf);
+        if (!match) return res.status(401).json({ error: 'Invalid password' });
+        res.json({ token: makeAdminToken(provided) });
+    } catch (e) { res.status(500).json({ error: 'Login failed' }); }
+});
+
+// =============================================================================
+// GET /api/admin/bookings
+// =============================================================================
+app.get('/api/admin/bookings', adminOnly, async (req, res) => {
+    try {
+        const sheet = req.doc.sheetsByTitle['Bookings'];
+        if (!sheet) throw new Error('Bookings tab not found');
+        const rows = await sheet.getRows();
+        res.json(rows.map(r => ({
+            bookingId:     r.get('Booking ID'),
+            name:          r.get('Client Name'),
+            email:         r.get('Client Email'),
+            phone:         r.get('Client Phone'),
+            address:       r.get('Client Address'),
+            services:      r.get('Service Names'),
+            date:          r.get('Date'),
+            time:          r.get('Time'),
+            total:         r.get('Total Amount (R)'),
+            deposit:       r.get('Deposit Amount (R)'),
+            balanceDue:    r.get('Balance Due (R)'),
+            status:        r.get('Deposit Status'),
+            balanceStatus: r.get('Balance Status'),
+            checkoutId:    r.get('Yoco Checkout ID'),
+            calEventId:    r.get('Calendar Event ID'),
+            createdAt:     r.get('Created At'),
+            yocoLink:      r.get('Yoco Link'),
+        })).filter(b => b.bookingId).reverse());
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// GET /api/admin/consultations
+// =============================================================================
+app.get('/api/admin/consultations', adminOnly, async (req, res) => {
+    try {
+        const bookSheet    = req.doc.sheetsByTitle['Bookings'];
+        const consultSheet = req.doc.sheetsByTitle['Consultations'];
+        if (!consultSheet) return res.json([]);
+
+        const [bookRows, consultRows] = await Promise.all([
+            bookSheet    ? bookSheet.getRows()    : Promise.resolve([]),
+            consultSheet.getRows(),
+        ]);
+
+        const bookMap = {};
+        bookRows.forEach(r => {
+            const id = (r.get('Booking ID') || '').trim();
+            if (id) bookMap[id] = {
+                name:     r.get('Client Name')    || '',
+                email:    r.get('Client Email')   || '',
+                phone:    r.get('Client Phone')   || '',
+                date:     r.get('Date')           || '',
+                time:     r.get('Time')           || '',
+                services: r.get('Service Names')  || '',
+                status:   r.get('Deposit Status') || '',
+            };
+        });
+
+        res.json(consultRows.map(r => {
+            const id = (r.get('Booking ID') || '').trim();
+            const b  = bookMap[id] || {};
+            return {
+                bookingId:        id,
+                clientType:       r.get('Client Type')        || '',
+                leadSource:       r.get('Lead Source')        || '',
+                skinConditions:   r.get('Skin Conditions')    || '',
+                medications:      r.get('Medications')        || '',
+                allergies:        r.get('Allergies')          || '',
+                healthConditions: r.get('Health Conditions')  || '',
+                pregnancy:        r.get('Pregnancy')          || '',
+                additionalNotes:  r.get('Additional Notes')   || '',
+                name:     b.name,     email:    b.email,
+                phone:    b.phone,    date:     b.date,
+                time:     b.time,     services: b.services,
+                status:   b.status,
+            };
+        }).filter(c => c.bookingId).reverse());
+
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/update-status
+// =============================================================================
+app.post('/api/admin/update-status', adminOnly, async (req, res) => {
+    try {
+        const { bookingId, status } = req.body;
+        const VALID_STATUSES = ['Pending Payment', 'Confirmed', 'Service Complete', 'Cancelled', 'Refunded'];
+        if (!VALID_STATUSES.includes(status)) return res.status(400).json({ error: 'Invalid status' });
+
+        const { row } = await findRow(req.doc, bookingId);
+        if (!row) return res.status(404).json({ error: 'Not found' });
+
+        const prev = row.get('Deposit Status') || '';
+        row.set('Deposit Status', status);
+        await row.save();
+
+        if (status === 'Confirmed') {
+            if (!row.get('Calendar Event ID')) {
+                const calId = await calCreate(req.settings, {
+                    bookingId,
+                    name:        row.get('Client Name'),
+                    email:       row.get('Client Email'),
+                    phone:       row.get('Client Phone'),
+                    address:     row.get('Client Address'),
+                    services:    row.get('Service Names'),
+                    date:        row.get('Date'),
+                    time:        row.get('Time'),
+                    totalAmount: row.get('Total Amount (R)'),
+                    deposit:     row.get('Deposit Amount (R)'),
+                    balance:     row.get('Balance Due (R)'),
+                });
+                if (calId) { row.set('Calendar Event ID', calId); await row.save(); }
+            }
+
+            if (prev !== 'Confirmed') {
+                sendAdminDepositNotification(req.settings, {
+                    bookingId,
+                    name:        row.get('Client Name'),
+                    email:       row.get('Client Email'),
+                    phone:       row.get('Client Phone'),
+                    address:     row.get('Client Address'),
+                    services:    row.get('Service Names'),
+                    date:        row.get('Date'),
+                    time:        row.get('Time'),
+                    totalAmount: row.get('Total Amount (R)'),
+                    deposit:     row.get('Deposit Amount (R)'),
+                    balance:     row.get('Balance Due (R)'),
+                }).catch(() => {});
+                sendCustomerConfirmationEmail(req.settings, {
+                    bookingId,
+                    name:     row.get('Client Name'),
+                    email:    row.get('Client Email'),
+                    address:  row.get('Client Address'),
+                    services: row.get('Service Names'),
+                    date:     row.get('Date'),
+                    time:     row.get('Time'),
+                    deposit:  row.get('Deposit Amount (R)'),
+                    balance:  row.get('Balance Due (R)'),
+                }).catch(() => {});
+            }
+        }
+
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/reschedule
+// =============================================================================
+app.post('/api/admin/reschedule', adminOnly, async (req, res) => {
+    try {
+        const { bookingId, newDate, newTime } = req.body;
+        const { row } = await findRow(req.doc, bookingId);
+        if (!row) return res.status(404).json({ error: 'Not found' });
+
+        const oldCal = row.get('Calendar Event ID') || '';
+        row.set('Date', newDate);
+        row.set('Time', newTime);
+        await row.save();
+
+        if (oldCal) {
+            const updated = await calUpdate(req.settings, oldCal, {
+                name:     row.get('Client Name'),
+                address:  row.get('Client Address'),
+                services: row.get('Service Names'),
+                date:     newDate,
+                time:     newTime,
+            });
+            if (!updated) {
+                await calDelete(req.settings, oldCal);
+                const nc = await calCreate(req.settings, {
+                    bookingId,
+                    name:        row.get('Client Name'),
+                    email:       row.get('Client Email'),
+                    phone:       row.get('Client Phone'),
+                    address:     row.get('Client Address'),
+                    services:    row.get('Service Names'),
+                    date:        newDate,
+                    time:        newTime,
+                    totalAmount: row.get('Total Amount (R)'),
+                    deposit:     row.get('Deposit Amount (R)'),
+                    balance:     row.get('Balance Due (R)'),
+                });
+                if (nc) { row.set('Calendar Event ID', nc); await row.save(); }
+            }
+        }
+
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/request-balance
+// =============================================================================
+app.post('/api/admin/request-balance', adminOnly, async (req, res) => {
+    try {
+        const { bookingId } = req.body;
+        const { row } = await findRow(req.doc, bookingId);
+        if (!row) return res.status(404).json({ error: 'Not found' });
+        if (row.get('Balance Status') === 'Paid') return res.status(400).json({ error: 'Already paid' });
+
+        const bal = parseFloat((row.get('Balance Due (R)') || '').replace(/[R\s]/g, '')) || 0;
+        if (bal < 2) return res.status(400).json({ error: 'Balance below R2' });
+
+        const s    = req.settings;
+        const base = s.app_base_url || 'http://localhost:3000';
+        const sUrl = `${base}/thankyou.html?balance=true&ref=${bookingId}`;
+        const cUrl = `${base}/?payment=cancelled&ref=${bookingId}`;
+        const slug = (s.yoco_payment_page_slug || '').replace(/^https?:\/\/pay\.yoco\.com\//, '').replace(/\?.*$/, '').trim();
+        const np   = (row.get('Client Name') || '').split(/\s+/);
+        let paymentUrl = null;
+
+        if (s.yoco_secret_key) {
+            const { ok, data } = await yocoCheckout({
+                key:        s.yoco_secret_key,
+                cents:      Math.round(bal * 100),
+                successUrl: sUrl,
+                cancelUrl:  cUrl,
+                customer:   { email: row.get('Client Email') || '', firstName: np[0] || '', lastName: np.slice(1).join(' ') || '', phone: row.get('Client Phone') || '' },
+                metadata:   { bookingId, type: 'balance' },
+                desc:       `PhenomeBeauty balance — ${row.get('Service Names')}`,
+            });
+            if (ok && data.redirectUrl) paymentUrl = data.redirectUrl;
+        }
+
+        if (!paymentUrl && slug) {
+            const p = new URLSearchParams({
+                amount:                   bal.toFixed(2),
+                reference:                `${bookingId}-BAL`,
+                firstName:                np[0] || '',
+                lastName:                 np.slice(1).join(' ') || '',
+                email:                    row.get('Client Email') || '',
+                redirectOnPaymentSuccess: sUrl,
+            });
+            paymentUrl = `https://pay.yoco.com/${slug}?${p}`;
+        }
+
+        if (!paymentUrl) return res.status(500).json({ error: 'No Yoco credentials' });
+
+        row.set('Deposit Status',  'Service Complete');
+        row.set('Balance Status',  'Requested');
+        row.set('Yoco Link',       paymentUrl);
+        await row.save();
+
+        sendBalanceRequestEmail(s, {
+            bookingId,
+            name:       row.get('Client Name'),
+            email:      row.get('Client Email'),
+            services:   row.get('Service Names'),
+            deposit:    row.get('Deposit Amount (R)'),
+            balance:    bal.toFixed(2),
+            paymentUrl: paymentUrl,
+        }).catch((e) => console.error('Balance request email error:', e.message));
+
+        res.json({ success: true, paymentUrl, balanceDue: bal });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/refund
+// =============================================================================
+app.post('/api/admin/refund', adminOnly, async (req, res) => {
+    try {
+        const { bookingId, reason } = req.body;
+        const { row } = await findRow(req.doc, bookingId);
+        if (!row) return res.status(404).json({ error: 'Not found' });
+
+        const key = req.settings.yoco_secret_key || '';
+        if (!key) return res.status(400).json({ error: 'yoco_secret_key not set' });
+
+        const cid = (row.get('Yoco Checkout ID') || '').trim();
+        if (!cid) return res.status(400).json({ error: 'No Checkout ID — refund manually in Yoco Dashboard' });
+
+        const r = await fetch(`https://payments.yoco.com/api/checkouts/${cid}/refund`, {
+            method:  'POST',
+            headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ reason: reason || 'requested_by_customer' }),
+        });
+        const d = await r.json();
+        if (!r.ok) return res.status(400).json({ error: d.displayMessage || d.message || 'Refund failed' });
+
+        row.set('Deposit Status', 'Refunded');
+        await row.save();
+
+        const calId = row.get('Calendar Event ID') || '';
+        if (calId) await calDelete(req.settings, calId);
+
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// GET /api/admin/loyalty
 // =============================================================================
 app.get('/api/admin/loyalty', adminOnly, async (req, res) => {
     try {
@@ -329,113 +1053,98 @@ app.get('/api/admin/loyalty', adminOnly, async (req, res) => {
         if (!sheet) return res.json([]);
         const rows = await sheet.getRows();
         res.json(rows.filter(r=>(r.get('Client Name')||'').trim()).map(r=>({
-            clientName: r.get('Client Name') || '',
-            whatsappLink: r.get('WhatsApp Link') || '',
-            phone: r.get('Phone Number') || '',
-            packProgress: r.get('Pack Progress') || '',
-            lastWaxDate: r.get('Last Wax Date') || '',
-            nextDueDate: r.get('Next Due Date') || '',
-            status: r.get('Status') || '',
-            notes: r.get('Notes') || '',
-            quickSend: r.get('Quick Send') || '',
-            overdue: r.get('Overdue') || '',
-            boughtPack: r.get('Bought 3-Pack, But No Booking') || '',
-            location: r.get('Location') || '',
-            emailSent: r.get('Email Invite Sent') || ''
+            clientName:r.get('Client Name')||'',whatsappLink:r.get('WhatsApp Link')||'',
+            phone:r.get('Phone Number')||'',packProgress:r.get('Pack Progress')||'',
+            lastWaxDate:r.get('Last Wax Date')||'',nextDueDate:r.get('Next Due Date')||'',
+            status:r.get('Status')||'',notes:r.get('Notes')||'',location:r.get('Location')||''
         })));
     } catch(e){res.status(500).json({error:e.message});}
 });
 
 // =============================================================================
-// GET /api/admin/stock — FIXED: Map correct column names from actual sheet
+// GET /api/admin/stock
 // =============================================================================
 app.get('/api/admin/stock', adminOnly, async (req, res) => {
     try {
         const sheet = req.doc.sheetsByTitle['Stock'];
         if (!sheet) return res.json([]);
         const rows = await sheet.getRows();
-        res.json(rows.filter(r=>(r.get('ITEM')||'').trim()).map(r=>({
-            item: r.get('ITEM') || '',
-            cost: r.get('COST') || '0',
-            stockOnHand: r.get('STOCK ON HAND') || '0',
-            totalCost: r.get('TOTAL COST') || '0',
-            notes: r.get('NOTES') || ''
+        res.json(rows.filter(r=>(r.get('Product Name')||r.get('Item')||r.get('Name')||'').trim()).map(r=>({
+            name:r.get('Product Name')||r.get('Item')||r.get('Name')||'',
+            category:r.get('Category')||'',quantity:r.get('Quantity')||r.get('Stock')||'0',
+            minStock:r.get('Min Stock')||r.get('Minimum')||'0',unit:r.get('Unit')||'',notes:r.get('Notes')||''
         })));
     } catch(e){res.status(500).json({error:e.message});}
 });
 
 // =============================================================================
-// GET /api/admin/consumption — NEW: Consumption Sheet tracking
+// GET /api/admin/reviews  — fetches live reviews from Google Places API (New)
+// Requires: google_maps_api_key + google_place_id in Settings sheet
+// Falls back gracefully if not configured.
 // =============================================================================
-app.get('/api/admin/consumption', adminOnly, async (req, res) => {
+app.get('/api/admin/reviews', adminOnly, rateLimit(10, 60000), async (req, res) => {
     try {
-        const sheet = req.doc.sheetsByTitle['Comsuption Sheet'];
-        if (!sheet) return res.json([]);
-        const rows = await sheet.getRows();
-        res.json(rows.filter(r=>(r.get('ITEM')||'').trim()).map(r=>({
-            item: r.get('ITEM') || '',
-            cost: r.get('COST') || '0',
-            used: r.get('USED') || '0',
-            totalCost: r.get('TOTAL COST') || '0',
-            notes: r.get('NOTES') || ''
-        })));
-    } catch(e){res.status(500).json({error:e.message});}
+        const s       = req.settings;
+        const apiKey  = s.google_maps_api_key || '';
+        const placeId = (s.google_place_id || '').trim();
+
+        if (!apiKey || !placeId) {
+            return res.json({ configured: false });
+        }
+
+        // Use Places API (New) — places.googleapis.com
+        const fields  = 'displayName,rating,userRatingCount,reviews';
+        const url     = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}` +
+                        `?fields=${fields}&key=${encodeURIComponent(apiKey)}`;
+
+        const resp = await fetch(url, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!resp.ok) {
+            const errBody = await resp.text();
+            console.error('Places API error:', resp.status, errBody.slice(0, 300));
+            return res.json({
+                configured: true,
+                error: `Google Places API error (${resp.status}) — check your API key and Place ID in Settings`,
+            });
+        }
+
+        const data = await resp.json();
+
+        const reviews = (data.reviews || []).map(r => ({
+            author:       r.authorAttribution?.displayName   || 'Anonymous',
+            profilePhoto: r.authorAttribution?.photoUri      || '',
+            rating:       r.rating                           || 0,
+            text:         r.text?.text                       || '',
+            relativeTime: r.relativePublishTimeDescription   || '',
+            publishTime:  r.publishTime                      || '',
+        }));
+
+        return res.json({
+            configured:   true,
+            rating:       data.rating        || 0,
+            totalReviews: data.userRatingCount || 0,
+            placeName:    data.displayName?.text || placeId,
+            reviews,
+        });
+
+    } catch (e) {
+        console.error('reviews endpoint error:', e.message);
+        res.status(500).json({ error: e.message });
+    }
 });
 
 // =============================================================================
-// GET /api/admin/services — NEW: Service catalog management
-// =============================================================================
-app.get('/api/admin/services', adminOnly, async (req, res) => {
-    try {
-        const services = await getServices(req.doc);
-        res.json(services.map(s => ({
-            id: s.id || '',
-            name: s.name || '',
-            description: s.description || '',
-            duration: s.duration || 0,
-            price: s.price || 0,
-            depositPercent: s.depositPercent || '',
-            active: s.active !== false && (s.active === true || (s.active || '').toUpperCase() === 'YES'),
-            category: s.category || ''
-        })));
-    } catch(e){res.status(500).json({error:e.message});}
-});
-
-// =============================================================================
-// POST /api/admin/services — NEW: Toggle service active status
-// =============================================================================
-app.post('/api/admin/services', adminOnly, async (req, res) => {
-    try {
-        const { id, active } = req.body;
-        if (!id) return res.status(400).json({ error: 'Service ID required' });
-        
-        const sheet = req.doc.sheetsByTitle['Services'];
-        if (!sheet) throw new Error('Services sheet not found');
-        
-        const rows = await sheet.getRows();
-        const row = rows.find(r => (r.get('ID') || '').trim() === id.trim());
-        if (!row) return res.status(404).json({ error: 'Service not found' });
-        
-        row.set('Active', active ? 'YES' : 'NO');
-        await row.save();
-        bustDocCache();
-        
-        res.json({ success: true });
-    } catch(e){res.status(500).json({error:e.message});}
-});
-
-// =============================================================================
-// GET /api/admin/availability — UPDATED: Include Notes column
+// GET /api/admin/availability — NEW: Read raw Availability sheet data
 // =============================================================================
 app.get('/api/admin/availability', adminOnly, async (req, res) => {
     try {
         const avRows = await getAvailabilityRows(req.doc);
         const slots = avRows.map(r => ({
-            weekday:   r.get('Weekday/Date')       || '',
-            timeSlot:  r.get('Time Slot')          || '',
+            weekday:   r.get('Weekday/Date')      || '',
+            timeSlot:  r.get('Time Slot')         || '',
             available: r.get('Available (YES/NO)') || '',
-            notes:     r.get('Notes')              || '',
-            _rowIndex: r.rowNumber
         })).filter(s => s.weekday && s.timeSlot);
         res.json(slots);
     } catch (e) {
@@ -444,33 +1153,95 @@ app.get('/api/admin/availability', adminOnly, async (req, res) => {
 });
 
 // =============================================================================
-// POST /api/admin/availability — NEW: Update availability slot
+// GET /api/admin/client-history
 // =============================================================================
-app.post('/api/admin/availability', adminOnly, async (req, res) => {
+app.get('/api/admin/client-history', adminOnly, async (req, res) => {
     try {
-        const { weekday, timeSlot, available } = req.body;
-        if (!weekday || !timeSlot) return res.status(400).json({ error: 'weekday and timeSlot required' });
-        
-        const sheet = req.doc.sheetsByTitle['Availability'];
-        if (!sheet) throw new Error('Availability sheet not found');
-        
+        const email = (req.query.email || '').trim().toLowerCase();
+        const phone = (req.query.phone || '').trim();
+        const sheet = req.doc.sheetsByTitle['Bookings'];
+        if (!sheet) return res.json([]);
         const rows = await sheet.getRows();
-        const row = rows.find(r => 
-            (r.get('Weekday/Date') || '').trim().toLowerCase() === weekday.trim().toLowerCase() &&
-            (r.get('Time Slot') || '').trim() === timeSlot.trim()
-        );
-        
-        if (!row) return res.status(404).json({ error: 'Slot not found' });
-        
-        row.set('Available (YES/NO)', available ? 'YES' : 'NO');
-        await row.save();
-        bustDocCache();
-        
-        res.json({ success: true });
-    } catch(e){res.status(500).json({error:e.message});}
+        const matches = rows.filter(r => {
+            const rEmail = (r.get('Client Email') || '').trim().toLowerCase();
+            const rPhone = (r.get('Client Phone') || '').trim();
+            return (email && rEmail === email) || (phone && rPhone === phone);
+        });
+        res.json(matches.map(r => ({
+            bookingId: r.get('Booking ID') || '',
+            services:  r.get('Service Names') || '',
+            date:      r.get('Date') || '',
+            status:    r.get('Deposit Status') || '',
+        })).filter(b => b.bookingId).reverse());
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Keep all other existing endpoints unchanged...
-// (reviews, integrations, email-config, etc.)
+// =============================================================================
+// POST /api/admin/add-service
+// =============================================================================
+app.post('/api/admin/add-service', adminOnly, async (req, res) => {
+    try {
+        const { bookingId, serviceName, servicePrice } = req.body;
+        if (!bookingId || !serviceName) return res.status(400).json({ error: 'bookingId and serviceName required' });
+        const { row } = await findRow(req.doc, bookingId);
+        if (!row) return res.status(404).json({ error: 'Booking not found' });
 
+        const price       = Math.max(0, parseFloat(servicePrice) || 0);
+        const oldServices = row.get('Service Names') || '';
+        const newServices = oldServices ? `${oldServices}, ${sanitize(serviceName, 60)}` : sanitize(serviceName, 60);
+        const oldTotal    = parseFloat(row.get('Total Amount (R)')   || 0);
+        const oldBalance  = parseFloat(row.get('Balance Due (R)')    || 0);
+        const newTotal    = Math.round((oldTotal   + price) * 100) / 100;
+        const newBalance  = Math.round((oldBalance + price) * 100) / 100;
+
+        row.set('Service Names',   newServices);
+        row.set('Total Amount (R)', newTotal.toFixed(2));
+        row.set('Balance Due (R)',  newBalance.toFixed(2));
+        await row.save();
+
+        res.json({ success: true, newServices, newTotal: newTotal.toFixed(2), newBalance: newBalance.toFixed(2) });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// POST /api/admin/test-email
+// =============================================================================
+app.post('/api/admin/test-email', adminOnly, async (req, res) => {
+    try {
+        const s = req.settings;
+        await sendAdminDepositNotification(s, {
+            bookingId:   'TEST-001',
+            name:        'Test Client',
+            email:       s.admin_email || '',
+            phone:       '+27000000000',
+            address:     '1 Test Street, Cape Town',
+            services:    'Test Service',
+            date:        new Date().toISOString().slice(0, 10),
+            time:        '10:00-11:00',
+            totalAmount: '200.00',
+            deposit:     '100.00',
+            balance:     '100.00',
+        });
+        res.json({ success: true, message: 'Test email sent to ' + (s.admin_email || 'admin') });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// GET /api/admin/email-config
+// =============================================================================
+app.get('/api/admin/email-config', adminOnly, async (req, res) => {
+    try {
+        const s = req.settings;
+        res.json({
+            ready:     !!(s.smtp_host && s.smtp_user && s.smtp_pass),
+            smtpHost:  s.smtp_host  || '',
+            smtpUser:  s.smtp_user  || '',
+            adminEmail:s.admin_email|| '',
+        });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// =============================================================================
+// Vercel serverless export
+// =============================================================================
 module.exports = app;
