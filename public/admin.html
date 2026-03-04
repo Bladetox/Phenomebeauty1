@@ -10,7 +10,7 @@
 <title>PhenomeBeauty — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family:Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
@@ -369,6 +369,12 @@ html,body {
   </div>
   <div class="nav-item active" onclick="show('dashboard',this)"><span class="nav-icon">◈</span><span class="nav-lbl">Dashboard</span></div>
   <div class="nav-item" onclick="show('bookings',this)"><span class="nav-icon">◷</span><span class="nav-lbl">Bookings</span><span class="nav-badge nav-lbl" id="badge-bookings" style="display:none;"></span></div>
+  <div class="nav-item" onclick="show('consults',this)"><span class="nav-icon">✦</span><span class="nav-lbl">Consultation Forms</span><span class="nav-badge nav-lbl" id="badge-consults" style="display:none;"></span></div>
+  <div class="nav-item" onclick="show('loyalty',this)"><span class="nav-icon">♡</span><span class="nav-lbl">Loyalty Tracker</span><span class="nav-badge nav-lbl" id="badge-loyalty" style="display:none;"></span></div>
+  <div class="nav-item" onclick="show('availability',this)"><span class="nav-icon">⊡</span><span class="nav-lbl">Availability</span></div>
+  <div class="nav-item" onclick="show('stock',this)"><span class="nav-icon">◫</span><span class="nav-lbl">Stock</span><span class="nav-badge nav-lbl" id="badge-stock" style="display:none;"></span></div>
+  <div class="nav-item" onclick="show('reviews',this)"><span class="nav-icon">★</span><span class="nav-lbl">Reviews</span></div>
+  <div class="nav-item" onclick="show('integrations',this)"><span class="nav-icon">⟡</span><span class="nav-lbl">Integrations</span></div>
   <div class="sidebar-spacer"></div>
   <div class="nav-item" onclick="show('settings',this)"><span class="nav-icon">⊙</span><span class="nav-lbl">Settings</span></div>
   <div class="nav-item" onclick="doLogout()" style="margin-top:4px;"><span class="nav-icon">↩</span><span class="nav-lbl">Sign Out</span></div>
@@ -406,6 +412,36 @@ html,body {
     <div class="booking-list" id="booking-list">
       <div class="data-note">Loading bookings…</div>
     </div>
+  </div>
+
+  <!-- ═══ CONSULTATION FORMS ═══ -->
+  <div class="view" id="view-consults">
+    <div class="data-note">Consultation forms feature coming soon</div>
+  </div>
+
+  <!-- ═══ LOYALTY TRACKER ═══ -->
+  <div class="view" id="view-loyalty">
+    <div class="data-note">Loyalty tracker feature coming soon</div>
+  </div>
+
+  <!-- ═══ AVAILABILITY ═══ -->
+  <div class="view" id="view-availability">
+    <div class="data-note">Availability management coming soon</div>
+  </div>
+
+  <!-- ═══ STOCK ═══ -->
+  <div class="view" id="view-stock">
+    <div class="data-note">Stock management feature coming soon</div>
+  </div>
+
+  <!-- ═══ REVIEWS ═══ -->
+  <div class="view" id="view-reviews">
+    <div class="data-note">Google Reviews feature coming soon</div>
+  </div>
+
+  <!-- ═══ INTEGRATIONS ═══ -->
+  <div class="view" id="view-integrations">
+    <div class="data-note">Integrations settings coming soon</div>
   </div>
 
   <!-- ═══ SETTINGS ═══ -->
@@ -482,9 +518,9 @@ html,body {
 <!-- ── TOAST ── -->
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ═══════════════════════════════════════════════════════════
-// PHENOMEBEAUTY ADMIN v6.1 — Fixed Service Dropdown
+// PHENOMEBEAUTY ADMIN v6.2 — All 10 Menu Items Restored
 // ═══════════════════════════════════════════════════════════
 
 let ADMIN_TOKEN = '';
@@ -555,12 +591,24 @@ async function apiFetch(url, opts = {}) {
 }
 
 // ── NAV ──
+const VIEW_TITLES = {
+  dashboard: 'Dashboard',
+  bookings: 'Bookings',
+  consults: 'Consultation Forms',
+  loyalty: 'Loyalty Tracker',
+  availability: 'Availability',
+  stock: 'Stock',
+  reviews: 'Reviews',
+  integrations: 'Integrations',
+  settings: 'Settings'
+};
+
 function show(viewName, el) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`view-${viewName}`).classList.add('active');
   if (el) el.classList.add('active');
-  document.getElementById('topbar-title').textContent = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+  document.getElementById('topbar-title').textContent = VIEW_TITLES[viewName] || viewName;
   closeSidebar();
 }
 
