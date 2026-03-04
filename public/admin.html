@@ -361,150 +361,94 @@ html,body {
 .review-text{font-size:12.5px;color:var(--t80);line-height:1.6;}
 
 
-/* ===== RESPONSIVE DESIGN - MOBILE & DESKTOP ===== */
 
-/* Base container */
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-}
+/* ===== CONSISTENT THEME FOR ADMIN PANEL ===== */
 
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
-  
-  .header {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start !important;
-  }
-  
-  .header h1 {
-    font-size: 20px !important;
-  }
-}
-
-/* Section headers - flex layout */
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.section-header h2 {
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.section-header .badge {
-  flex-shrink: 0;
-}
-
-.section-header .icon-btn {
+/* Settings Button - Consistent styling */
+.settings-btn {
   margin-left: auto;
   background: var(--card);
   border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.section-header .icon-btn:hover {
-  background: var(--hover);
-  border-color: var(--t20);
-}
-
-@media (max-width: 768px) {
-  .section-header {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-  
-  .section-header .icon-btn {
-    padding: 5px 8px;
-    font-size: 16px;
-  }
-}
-
-/* Tables - responsive */
-.data-table {
-  width: 100%;
-  overflow-x: auto;
-  display: block;
-}
-
-@media (max-width: 768px) {
-  .data-table {
-    font-size: 12px;
-  }
-  
-  .data-table th,
-  .data-table td {
-    padding: 8px 4px !important;
-    white-space: nowrap;
-  }
-}
-
-/* Modals - responsive */
-.modal-content {
-  width: 90%;
-  max-width: 500px;
-  margin: 20px;
-}
-
-@media (max-width: 768px) {
-  .modal-content {
-    width: 95%;
-    margin: 10px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-}
-
-/* Buttons - consistent sizing */
-button, .btn, .primary-btn {
-  padding: 10px 16px;
+  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.2s;
+  font-weight: 500;
+  color: var(--t100);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
+.settings-btn:hover {
+  background: var(--hover);
+  border-color: var(--t20);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.settings-btn:active {
+  transform: translateY(0);
+}
+
+/* Save Button in Stock Table */
+.save-btn {
+  background: #10b981;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+/* Editable cells */
+.editable {
+  cursor: text;
+  transition: background 0.2s;
+  padding: 8px;
+}
+
+.editable:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.editable:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* Responsive for mobile */
 @media (max-width: 768px) {
-  button, .btn, .primary-btn {
-    padding: 8px 12px;
+  .settings-btn {
+    padding: 6px 10px;
     font-size: 13px;
+    gap: 4px;
+  }
+  
+  .save-btn {
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+  
+  .section-header {
+    gap: 8px;
   }
 }
 
-/* Stats cards - responsive grid */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+/* Remove any orphaned buttons outside sections */
+.header .icon-btn[onclick*="Settings"] {
+  display: none !important;
 }
 
-@media (max-width: 768px) {
-  .stats {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
-
-/* Ensure all sections scale properly */
-.section {
-  margin-bottom: 30px;
-}
-
-@media (max-width: 768px) {
-  .section {
-    margin-bottom: 20px;
-  }
 }
 
 
@@ -1048,27 +992,44 @@ async function loadStock() {
     }
     
     container.innerHTML = `
-      <table class="data-table">
+      <table class="data-table stock-table">
         <thead><tr>
           <th>Item</th><th>Cost (R)</th><th>Stock On Hand</th>
-          <th>Total Cost (R)</th><th>Notes</th>
+          <th>Total Cost (R)</th><th>Notes</th><th>Actions</th>
         </tr></thead>
-        <tbody>${data.map(s => {
+        <tbody>${data.map((s, idx) => {
           const stockQty = parseInt(s.stockOnHand) || 0;
           const threshold = parseInt(localStorage.getItem('stockThreshold') || '5');
           const lowStock = stockQty <= threshold;
           const goodStock = stockQty > threshold;
           return `
-          <tr style="${lowStock ? 'background:rgba(248,113,113,0.08);' : goodStock ? 'background:rgba(74,222,128,0.08);' : ''}">
-            <td style="font-weight:700;color:var(--t100);">${s.item || '—'}</td>
-            <td>R ${(parseFloat(s.cost) || 0).toFixed(2)}</td>
-            <td style="${lowStock ? 'color:#ef4444;font-weight:700;' : goodStock ? 'color:#16a34a;font-weight:700;' : ''}">${s.stockOnHand || '0'}</td>
-            <td>R ${(parseFloat(s.totalCost) || 0).toFixed(2)}</td>
-            <td style="font-size:11px;color:var(--t60);">${s.notes || ''}</td>
+          <tr data-row="${idx}" style="${lowStock ? 'background:rgba(248,113,113,0.08);' : goodStock ? 'background:rgba(74,222,128,0.08);' : ''}">
+            <td contenteditable="true" data-field="item" class="editable">${s.item || ''}</td>
+            <td contenteditable="true" data-field="cost" class="editable">R ${(parseFloat(s.cost) || 0).toFixed(2)}</td>
+            <td contenteditable="true" data-field="stockOnHand" class="editable" style="${lowStock ? 'color:#ef4444;font-weight:700;' : goodStock ? 'color:#16a34a;font-weight:700;' : ''}">${s.stockOnHand || '0'}</td>
+            <td class="calculated">R ${(parseFloat(s.totalCost) || 0).toFixed(2)}</td>
+            <td contenteditable="true" data-field="notes" class="editable" style="font-size:11px;">${s.notes || ''}</td>
+            <td><button class="save-btn" onclick="saveStockRow(${idx})" title="Save to Sheet">💾</button></td>
           </tr>
         `}).join('')}</tbody>
       </table>
     `;
+    
+    // Add blur event listeners for auto-calculation
+    document.querySelectorAll('.stock-table [contenteditable="true"]').forEach(cell => {
+      cell.addEventListener('blur', () => {
+        const row = cell.closest('tr');
+        const costCell = row.querySelector('[data-field="cost"]');
+        const stockCell = row.querySelector('[data-field="stockOnHand"]');
+        const totalCell = row.querySelector('.calculated');
+        
+        if (costCell && stockCell && totalCell) {
+          const cost = parseFloat(costCell.textContent.replace('R', '').trim()) || 0;
+          const stock = parseFloat(stockCell.textContent.trim()) || 0;
+          totalCell.textContent = 'R ' + (cost * stock).toFixed(2);
+        }
+      });
+    });
     
     const badge = document.getElementById('badge-stock');
     const threshold = parseInt(localStorage.getItem('stockThreshold') || '5');
@@ -1399,6 +1360,40 @@ function saveStockSettings() {
   closeStockSettings();
   loadStock(); // Reload stock to apply new threshold
   showToast('Stock threshold updated to ' + threshold);
+}
+</script>
+
+
+<script>
+async function saveStockRow(rowIdx) {
+  const row = document.querySelector(`[data-row="${rowIdx}"]`);
+  if (!row) return;
+  
+  const data = {
+    item: row.querySelector('[data-field="item"]').textContent,
+    cost: parseFloat(row.querySelector('[data-field="cost"]').textContent.replace('R', '').trim()) || 0,
+    stockOnHand: parseFloat(row.querySelector('[data-field="stockOnHand"]').textContent.trim()) || 0,
+    notes: row.querySelector('[data-field="notes"]').textContent
+  };
+  
+  data.totalCost = data.cost * data.stockOnHand;
+  
+  try {
+    const res = await fetch('/api/stock/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rowIndex: rowIdx, ...data })
+    });
+    
+    if (res.ok) {
+      showToast('✅ Stock updated successfully');
+      loadStock(); // Reload to show updated colors
+    } else {
+      showToast('❌ Failed to update stock');
+    }
+  } catch (err) {
+    showToast('❌ Error updating stock');
+  }
 }
 </script>
 
