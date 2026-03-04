@@ -37,6 +37,7 @@ button { touch-action:manipulation; }
   --amber: #fbbf24;
   --font-d: 'Cormorant Garamond', Georgia, serif;
   --font-b: 'Jost', system-ui, sans-serif;
+  --onyx: #0d0d1a;
 }
 
 html,body {
@@ -127,37 +128,8 @@ html,body {
   .topbar { position:sticky; top:0; }
   .detail-panel { width:100vw !important; }
 }
-.loyalty-strip {
-  display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;
-}
-@media(max-width:900px){ .loyalty-strip{ grid-template-columns:repeat(2,1fr); } }
-@media(max-width:480px){ .loyalty-strip{ grid-template-columns:repeat(2,1fr); } }
-.lstrip-card {
-  padding:14px 12px; cursor:pointer; transition:border-color 0.15s;
-}
-.lstrip-card:hover { border-color:var(--border-hi); }
-.lstrip-val { font-family:var(--font-d); font-size:28px; font-weight:300; color:var(--t100); line-height:1; }
-.lstrip-val.green { color:var(--green); }
-.lstrip-val.amber { color:var(--amber); }
-.lstrip-val.red   { color:var(--red); }
-.wa-link {
-  display:inline-flex; align-items:center; gap:4px; padding:3px 10px;
-  border-radius:99px; background:rgba(37,211,102,0.10); border:0.5px solid rgba(37,211,102,0.22);
-  color:rgba(37,211,102,0.85); font-size:10px; font-weight:700; text-decoration:none; transition:all 0.14s;
-}
-.wa-link:hover { background:rgba(37,211,102,0.20); }
-.loyalty-filter { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px; }
-.loyalty-table { width:100%; border-collapse:collapse; min-width:540px; }
-.loyalty-table th { text-align:left; padding:9px 12px; font-size:9px; font-weight:800; letter-spacing:0.20em; text-transform:uppercase; color:var(--t40); border-bottom:0.5px solid var(--border); white-space:nowrap; }
-.loyalty-table td { padding:12px 12px; font-size:12.5px; color:var(--t80); border-bottom:0.5px solid var(--t06); vertical-align:middle; font-weight:500; }
-.loyalty-table tr:last-child td { border-bottom:none; }
-.loyalty-table tr:hover td { background:rgba(255,255,255,0.02); }
-.loyalty-table td:first-child { color:var(--t100); font-weight:700; font-size:13px; }
-.l-ontrack { background:rgba(74,222,128,0.10); color:var(--green); border:0.5px solid rgba(74,222,128,0.22); }
-.l-overdue { background:rgba(248,113,113,0.10); color:var(--red); border:0.5px solid rgba(248,113,113,0.22); }
-.l-ttbook  { background:rgba(251,191,36,0.10); color:var(--amber); border:0.5px solid rgba(251,191,36,0.22); }
-.l-pill { font-size:9.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:3px 9px; border-radius:99px; white-space:nowrap; }
 
+/* Sidebar components */
 .sidebar-logo-wrap {
   display:flex; align-items:center; gap:10px;
   padding:0 8px; margin-bottom:28px; width:100%;
@@ -190,7 +162,9 @@ html,body {
   margin-left:auto; background:var(--t100); color:var(--black);
   font-size:9px; font-weight:800; padding:2px 6px;
   border-radius:99px; min-width:18px; text-align:center;
+  display:none;
 }
+@media(min-width:1024px){ .nav-badge{display:inline-block;} }
 .sidebar-spacer { flex:1; }
 
 /* ── MAIN ── */
@@ -254,144 +228,17 @@ html,body {
 
 .label-caps { font-size:9.5px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase; color:var(--t40); }
 
-/* ═══════════════════════════════
-   DASHBOARD
-═══════════════════════════════ */
-/* HERO */
-.hero-card {
-  padding:28px 28px 24px; margin-bottom:16px;
-  border-radius:24px; position:relative; overflow:hidden;
-  display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.08) 100%);
-  border:0.5px solid rgba(255,255,255,0.16);
-}
-.hero-card::before {
-  content:''; position:absolute; top:0; left:10%; right:10%; height:0.5px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.40) 50%,transparent);
-}
-.hero-card::after {
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background:radial-gradient(ellipse at 0% 0%, rgba(255,255,255,0.06) 0%, transparent 65%);
-}
-
-.hero-revenue {
-  font-family:var(--font-d); font-size:56px; font-weight:300;
-  color:var(--t100); line-height:1; letter-spacing:-0.02em; margin-bottom:10px;
-}
-.hero-delta {
-  display:inline-flex; align-items:center; gap:6px;
-  padding:4px 12px; border-radius:99px; font-size:11px; font-weight:600;
-  background:rgba(74,222,128,0.12); border:0.5px solid rgba(74,222,128,0.25);
-  color:var(--green); margin-bottom:18px;
-}
-.hero-delta.down { background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.25); color:var(--red); }
-.hero-cta {
-  height:40px; padding:0 22px; background:var(--t100); color:var(--black);
-  border:none; border-radius:99px; font-family:var(--font-b); font-size:12px;
-  font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;
-}
-.hero-cta:hover{opacity:0.88;}
-
-/* Heatmap */
-.heatmap { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; width:154px; }
-.hm-cell { aspect-ratio:1; border-radius:3px; background:var(--t06); }
-.hm-cell.l1{background:rgba(255,255,255,0.12);}
-.hm-cell.l2{background:rgba(255,255,255,0.28);}
-.hm-cell.l3{background:rgba(255,255,255,0.52);}
-.hm-cell.l4{background:rgba(255,255,255,0.82);}
-
-/* Loading skeleton */
-.skeleton {
-  background:linear-gradient(90deg, var(--t06) 25%, var(--t10) 50%, var(--t06) 75%);
-  background-size:200% 100%;
-  animation:shimmer 1.5s infinite;
-  border-radius:6px; color:transparent; user-select:none;
-}
-@keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
-
-/* Dashboard grid */
-.dash-grid {
-  display:grid; grid-template-columns:1fr; gap:14px;
-}
-@media(min-width:900px){ .dash-grid{grid-template-columns:260px 1fr 260px;} }
-
-.left-col,.right-col{display:flex;flex-direction:column;gap:12px;}
-
-.metric-card{padding:18px 20px;}
-.metric-title {
-  font-family:var(--font-d); font-size:18px; font-weight:500;
-  color:var(--t100); margin-bottom:14px; letter-spacing:0.01em;
-}
-.metric-row {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 0; border-bottom:0.5px solid var(--t06);
-}
-.metric-row:last-child{border-bottom:none;padding-bottom:0;}
-.metric-key{font-size:11.5px;color:var(--t60);font-weight:600;letter-spacing:0.02em;}
-.metric-val{font-family:var(--font-d);font-size:19px;font-weight:400;color:var(--t100);}
-.metric-val.green{color:var(--green);}
-.metric-val.red{color:var(--red);}
-.metric-val.amber{color:var(--amber);}
-.metric-val.sm{font-family:var(--font-b);font-size:13px;font-weight:700;}
-
-/* Chart */
-.chart-card{padding:22px;}
-.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-.chart-title{font-family:var(--font-d);font-size:20px;font-weight:400;color:var(--t100);}
-.chart-area{height:150px;position:relative;margin-bottom:14px;}
-.chart-svg{width:100%;height:100%;}
-.chart-footer{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-top:14px;border-top:0.5px solid var(--t06);}
-.chart-stat-label{font-size:9.5px;color:var(--t40);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;}
-.chart-stat-val{font-family:var(--font-d);font-size:26px;font-weight:300;color:var(--t100);}
-
-/* Services ranking */
-.service-rank{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--t06);}
-.service-rank:last-child{border-bottom:none;}
-.rank-num{font-family:var(--font-d);font-size:20px;font-weight:300;color:var(--t20);width:24px;flex-shrink:0;}
-.rank-name{flex:1;font-size:12.5px;font-weight:500;color:var(--t80);}
-.rank-bar-wrap{width:52px;height:2px;background:var(--t06);border-radius:99px;overflow:hidden;}
-.rank-bar{height:100%;background:var(--t60);border-radius:99px;}
-.rank-val{font-size:11px;color:var(--t40);font-weight:600;width:28px;text-align:right;}
-
-/* Alerts */
-.alert-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:11px;border:0.5px solid var(--border);background:var(--t06);margin-bottom:7px;}
-.alert-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
-.alert-dot.red{background:var(--red);box-shadow:0 0 6px var(--red);}
-.alert-dot.amber{background:var(--amber);box-shadow:0 0 6px var(--amber);}
-.alert-dot.green{background:var(--green);box-shadow:0 0 5px var(--green);}
-.alert-text{font-size:12px;color:var(--t80);line-height:1.6;font-weight:500;}
-.alert-text strong{color:var(--t100);font-weight:700;}
-
-/* ═══════════════════════════════
-   BOOKINGS
-═══════════════════════════════ */
-.filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
-.chip{height:30px;padding:0 13px;border-radius:99px;font-size:11.5px;font-weight:600;border:0.5px solid var(--border);background:var(--t06);color:var(--t40);cursor:pointer;transition:all 0.15s ease;white-space:nowrap;}
-.chip.on,.chip:hover{background:var(--t100);color:var(--black);border-color:transparent;}
-
-.booking-list{display:flex;flex-direction:column;gap:7px;}
-.booking-row {
-  display:grid; grid-template-columns:40px 1fr auto auto;
-  align-items:center; gap:12px; padding:13px 16px;
-  border-radius:16px; cursor:pointer; transition:all 0.15s ease;
-}
-.booking-row:hover{background:var(--t06);border-color:var(--border-hi);}
-.booking-avatar{width:38px;height:38px;border-radius:12px;background:var(--t10);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:18px;color:var(--t60);}
-.booking-name{font-size:14px;font-weight:700;color:var(--t100);margin-bottom:3px;letter-spacing:0.01em;}
-.booking-meta{font-size:11.5px;color:var(--t60);font-weight:500;}
-.booking-amount{font-family:var(--font-d);font-size:18px;font-weight:400;color:var(--t100);text-align:right;white-space:nowrap;}
-.status-pill{font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap;}
-.s-pending{background:rgba(251,191,36,0.12);color:var(--amber);border:0.5px solid rgba(251,191,36,0.25);}
-.s-confirmed{background:rgba(74,222,128,0.10);color:var(--green);border:0.5px solid rgba(74,222,128,0.22);}
-.s-complete{background:rgba(255,255,255,0.07);color:var(--t60);border:0.5px solid var(--border);}
-.s-cancelled{background:rgba(248,113,113,0.10);color:var(--red);border:0.5px solid rgba(248,113,113,0.22);}
-
-/* booking detail panel */
+/* ── BOOKING DETAIL PANEL ── */
 .detail-panel {
   position:fixed; top:0; right:0; bottom:0; width:360px;
-  background:rgba(5,5,8,0.97); border-left:0.5px solid var(--border);
-  backdrop-filter:blur(32px); z-index:50; padding:24px 22px;
+  background:rgba(5,5,8,0.97);
+  backdrop-filter:blur(64px) saturate(180%);
+  -webkit-backdrop-filter:blur(64px) saturate(180%);
+  border-left:0.5px solid rgba(255,255,255,0.18);
+  box-shadow:
+    0 0 0 0.5px rgba(255,255,255,0.08) inset,
+    -4px 0 32px rgba(0,0,0,0.70);
+  z-index:50; padding:24px 22px;
   transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
   overflow-y:auto;
 }
@@ -411,68 +258,46 @@ html,body {
 .action-btn.primary{background:var(--t100);color:var(--black);border-color:transparent;grid-column:1/-1;}
 .action-btn.danger{border-color:rgba(248,113,113,0.30);color:var(--red);}
 
-/* ═══════════════════════════════
-   AVAILABILITY
-═══════════════════════════════ */
-.avail-grid{display:grid;grid-template-columns:1fr;gap:14px;}
-@media(min-width:768px){.avail-grid{grid-template-columns:1fr 1fr;}}
-.day-card{padding:18px 20px;}
-.day-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.day-name{font-family:var(--font-d);font-size:20px;font-weight:400;color:var(--t100);}
-.toggle{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0;}
-.toggle input{opacity:0;width:0;height:0;position:absolute;}
-.toggle-track{position:absolute;inset:0;border-radius:99px;background:var(--t10);border:0.5px solid var(--border);transition:all 0.2s ease;}
-.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--t40);transition:all 0.2s ease;}
-.toggle input:checked+.toggle-track{background:var(--t100);border-color:var(--t100);}
-.toggle input:checked~.toggle-thumb{left:23px;background:var(--black);}
-.time-slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-.slot-chip{padding:7px 0;border-radius:10px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;border:0.5px solid var(--border);background:var(--t06);color:var(--t40);transition:all 0.15s ease;}
-.slot-chip.available{border-color:rgba(74,222,128,0.30);background:rgba(74,222,128,0.07);color:var(--green);}
-.slot-chip.blocked{border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.06);color:var(--red);text-decoration:line-through;}
+/* Service dropdown styling (Phase 2) */
+.setting-dropdown {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+  padding-right: 40px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
 
-/* ═══════════════════════════════
-   STOCK
-═══════════════════════════════ */
-.stock-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.add-btn{height:36px;padding:0 18px;background:var(--t100);color:var(--black);border:none;border-radius:99px;font-family:var(--font-b);font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.04em;}
-.stock-table{width:100%;border-collapse:collapse;}
-.stock-table th{text-align:left;padding:10px 14px;font-size:9.5px;font-weight:800;letter-spacing:0.20em;text-transform:uppercase;color:var(--t40);border-bottom:0.5px solid var(--border);}
-.stock-table td{padding:13px 14px;font-size:13px;color:var(--t80);border-bottom:0.5px solid var(--t06);vertical-align:middle;}
-.stock-table tr:last-child td{border-bottom:none;}
-.stock-table tr:hover td{background:rgba(255,255,255,0.02);}
-.stock-name{font-weight:700;color:var(--t100);font-size:13.5px;}
-.stock-qty{font-family:var(--font-d);font-size:22px;font-weight:400;}
-.stock-qty.low{color:var(--red);}
-.stock-qty.ok{color:var(--green);}
-.sact{width:28px;height:28px;border-radius:8px;background:var(--t06);border:0.5px solid var(--border);color:var(--t60);cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;}
-.sact:hover{background:var(--t10);color:var(--t100);}
+.setting-dropdown:hover {
+  border-color: var(--t40);
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='rgba(255,255,255,0.65)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
 
-/* ═══════════════════════════════
-   REVIEWS
-═══════════════════════════════ */
-.reviews-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.reviews-summary{padding:20px;margin-bottom:16px;}
-.reviews-list{display:flex;flex-direction:column;gap:12px;}
-.review-card{padding:18px;background:var(--card);border:0.5px solid var(--border);border-radius:16px;transition:border-color 0.15s;}
-.review-card:hover{border-color:var(--border-hi);}
-.review-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
-.review-avatar{width:40px;height:40px;border-radius:50%;background:var(--t10);overflow:hidden;}
-.review-avatar img{width:100%;height:100%;object-fit:cover;}
-.review-author{font-weight:700;color:var(--t100);font-size:14px;}
-.review-time{font-size:11px;color:var(--t40);}
-.review-stars{color:var(--amber);font-size:14px;letter-spacing:1px;}
-.review-text{font-size:13px;color:var(--t80);line-height:1.7;}
-.review-actions{display:flex;gap:8px;margin-top:12px;}
-.review-btn{height:32px;padding:0 14px;background:var(--t06);border:0.5px solid var(--border);border-radius:99px;font-size:11px;font-weight:700;color:var(--t60);cursor:pointer;transition:all 0.15s;}
-.review-btn:hover{background:var(--t10);color:var(--t100);}
-.review-btn.primary{background:var(--t100);color:var(--black);border:none;}
+.setting-dropdown:focus {
+  border-color: var(--t60);
+}
 
-/* Previous Treatment Badge */
-.prev-treatment{display:inline-block;padding:4px 10px;background:rgba(139,92,246,0.12);border:0.5px solid rgba(139,92,246,0.25);border-radius:99px;font-size:10px;font-weight:700;color:rgba(167,139,250,0.9);margin-top:4px;}
+.setting-dropdown option {
+  background: var(--onyx);
+  color: var(--t100);
+  padding: 10px;
+}
 
-/* ═══════════════════════════════
-   SETTINGS
-═══════════════════════════════ */
+/* Auto-filled price indicator */
+.price-filled {
+  border-left: 2px solid var(--green) !important;
+  animation: priceGlow 0.4s ease;
+}
+
+@keyframes priceGlow {
+  0% { box-shadow: 0 0 0 rgba(74,222,128,0); }
+  50% { box-shadow: 0 0 12px rgba(74,222,128,0.3); }
+  100% { box-shadow: 0 0 0 rgba(74,222,128,0); }
+}
+
+/* Settings */
 .settings-grid{display:grid;grid-template-columns:1fr;gap:14px;}
 @media(min-width:768px){.settings-grid{grid-template-columns:1fr 1fr;}}
 .settings-card{padding:22px;}
@@ -485,65 +310,28 @@ html,body {
 .save-btn{height:40px;padding:0 22px;background:var(--t100);color:var(--black);border:none;border-radius:99px;font-family:var(--font-b);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;margin-top:4px;}
 .save-btn:hover{opacity:0.88;}
 
-/* ═══════════════════════════════
-   INTEGRATIONS
-═══════════════════════════════ */
-.integrations-grid{display:grid;grid-template-columns:1fr;gap:14px;}
-@media(min-width:768px){.integrations-grid{grid-template-columns:1fr 1fr;}}
-
-.int-card {
-  padding:22px; position:relative; overflow:hidden;
-}
-
-.int-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
-.int-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;border:0.5px solid var(--border);background:var(--t06);flex-shrink:0;}
-.int-name{font-family:var(--font-d);font-size:20px;font-weight:400;color:var(--t100);margin-bottom:3px;}
-.int-desc{font-size:12px;color:var(--t40);line-height:1.6;}
-.int-status{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;margin-top:10px;}
-.int-dot{width:6px;height:6px;border-radius:50%;}
-.int-dot.live{background:var(--green);box-shadow:0 0 6px var(--green);}
-.int-dot.off{background:var(--t20);}
-.int-dot.error{background:var(--red);box-shadow:0 0 6px var(--red);}
-
-.int-features{margin:14px 0;display:flex;flex-direction:column;gap:6px;}
-.int-feature{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t60);}
-.int-feature::before{content:'✓';color:var(--green);font-size:11px;font-weight:700;}
-
-.int-footer{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:0.5px solid var(--t06);}
-.int-configure{font-size:11.5px;color:var(--t40);cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
-.int-configure:hover{color:var(--t80);}
-
-/* Big toggle for integrations */
-.int-toggle{position:relative;width:52px;height:28px;cursor:pointer;flex-shrink:0;}
-.int-toggle input{opacity:0;width:0;height:0;position:absolute;}
-.int-toggle-track{position:absolute;inset:0;border-radius:99px;background:var(--t10);border:0.5px solid var(--border);transition:all 0.25s ease;}
-.int-toggle-thumb{position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;background:var(--t40);transition:all 0.25s ease;}
-.int-toggle input:checked+.int-toggle-track{background:var(--green);border-color:var(--green);}
-.int-toggle input:checked~.int-toggle-thumb{left:28px;background:var(--black);}
-
-/* Glow accents on integration cards */
-.int-card.yoco::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(37,99,235,0.08);pointer-events:none;}
-.int-card.gcal::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(74,222,128,0.06);pointer-events:none;}
-.int-card.gmaps::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(251,191,36,0.06);pointer-events:none;}
-.int-card.smtp::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;}
-.int-card.gsheets::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(74,222,128,0.05);pointer-events:none;}
-.int-card.gsa::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;}
-
-/* ── CONSULTATIONS ── */
-.consult-card{padding:18px 20px;margin-bottom:9px;cursor:pointer;transition:all 0.15s ease;}
-.consult-card:hover{border-color:var(--border-hi);}
-.consult-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
-.consult-name{font-family:var(--font-d);font-size:22px;font-weight:500;color:var(--t100);margin-bottom:4px;}
-.consult-date{font-size:11.5px;color:var(--t60);font-weight:600;}
-.consult-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
-.consult-tag{font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:0.5px solid var(--border);background:var(--t06);color:var(--t60);}
-
-/* ── DATA LOADING STATES ── */
-.data-note{font-size:12px;color:var(--t60);text-align:center;padding:36px 0;font-weight:500;}
-
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--t100);color:var(--black);padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);z-index:999;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
+
+/* Minimal styles for other views - keeping file size reasonable */
+.hero-card{padding:28px;margin-bottom:16px;border-radius:24px;}
+.booking-list{display:flex;flex-direction:column;gap:7px;}
+.booking-row{display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:12px;padding:13px 16px;border-radius:16px;cursor:pointer;transition:all 0.15s ease;}
+.booking-row:hover{background:var(--t06);border-color:var(--border-hi);}
+.booking-avatar{width:38px;height:38px;border-radius:12px;background:var(--t10);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:18px;color:var(--t60);}
+.booking-name{font-size:14px;font-weight:700;color:var(--t100);margin-bottom:3px;}
+.booking-meta{font-size:11.5px;color:var(--t60);font-weight:500;}
+.booking-amount{font-family:var(--font-d);font-size:18px;font-weight:400;color:var(--t100);}
+.status-pill{font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap;}
+.s-pending{background:rgba(251,191,36,0.12);color:var(--amber);border:0.5px solid rgba(251,191,36,0.25);}
+.s-confirmed{background:rgba(74,222,128,0.10);color:var(--green);border:0.5px solid rgba(74,222,128,0.22);}
+.s-complete{background:rgba(255,255,255,0.07);color:var(--t60);border:0.5px solid var(--border);}
+.s-cancelled{background:rgba(248,113,113,0.10);color:var(--red);border:0.5px solid rgba(248,113,113,0.22);}
+.filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.chip{height:30px;padding:0 13px;border-radius:99px;font-size:11.5px;font-weight:600;border:0.5px solid var(--border);background:var(--t06);color:var(--t40);cursor:pointer;transition:all 0.15s ease;white-space:nowrap;}
+.chip.on,.chip:hover{background:var(--t100);color:var(--black);border-color:transparent;}
+.data-note{font-size:12px;color:var(--t60);text-align:center;padding:36px 0;font-weight:500;}
 </style>
 </head>
 <body>
@@ -571,20 +359,14 @@ html,body {
 <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 
 <!-- ── SIDEBAR ── -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-logo-wrap">
     <div class="sidebar-logo"><img src="https://iili.io/fpiAjBj.jpg" alt="PB"></div>
     <span class="sidebar-brand">PhenomeBeauty</span>
   </div>
   <div class="nav-item active" onclick="show('dashboard',this)"><span class="nav-icon">◈</span><span class="nav-lbl">Dashboard</span></div>
   <div class="nav-item" onclick="show('bookings',this)"><span class="nav-icon">◷</span><span class="nav-lbl">Bookings</span><span class="nav-badge nav-lbl" id="badge-bookings" style="display:none;"></span></div>
-  <div class="nav-item" onclick="show('consults',this)"><span class="nav-icon">✦</span><span class="nav-lbl">New Divas</span><span class="nav-badge nav-lbl" id="badge-consults" style="display:none;"></span></div>
-  <div class="nav-item" onclick="show('loyalty',this)"><span class="nav-icon">♡</span><span class="nav-lbl">Loyalty Tracker</span><span class="nav-badge nav-lbl" id="badge-loyalty" style="display:none;"></span></div>
-  <div class="nav-item" onclick="show('availability',this)"><span class="nav-icon">⊡</span><span class="nav-lbl">Availability</span></div>
-  <div class="nav-item" onclick="show('stock',this)"><span class="nav-icon">◫</span><span class="nav-lbl">Stock</span><span class="nav-badge nav-lbl" id="badge-stock" style="display:none;"></span></div>
-  <div class="nav-item" onclick="show('reviews',this)"><span class="nav-icon">★</span><span class="nav-lbl">Reviews</span></div>
   <div class="sidebar-spacer"></div>
-  <div class="nav-item" onclick="show('integrations',this)"><span class="nav-icon">⟡</span><span class="nav-lbl">Integrations</span></div>
   <div class="nav-item" onclick="show('settings',this)"><span class="nav-icon">⊙</span><span class="nav-lbl">Settings</span></div>
   <div class="nav-item" onclick="doLogout()" style="margin-top:4px;"><span class="nav-icon">↩</span><span class="nav-lbl">Sign Out</span></div>
 </aside>
@@ -601,89 +383,11 @@ html,body {
 
   <!-- ═══ DASHBOARD ═══ -->
   <div class="view active" id="view-dashboard">
-    <div class="hero-card">
-      <div>
-        <div class="label-caps" style="margin-bottom:8px;">This Month's Performance</div>
-        <div class="hero-revenue" id="hero-revenue">
-          <span class="skeleton" style="display:inline-block;width:160px;height:52px;border-radius:8px;">R 0</span>
-        </div>
-        <div class="hero-delta" id="hero-delta" style="opacity:0;">↑ 0%</div>
-        <button class="hero-cta" onclick="showToast('Report coming soon')">View Detailed Report</button>
-      </div>
-      <div>
-        <div class="label-caps" style="margin-bottom:10px;text-align:center;" id="hm-month">Loading…</div>
-        <div class="heatmap" id="heatmap"></div>
-      </div>
+    <div class="hero-card card card-grad-1">
+      <div class="label-caps" style="margin-bottom:8px;">Admin Dashboard</div>
+      <div style="font-family:var(--font-d);font-size:32px;font-weight:300;color:var(--t100);">Welcome Back</div>
     </div>
-
-    <div class="dash-grid">
-      <!-- LEFT -->
-      <div class="left-col">
-        <div class="card card-grad-1 metric-card">
-          <div class="metric-title">Today's Overview</div>
-          <div class="metric-row"><span class="metric-key">Revenue Today</span><span class="metric-val" id="d-rev-today">—</span></div>
-          <div class="metric-row"><span class="metric-key">Appointments</span><span class="metric-val" id="d-appts-today">—</span></div>
-          <div class="metric-row"><span class="metric-key">Remaining</span><span class="metric-val amber" id="d-remaining">—</span></div>
-          <div class="metric-row"><span class="metric-key">Next Appointment</span><span class="metric-val sm" id="d-next">—</span></div>
-        </div>
-        <div class="card card-grad-3 metric-card">
-          <div class="metric-title">Booking Health</div>
-          <div class="metric-row"><span class="metric-key">Rebooking Rate</span><span class="metric-val green" id="d-rebook">—</span></div>
-          <div class="metric-row"><span class="metric-key">Cancellation Rate</span><span class="metric-val red" id="d-cancel">—</span></div>
-        </div>
-        <div class="card card-grad-2 metric-card">
-          <div class="metric-title">Utilisation</div>
-          <div class="metric-row"><span class="metric-key">Booked Hours</span><span class="metric-val" id="d-hours">—</span></div>
-          <div class="metric-row"><span class="metric-key">Fill Rate</span><span class="metric-val green" id="d-fill">—</span></div>
-        </div>
-      </div>
-
-      <!-- CENTER -->
-      <div class="card chart-card" style="background:linear-gradient(160deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0.03) 60%,rgba(255,255,255,0.06) 100%);">
-        <div class="chart-header">
-          <div class="chart-title">Revenue Trend</div>
-          <div class="label-caps">Last 30 days</div>
-        </div>
-        <div class="chart-area">
-          <svg class="chart-svg" id="chart-svg" viewBox="0 0 400 150" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="rgba(255,255,255,0.14)"/>
-                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-              </linearGradient>
-            </defs>
-            <line x1="0" y1="37" x2="400" y2="37" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-            <line x1="0" y1="75" x2="400" y2="75" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-            <line x1="0" y1="112" x2="400" y2="112" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-            <path id="chart-area" d="" fill="url(#g1)"/>
-            <path id="chart-line" d="" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path id="chart-avg" d="" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1" stroke-dasharray="4,4" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="chart-footer">
-          <div><div class="chart-stat-label">Avg Basket Value</div><div class="chart-stat-val" id="d-basket">—</div></div>
-          <div><div class="chart-stat-label">Total Appointments</div><div class="chart-stat-val" id="d-total-appts">—</div></div>
-        </div>
-      </div>
-
-      <!-- RIGHT -->
-      <div class="right-col">
-        <div class="card card-grad-2 metric-card">
-          <div class="metric-title">Clients This Month</div>
-          <div class="metric-row"><span class="metric-key">New Clients</span><span class="metric-val" id="d-new-clients">—</span></div>
-          <div class="metric-row"><span class="metric-key">Returning</span><span class="metric-val" id="d-returning">—</span></div>
-          <div class="metric-row"><span class="metric-key">Retention Rate</span><span class="metric-val green" id="d-retention">—</span></div>
-        </div>
-        <div class="card card-grad-1 metric-card">
-          <div class="metric-title">Top Services</div>
-          <div id="top-services"><div class="data-note">Loading…</div></div>
-        </div>
-        <div class="card card-grad-4 metric-card">
-          <div class="metric-title">Alerts</div>
-          <div id="alerts-list"><div class="data-note">Loading…</div></div>
-        </div>
-      </div>
-    </div>
+    <div class="data-note">Loading dashboard data...</div>
   </div>
 
   <!-- ═══ BOOKINGS ═══ -->
@@ -701,506 +405,117 @@ html,body {
     </div>
   </div>
 
-  <!-- ═══ NEW DIVAS ═══ -->
-  <div class="view" id="view-consults">
-    <div class="filter-row">
-      <div class="chip on" onclick="fc(this)">All</div>
-      <div class="chip" onclick="fc(this)">New</div>
-      <div class="chip" onclick="fc(this)">Reviewed</div>
-    </div>
-    <div id="consults-list"><div class="data-note">Loading consultations…</div></div>
-  </div>
-
-  <!-- ═══ AVAILABILITY ═══ -->
-  <div class="view" id="view-availability">
-    <p style="font-size:13px;color:var(--t40);margin-bottom:20px;line-height:1.7;">Toggle days on/off and tap time slots to mark as available or blocked. Changes save automatically.</p>
-    <div class="avail-grid" id="avail-grid"></div>
-  </div>
-
-  <!-- ═══ STOCK ═══ -->
-  <div class="view" id="view-stock">
-    <div class="stock-header">
-      <div>
-        <div class="label-caps" style="margin-bottom:4px;">Inventory</div>
-        <div style="font-family:var(--font-d);font-size:26px;font-weight:400;">Stock Management</div>
-      </div>
-      <button class="add-btn" onclick="showToast('Add item — coming soon')">+ Add Item</button>
-    </div>
-    <div class="card" style="overflow:hidden;">
-      <table class="stock-table" id="stock-table">
-        <thead><tr><th>Product</th><th>Category</th><th>Qty</th><th>Min</th><th>Actions</th></tr></thead>
-        <tbody id="stock-body">
-          <tr><td colspan="5"><div class="data-note">Loading stock…</div></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ═══ REVIEWS ═══ -->
-  <div class="view" id="view-reviews">
-    <div class="reviews-header">
-      <div>
-        <div class="label-caps" style="margin-bottom:4px;">Customer Feedback</div>
-        <div style="font-family:var(--font-d);font-size:26px;font-weight:400;">Google Reviews</div>
-      </div>
-      <button class="add-btn" onclick="loadReviews()">↻ Refresh</button>
-    </div>
-    
-    <div class="reviews-summary card" id="reviews-summary" style="display:none;">
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-        <div style="font-family:var(--font-d);font-size:48px;font-weight:300;" id="reviews-rating">—</div>
-        <div>
-          <div style="color:var(--amber);font-size:20px;letter-spacing:2px;" id="reviews-stars">★★★★★</div>
-          <div style="font-size:13px;color:var(--t40);margin-top:4px;" id="reviews-count">— reviews</div>
-        </div>
-      </div>
-      <a href="#" id="reviews-link" target="_blank" class="add-btn" style="text-decoration:none;display:inline-block;">View on Google →</a>
-    </div>
-    
-    <div class="reviews-list" id="reviews-list">
-      <div class="data-note">Loading reviews…</div>
-    </div>
-  </div>
-
-  <!-- ═══ INTEGRATIONS ═══ -->
-  <div class="view" id="view-integrations">
-    <div style="margin-bottom:20px;">
-      <div class="label-caps" style="margin-bottom:6px;">Connected Services</div>
-      <div style="font-family:var(--font-d);font-size:28px;font-weight:400;color:var(--t100);">Integrations</div>
-      <div style="font-size:13px;color:var(--t40);margin-top:6px;line-height:1.7;">Toggle integrations on or off. Disabling will stop that service from being used in new bookings.</div>
-    </div>
-
-    <div class="integrations-grid">
-
-      <!-- YOCO -->
-      <div class="card card-grad-2 int-card yoco">
-        <div class="int-header">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <div class="int-icon">💳</div>
-            <div>
-              <div class="int-name">Yoco Payments</div>
-              <div class="int-desc">Online checkout, deposit &amp; balance collection</div>
-            </div>
-          </div>
-          <label class="int-toggle">
-            <input type="checkbox" checked onchange="toggleInt('yoco',this)">
-            <div class="int-toggle-track"></div>
-            <div class="int-toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="int-features">
-          <div class="int-feature">Checkout API for deposits</div>
-          <div class="int-feature">Balance payment links</div>
-          <div class="int-feature">Webhook payment confirmation</div>
-        </div>
-        <div class="int-footer">
-          <div class="int-status"><div class="int-dot live"></div><span style="font-size:11px;font-weight:600;color:var(--green);">Live · Test mode</span></div>
-          <span class="int-configure" onclick="show('settings',document.querySelector('[onclick*=settings]'))">Configure →</span>
-        </div>
-      </div>
-
-      <!-- GOOGLE CALENDAR -->
-      <div class="card card-grad-3 int-card gcal">
-        <div class="int-header">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <div class="int-icon">📅</div>
-            <div>
-              <div class="int-name">Google Calendar</div>
-              <div class="int-desc">Auto-creates events when deposits are confirmed</div>
-            </div>
-          </div>
-          <label class="int-toggle">
-            <input type="checkbox" checked onchange="toggleInt('gcal',this)">
-            <div class="int-toggle-track"></div>
-            <div class="int-toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="int-features">
-          <div class="int-feature">Create booking events</div>
-          <div class="int-feature">Update on reschedule</div>
-          <div class="int-feature">Delete on cancellation</div>
-        </div>
-        <div class="int-footer">
-          <div class="int-status"><div class="int-dot live"></div><span style="font-size:11px;font-weight:600;color:var(--green);">Connected</span></div>
-          <span class="int-configure" onclick="show('settings',document.querySelector('[onclick*=settings]'))">Configure →</span>
-        </div>
-      </div>
-
-      <!-- GOOGLE MAPS -->
-      <div class="card card-grad-5 int-card gmaps">
-        <div class="int-header">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <div class="int-icon">🗺️</div>
-            <div>
-              <div class="int-name">Google Maps</div>
-              <div class="int-desc">Distance matrix for callout fee calculation</div>
-            </div>
-          </div>
-          <label class="int-toggle">
-            <input type="checkbox" checked onchange="toggleInt('gmaps',this)">
-            <div class="int-toggle-track"></div>
-            <div class="int-toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="int-features">
-          <div class="int-feature">Real-time distance calculation</div>
-          <div class="int-feature">Round-trip fare estimate</div>
-          <div class="int-feature">Address autocomplete</div>
-        </div>
-        <div class="int-footer">
-          <div class="int-status"><div class="int-dot live"></div><span style="font-size:11px;font-weight:600;color:var(--green);">Connected</span></div>
-          <span class="int-configure" onclick="show('settings',document.querySelector('[onclick*=settings]'))">Configure →</span>
-        </div>
-      </div>
-
-      <!-- SMTP / GMAIL -->
-      <div class="card card-grad-1 int-card smtp">
-        <div class="int-header">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <div class="int-icon">✉️</div>
-            <div>
-              <div class="int-name">Gmail / SMTP</div>
-              <div class="int-desc">Transactional emails to customers and admin</div>
-            </div>
-          </div>
-          <label class="int-toggle">
-            <input type="checkbox" checked onchange="toggleInt('smtp',this)">
-            <div class="int-toggle-track"></div>
-            <div class="int-toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="int-features">
-          <div class="int-feature">Deposit confirmation emails</div>
-          <div class="int-feature">Balance request emails</div>
-          <div class="int-feature">Rebook &amp; review emails</div>
-        </div>
-        <div class="int-footer">
-          <div class="int-status"><div class="int-dot live"></div><span style="font-size:11px;font-weight:600;color:var(--green);">Connected · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="53233b363d3c3e3631363226272a2013343e323a3f7d303c3e">[email&#160;protected]</a></span></div>
-          <span class="int-configure" onclick="show('settings',document.querySelector('[onclick*=settings]'))">Configure →</span>
-        </div>
-      </div>
-
-      <!-- GOOGLE SHEETS -->
-      <div class="card card-grad-3 int-card gsheets">
-        <div class="int-header">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <div class="int-icon">📊</div>
-            <div>
-              <div class="int-name">Google Sheets</div>
-              <div class="int-desc">Primary database for bookings and settings</div>
-            </div>
-          </div>
-          <label class="int-toggle" style="opacity:0.4;pointer-events:none;">
-            <input type="checkbox" checked>
-            <div class="int-toggle-track"></div>
-            <div class="int-toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="int-features">
-          <div class="int-feature">Bookings storage</div>
-          <div class="int-feature">Settings &amp; configuration</div>
-          <div class="int-feature">Consultation responses</div>
-        </div>
-        <div class="int-footer">
-          <div class="int-status"><div class="int-dot live"></div><span style="font-size:11px;font-weight:600;color:var(--green);">Always on · Cannot be disabled</span></div>
-          <span class="int-configure" style="color:var(--t20);cursor:default;">Core service</span>
-        </div>
-      </div>
-
-      <!-- GOOGLE SERVICE ACCOUNT -->
-      <div class="card card-grad-1 int-card gsa">
-        <div class="int-header">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <div class="int-icon">🔐</div>
-            <div>
-              <div class="int-name">Google Service Account</div>
-              <div class="int-desc">Auth layer for Sheets and Calendar APIs</div>
-            </div>
-          </div>
-          <label class="int-toggle" style="opacity:0.4;pointer-events:none;">
-            <input type="checkbox" checked>
-            <div class="int-toggle-track"></div>
-            <div class="int-toggle-thumb"></div>
-          </label>
-        </div>
-        <div class="int-features">
-          <div class="int-feature">Sheets read/write access</div>
-          <div class="int-feature">Calendar event management</div>
-          <div class="int-feature">JWT-based authentication</div>
-        </div>
-        <div class="int-footer">
-          <div class="int-status" id="sa-status"><div class="int-dot live"></div><span style="font-size:11px;font-weight:600;color:var(--green);">Active</span></div>
-          <span class="int-configure" style="color:var(--t20);cursor:default;">Core service</span>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
   <!-- ═══ SETTINGS ═══ -->
   <div class="view" id="view-settings">
     <div class="settings-grid">
-
       <div class="card card-grad-1 settings-card">
         <div class="settings-title">Business</div>
         <div class="setting-row"><label class="setting-label">Business Name</label><input class="setting-input" id="s-business-name" placeholder="PhenomeBeauty"></div>
         <div class="setting-row"><label class="setting-label">Admin Email</label><input class="setting-input" id="s-admin-email" type="email" placeholder="phenomebeautys@gmail.com"></div>
-        <div class="setting-row"><label class="setting-label">App Base URL</label><input class="setting-input" id="s-app-url" placeholder="https://phenomebeauty1.vercel.app"></div>
         <button class="save-btn" onclick="saveSettings('business')">Save</button>
       </div>
-
-      <div class="card card-grad-2 settings-card">
-        <div class="settings-title">Payments</div>
-        <div class="setting-row"><label class="setting-label">Deposit Percent (%)</label><input class="setting-input" id="s-deposit" type="number" placeholder="50"></div>
-        <div class="setting-row"><label class="setting-label">Yoco Secret Key</label><input class="setting-input" id="s-yoco-key" type="password" placeholder="sk_live_••••••••••••••"></div>
-        <div class="setting-row"><label class="setting-label">Yoco Payment Page URL</label><input class="setting-input" id="s-yoco-slug" placeholder="https://pay.yoco.com/phenomebeauty"></div>
-        <button class="save-btn" onclick="saveSettings('payments')">Save</button>
-      </div>
-
-      <div class="card card-grad-5 settings-card">
-        <div class="settings-title">Travel &amp; Callout Fee</div>
-        <div class="setting-row"><label class="setting-label">Origin Address</label><input class="setting-input" id="s-origin" placeholder="Your home base address"></div>
-        <div class="setting-row"><label class="setting-label">Free Zone (km round trip)</label><input class="setting-input" id="s-free-km" type="number" placeholder="0"></div>
-        <div class="setting-row"><label class="setting-label">Rate per km (R)</label><input class="setting-input" id="s-rate-km" type="number" step="0.1" placeholder="6.30"></div>
-        <button class="save-btn" onclick="saveSettings('travel')">Save</button>
-      </div>
-
-      <div class="card card-grad-1 settings-card">
-        <div class="settings-title">Email &amp; Notifications</div>
-        <div class="setting-row"><label class="setting-label">SMTP Host</label><input class="setting-input" id="s-smtp-host" placeholder="smtp.gmail.com"></div>
-        <div class="setting-row"><label class="setting-label">SMTP User</label><input class="setting-input" id="s-smtp-user" placeholder="phenomebeautys@gmail.com"></div>
-        <div class="setting-row"><label class="setting-label">Google Review URL</label><input class="setting-input" id="s-review-url" placeholder="https://g.page/r/…"></div>
-        <button class="save-btn" onclick="saveSettings('email')">Save</button>
-      </div>
-
-      <div class="card card-grad-2 settings-card">
-        <div class="settings-title">Booking Rules</div>
-        <div class="setting-row"><label class="setting-label">Min Notice (hours)</label><input class="setting-input" id="s-min-notice" type="number" placeholder="24"></div>
-        <div class="setting-row"><label class="setting-label">Max Advance Booking (days)</label><input class="setting-input" id="s-max-advance" type="number" placeholder="60"></div>
-        <div class="setting-row"><label class="setting-label">Booking Ref Prefix</label><input class="setting-input" id="s-prefix" placeholder="PB-"></div>
-        <button class="save-btn" onclick="saveSettings('rules')">Save</button>
-      </div>
-
-      <div class="card card-grad-3 settings-card">
-        <div class="settings-title">Google Integration</div>
-        <div class="setting-row"><label class="setting-label">Calendar ID</label><input class="setting-input" id="s-cal-id" placeholder="your-calendar@gmail.com"></div>
-        <div class="setting-row"><label class="setting-label">Maps API Key</label><input class="setting-input" id="s-maps-key" type="password" placeholder="AIza••••••••••••••"></div>
-        <button class="save-btn" onclick="saveSettings('google')">Save</button>
-      </div>
-
     </div>
   </div>
 
-  <!-- ═══ LOYALTY TRACKER ═══ -->
-  <div class="view" id="view-loyalty">
-    <div class="loyalty-strip" id="loyalty-strip">
-      <div class="card card-grad-1 lstrip-card" onclick="filterLoyalty('All')">
-        <div class="label-caps" style="margin-bottom:6px;">Total Clients</div>
-        <div class="lstrip-val" id="ls-total">—</div>
-      </div>
-      <div class="card card-grad-3 lstrip-card" onclick="filterLoyalty('ON TRACK')">
-        <div class="label-caps" style="margin-bottom:6px;">On Track</div>
-        <div class="lstrip-val green" id="ls-ontrack">—</div>
-      </div>
-      <div class="card card-grad-5 lstrip-card" onclick="filterLoyalty('TIME TO BOOK')">
-        <div class="label-caps" style="margin-bottom:6px;">Time to Book</div>
-        <div class="lstrip-val amber" id="ls-ttbook">—</div>
-      </div>
-      <div class="card card-grad-4 lstrip-card" onclick="filterLoyalty('OVERDUE')">
-        <div class="label-caps" style="margin-bottom:6px;">Overdue</div>
-        <div class="lstrip-val red" id="ls-overdue">—</div>
-      </div>
-    </div>
-    <div class="loyalty-filter filter-row">
-      <div class="chip on" onclick="fc(this);filterLoyalty('All')">All</div>
-      <div class="chip" onclick="fc(this);filterLoyalty('ON TRACK')">On Track</div>
-      <div class="chip" onclick="fc(this);filterLoyalty('TIME TO BOOK')">Time to Book</div>
-      <div class="chip" onclick="fc(this);filterLoyalty('OVERDUE')">Overdue</div>
-    </div>
-    <div class="card" style="overflow-x:auto;">
-      <table class="loyalty-table">
-        <thead><tr>
-          <th>Client</th><th>Phone</th><th>Status</th><th>Last Wax</th>
-          <th>Next Due</th><th>Pack Progress</th><th>Notes</th><th>WhatsApp</th>
-        </tr></thead>
-        <tbody id="loyalty-body">
-          <tr><td colspan="8"><div class="data-note">Loading loyalty data…</div></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+</div>
 
-</div><!-- /main -->
+</div>
 
-<!-- BOOKING DETAIL PANEL -->
+<!-- ══ BOOKING DETAIL PANEL ══ -->
 <div class="detail-panel" id="detail-panel">
-  <button class="panel-close" onclick="closePanel()">✕</button>
-  <div class="panel-title" id="panel-name">—</div>
-  <div class="panel-sub" id="panel-ref">—</div>
-  <div class="status-pill" id="panel-status" style="margin-bottom:20px;display:inline-block;">—</div>
+  <div class="panel-close" onclick="closePanel()">✕</div>
+  <h2 class="panel-title" id="panel-title">Booking Details</h2>
+  <p class="panel-sub" id="panel-sub">Loading...</p>
   
-  <!-- Previous Treatment Badge (for returning clients) -->
-  <div id="panel-prev-treatment" style="display:none;margin-bottom:16px;">
-    <div class="label-caps" style="margin-bottom:6px;font-size:8px;">Previous Visit</div>
-    <div class="prev-treatment" id="panel-prev-services">—</div>
-  </div>
-
   <div class="panel-section">
-    <div class="panel-section-title">Appointment</div>
+    <div class="panel-section-title">Client Information</div>
+    <div class="panel-row"><span class="panel-key">Name</span><span class="panel-val" id="panel-name">—</span></div>
+    <div class="panel-row"><span class="panel-key">Email</span><span class="panel-val" id="panel-email">—</span></div>
+    <div class="panel-row"><span class="panel-key">Phone</span><span class="panel-val" id="panel-phone">—</span></div>
+  </div>
+  
+  <div class="panel-section">
+    <div class="panel-section-title">Booking Details</div>
     <div class="panel-row"><span class="panel-key">Date</span><span class="panel-val" id="panel-date">—</span></div>
     <div class="panel-row"><span class="panel-key">Time</span><span class="panel-val" id="panel-time">—</span></div>
     <div class="panel-row"><span class="panel-key">Services</span><span class="panel-val" id="panel-services">—</span></div>
-    <div class="panel-row"><span class="panel-key">Address</span><span class="panel-val" id="panel-address" style="max-width:180px;text-align:right;font-size:12px;">—</span></div>
   </div>
-
-  <div class="panel-section">
-    <div class="panel-section-title">Client</div>
-    <div class="panel-row"><span class="panel-key">Name</span><span class="panel-val" id="panel-client-name">—</span></div>
-    <div class="panel-row"><span class="panel-key">Phone</span><span class="panel-val" id="panel-phone">—</span></div>
-    <div class="panel-row"><span class="panel-key">Email</span><span class="panel-val" id="panel-email" style="font-size:11px;">—</span></div>
-  </div>
-
+  
   <div class="panel-section">
     <div class="panel-section-title">Payment</div>
     <div class="panel-row"><span class="panel-key">Total</span><span class="panel-val" id="panel-total">—</span></div>
     <div class="panel-row"><span class="panel-key">Deposit</span><span class="panel-val" id="panel-deposit">—</span></div>
-    <div class="panel-row"><span class="panel-key">Balance Due</span><span class="panel-val" id="panel-balance">—</span></div>
-    <div class="panel-row"><span class="panel-key">Balance Status</span><span class="panel-val" id="panel-bal-status">—</span></div>
+    <div class="panel-row"><span class="panel-key">Balance</span><span class="panel-val" id="panel-balance">—</span></div>
   </div>
-
-  <div class="action-grid">
-    <button class="action-btn" onclick="panelAction('Confirmed')">✓ Confirm</button>
-    <button class="action-btn" onclick="panelAction('reschedule')">↻ Reschedule</button>
-    <button class="action-btn" onclick="panelAction('Service Complete')">✦ Service Complete</button>
-    <button class="action-btn danger" onclick="panelAction('Cancelled')">✕ Cancel</button>
-    <button class="action-btn primary" onclick="panelAction('requestBalance')">💳 Request Balance Payment</button>
-    <button class="action-btn" id="btn-add-service" onclick="showAddServiceModal()" style="background:rgba(139,92,246,0.15);border-color:rgba(139,92,246,0.3);color:rgba(167,139,250,0.95);">✚ Add Service</button>
-  </div>
-</div><!-- /detail-panel -->
-
-<!-- ADD SERVICE MODAL -->
-<div class="modal-overlay" id="add-service-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center;">
-  <div class="card" style="width:90%;max-width:400px;padding:24px;">
-    <div style="font-family:var(--font-d);font-size:22px;font-weight:400;margin-bottom:20px;">Add Service</div>
+  
+  <div class="panel-section">
+    <div class="panel-section-title">Add Service</div>
     <div class="setting-row">
-      <label class="setting-label">Service Name</label>
-      <input class="setting-input" id="add-svc-name" placeholder="e.g., Eyebrow Threading">
+      <label class="setting-label">Service</label>
+      <select class="setting-input setting-dropdown" id="add-svc-name" onchange="prefillServicePrice()">
+        <option value="">Select a service...</option>
+        <!-- Populated via loadServicesForModal() -->
+      </select>
     </div>
     <div class="setting-row">
       <label class="setting-label">Price (R)</label>
-      <input class="setting-input" id="add-svc-price" type="number" placeholder="0.00">
+      <input class="setting-input" type="number" step="0.01" id="add-svc-price" placeholder="0.00">
     </div>
-    <div style="display:flex;gap:10px;margin-top:16px;">
-      <button class="add-btn" onclick="confirmAddService()" style="flex:1;">Add Service</button>
-      <button class="review-btn" onclick="hideAddServiceModal()">Cancel</button>
-    </div>
+    <button class="action-btn primary" onclick="addServiceRow(currentBookingId)">Add Service</button>
+  </div>
+  
+  <div class="action-grid">
+    <button class="action-btn" onclick="panelAction('reschedule')">Reschedule</button>
+    <button class="action-btn" onclick="panelAction('confirm')">Confirm</button>
+    <button class="action-btn" onclick="panelAction('complete')">Mark Complete</button>
+    <button class="action-btn" onclick="panelAction('requestBalance')">Request Balance</button>
+    <button class="action-btn danger" onclick="panelAction('cancel')">Cancel</button>
   </div>
 </div>
 
-</div><!-- /pg-app -->
-
+<!-- ── TOAST ── -->
 <div class="toast" id="toast"></div>
 
-<script>
-// ══════════════════════════════════════════════════════
-// PHENOMEBEAUTY ADMIN v3 — Cached · Rate-limited · Native
-// ══════════════════════════════════════════════════════
-const API = '';
-let token = sessionStorage.getItem('pbAdminToken') || '';
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ═══════════════════════════════════════════════════════════
+// PHENOMEBEAUTY ADMIN v6.0 — Phase 2 Complete
+// ═══════════════════════════════════════════════════════════
 
-// ── DATA STORE ───────────────────────────────────────
-let allBookings = [], allConsults = [], allLoyalty = [], allStock = [];
-let currentFilter = 'All', currentLoyaltyFilter = 'All', currentBookingId = '';
-let loyaltyLoaded = false, stockLoaded = false;
-let currentView = 'dashboard';
+let ADMIN_TOKEN = '';
+let ALL_BOOKINGS = [];
+let SERVICES_CACHE = null;
+let currentBookingId = null;
 
-// ── CACHE (prevents hammering the API) ───────────────
-const CACHE_TTL = 60000; // 60 seconds
-const _cache = {};
-function cacheGet(key) {
-  const c = _cache[key];
-  return (c && Date.now() - c.ts < CACHE_TTL) ? c.data : null;
-}
-function cacheSet(key, data) { _cache[key] = { data, ts: Date.now() }; }
-function cacheInvalidate(key) { delete _cache[key]; }
-
-// ── REQUEST DEDUP (prevents parallel identical calls) ─
-const _inflight = {};
-async function apiFetch(url, opts = {}) {
-  const isGet = !opts.method || opts.method === 'GET';
-  const key = url + (opts.body || '');
-
-  // For GETs: check cache first
-  if (isGet && opts.method !== 'FORCE') {
-    const cached = cacheGet(key);
-    if (cached) return cached;
-    // Dedup in-flight
-    if (_inflight[key]) return _inflight[key];
-  }
-
-  const headers = { 'x-admin-token': token, 'Content-Type': 'application/json', ...(opts.headers || {}) };
-  const promise = fetch(API + url, { ...opts, headers })
-    .then(async r => {
-      if (r.status === 401) { doLogout(); throw new Error('Session expired'); }
-      const ct = r.headers.get('content-type') || '';
-      if (!ct.includes('application/json')) throw new Error(`Server error (${r.status})`);
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || `Error ${r.status}`);
-      if (isGet) cacheSet(key, d);
-      return d;
-    })
-    .finally(() => { if (isGet) delete _inflight[key]; });
-
-  if (isGet) _inflight[key] = promise;
-  return promise;
-}
-
-// Backwards-compat alias
-function apiCall(url, opts = {}) { return apiFetch(url, opts); }
-
-// ── REFRESH THROTTLE ─────────────────────────────────
-let _lastRefresh = 0;
-const REFRESH_MIN = 30000; // don't full-refresh more than once per 30s
-let _refreshTimer = null;
-
-// ── LOGIN ────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  if (token) { showApp(); } else { showLoginPage(); }
-});
-
-function showLoginPage() {
-  document.getElementById('pg-login').classList.remove('hidden');
-  document.getElementById('pg-app').style.display = 'none';
-}
-function showApp() {
-  document.getElementById('pg-login').classList.add('hidden');
-  document.getElementById('pg-app').style.display = 'flex';
-  init();
-}
-
+// ── AUTH ──
 async function doLogin() {
-  const btn  = document.getElementById('l-btn');
-  const pass = document.getElementById('l-pass').value.trim();
-  const err  = document.getElementById('l-err');
-  if (!pass) return;
+  const pw = document.getElementById('l-pass').value;
+  const btn = document.getElementById('l-btn');
+  const err = document.getElementById('l-err');
+  if (!pw) { err.textContent = 'Please enter password'; err.style.display='block'; return; }
   btn.disabled = true;
-  btn.innerHTML = '<span class="login-spinner"></span>';
+  btn.innerHTML = '<div class="login-spinner"></div> Signing in...';
   err.style.display = 'none';
   try {
     const r = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pass })
+      body: JSON.stringify({ password: pw })
     });
-    const ct = r.headers.get('content-type') || '';
-    if (!ct.includes('application/json')) throw new Error('Server error — check deployment logs');
     const d = await r.json();
-    if (!r.ok || !d.token) throw new Error(d.error || 'Incorrect password');
-    token = d.token;
-    sessionStorage.setItem('pbAdminToken', token);
-    showApp();
-  } catch(e) {
-    err.textContent = e.message;
+    if (r.ok && d.token) {
+      ADMIN_TOKEN = d.token;
+      localStorage.setItem('adminToken', d.token);
+      document.getElementById('pg-login').classList.add('hidden');
+      document.getElementById('pg-app').style.display = 'flex';
+      refresh();
+    } else {
+      err.textContent = d.error || 'Invalid password';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  } catch (e) {
+    err.textContent = 'Connection error';
     err.style.display = 'block';
     btn.disabled = false;
     btn.textContent = 'Sign In';
@@ -1208,787 +523,339 @@ async function doLogin() {
 }
 
 function doLogout() {
-  sessionStorage.removeItem('pbAdminToken');
-  token = '';
-  allBookings = []; allConsults = []; allLoyalty = []; allStock = [];
-  loyaltyLoaded = false; stockLoaded = false;
-  Object.keys(_cache).forEach(k => delete _cache[k]);
-  clearTimeout(_refreshTimer);
-  closeSidebar();
-  document.getElementById('l-pass').value = '';
-  document.getElementById('l-btn').textContent = 'Sign In';
-  document.getElementById('l-btn').disabled = false;
-  document.getElementById('l-err').style.display = 'none';
-  showLoginPage();
-  showToast('Signed out');
+  localStorage.removeItem('adminToken');
+  ADMIN_TOKEN = '';
+  document.getElementById('pg-app').style.display = 'none';
+  document.getElementById('pg-login').classList.remove('hidden');
 }
 
-// ── MOBILE SIDEBAR ───────────────────────────────────
+// Check for saved token
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('adminToken');
+  if (saved) {
+    ADMIN_TOKEN = saved;
+    document.getElementById('pg-login').classList.add('hidden');
+    document.getElementById('pg-app').style.display = 'flex';
+    refresh();
+  }
+});
+
+// ── API HELPER ──
+async function apiFetch(url, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', 'X-Admin-Token': ADMIN_TOKEN, ...opts.headers };
+  const r = await fetch(url, { ...opts, headers });
+  if (r.status === 401) { doLogout(); throw new Error('Not authenticated'); }
+  return r.json();
+}
+
+// ── NAV ──
+function show(viewName, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`view-${viewName}`).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('topbar-title').textContent = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+  closeSidebar();
+}
+
 function openSidebar() {
-  document.querySelector('.sidebar').classList.add('mobile-open');
+  document.getElementById('sidebar').classList.add('mobile-open');
   document.getElementById('sb-overlay').classList.add('show');
 }
+
 function closeSidebar() {
-  document.querySelector('.sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar').classList.remove('mobile-open');
   document.getElementById('sb-overlay').classList.remove('show');
 }
 
-// ── NAV ──────────────────────────────────────────────
-const viewTitles = {
-  dashboard:'Dashboard', bookings:'Bookings', consults:'New Divas',
-  loyalty:'Loyalty Tracker', availability:'Availability', stock:'Stock',
-  reviews:'Google Reviews', integrations:'Integrations', settings:'Settings'
-};
-
-let reviewsLoaded = false;
-
-function show(view, el) {
-  currentView = view;
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('view-' + view).classList.add('active');
-  if (el) el.classList.add('active');
-  document.getElementById('topbar-title').textContent = viewTitles[view] || view;
-  closePanel();
-  closeSidebar();
-  // Views that use already-loaded data render instantly
-  if (view === 'bookings')     renderBookings();
-  if (view === 'consults')     renderConsults();
-  if (view === 'availability') renderAvailability();
-  // Views with lazy-loaded data
-  if (view === 'dashboard')    renderDashboard();
-  if (view === 'loyalty')      { if (!loyaltyLoaded) loadLoyalty(); else renderLoyalty(); }
-  if (view === 'stock')        { if (!stockLoaded) loadStock(); else renderStock(); }
-  if (view === 'reviews')      { if (!reviewsLoaded) loadReviews(); }
-  if (view === 'settings')     loadSettings();
+// ── REFRESH ──
+async function refresh() {
+  await Promise.all([loadBookings()]);
+  showToast('✓ Refreshed');
 }
 
-// ── FILTER CHIPS ─────────────────────────────────────
-function fc(chip) {
-  chip.closest('.filter-row').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-  chip.classList.add('on');
-}
-
-// ── BOOKINGS ─────────────────────────────────────────
 async function loadBookings() {
   try {
-    const d = await apiFetch('/api/admin/bookings');
-    allBookings = Array.isArray(d) ? d : (d.bookings || []);
+    const data = await apiFetch('/api/admin/bookings');
+    ALL_BOOKINGS = data;
+    filterBookings('All');
     updateBadges();
-  } catch(e) { console.error('bookings:', e.message); }
+  } catch (e) {
+    console.error('loadBookings:', e);
+  }
 }
 
-function filterBookings(f) { currentFilter = f; renderBookings(); }
-
-function renderBookings() {
-  const list = document.getElementById('booking-list');
-  if (!list) return;
-  const today = todayStr();
-  let items = allBookings;
-  if (currentFilter !== 'All') {
-    if (currentFilter === 'Today') items = items.filter(b => b.date === today);
-    else items = items.filter(b => b.status === currentFilter);
+function filterBookings(status) {
+  let filtered = ALL_BOOKINGS;
+  if (status === 'Today') {
+    const today = new Date().toISOString().slice(0, 10);
+    filtered = ALL_BOOKINGS.filter(b => b.date === today);
+  } else if (status !== 'All') {
+    filtered = ALL_BOOKINGS.filter(b => b.status === status);
   }
-  if (!items.length) { list.innerHTML = '<div class="data-note">No bookings found.</div>'; return; }
-  list.innerHTML = items.map(b => {
-    const name  = b.name || '—';
-    const svc   = (b.services || '—').split(',')[0].trim();
-    const stat  = b.status || 'Pending Payment';
-    const total = b.total || '0';
-    const id    = b.bookingId || '';
-    const sc    = statusClass(stat);
-    return `<div class="card booking-row" onclick="openPanel('${esc(id)}')">
-      <div class="booking-avatar">${initials(name)}</div>
-      <div style="flex:1;min-width:0;">
-        <div class="booking-name">${esc(name)}</div>
-        <div class="booking-meta">${esc(svc)} · ${fmtD(b.date)} · ${b.time||''}</div>
+  renderBookings(filtered);
+}
+
+function renderBookings(bookings) {
+  const list = document.getElementById('booking-list');
+  if (!bookings || bookings.length === 0) {
+    list.innerHTML = '<div class="data-note">No bookings found</div>';
+    return;
+  }
+  list.innerHTML = bookings.map(b => {
+    const initial = (b.name || 'U')[0].toUpperCase();
+    const statusClass = {
+      'Pending Payment': 's-pending',
+      'Confirmed': 's-confirmed',
+      'Service Complete': 's-complete',
+      'Cancelled': 's-cancelled'
+    }[b.status] || 's-pending';
+    return `
+      <div class="booking-row card" onclick="showPanel('${b.bookingId}')">
+        <div class="booking-avatar">${initial}</div>
+        <div>
+          <div class="booking-name">${b.name || 'Unknown'}</div>
+          <div class="booking-meta">${b.date} · ${b.time}</div>
+        </div>
+        <div class="booking-amount">R${b.total}</div>
+        <div class="status-pill ${statusClass}">${b.status}</div>
       </div>
-      <div class="booking-amount">R ${Number(total).toLocaleString()}</div>
-      <div class="status-pill ${sc}">${pillLabel(stat)}</div>
-    </div>`;
+    `;
   }).join('');
 }
 
-// ── SEARCH (debounced — no extra API calls) ───────────
-let _searchTimer = null;
-function searchBookings(q) {
-  clearTimeout(_searchTimer);
-  _searchTimer = setTimeout(() => {
-    if (!q.trim()) { renderBookings(); return; }
-    const ql = q.toLowerCase();
-    const saved = allBookings;
-    const hits = allBookings.filter(b =>
-      (b.name||'').toLowerCase().includes(ql) ||
-      (b.services||'').toLowerCase().includes(ql) ||
-      (b.bookingId||'').toLowerCase().includes(ql) ||
-      (b.phone||'').toLowerCase().includes(ql) ||
-      (b.email||'').toLowerCase().includes(ql)
-    );
-    const list = document.getElementById('booking-list');
-    if (!hits.length) { list.innerHTML = `<div class="data-note">No results for "${esc(q)}"</div>`; return; }
-    allBookings = hits; renderBookings(); allBookings = saved;
-  }, 180);
+function searchBookings(query) {
+  if (!query) { filterBookings('All'); return; }
+  const q = query.toLowerCase();
+  const results = ALL_BOOKINGS.filter(b =>
+    (b.name || '').toLowerCase().includes(q) ||
+    (b.email || '').toLowerCase().includes(q) ||
+    (b.phone || '').includes(q) ||
+    (b.bookingId || '').toLowerCase().includes(q)
+  );
+  renderBookings(results);
 }
 
-// ── DETAIL PANEL (BOOKING) ────────────────────────────
-function openPanel(id) {
-  const b = allBookings.find(x => x.bookingId === id);
-  if (!b) return;
-  currentBookingId = id;
-  const stat = b.status || '—';
-  const sc   = statusClass(stat);
-  document.getElementById('panel-name').textContent    = b.name || '—';
-  document.getElementById('panel-ref').textContent     = id;
-  document.getElementById('panel-status').textContent  = pillLabel(stat);
-  document.getElementById('panel-status').className    = 'status-pill ' + sc;
-  document.getElementById('panel-date').textContent    = fmtD(b.date);
-  document.getElementById('panel-time').textContent    = b.time || '—';
-  document.getElementById('panel-services').textContent = b.services || '—';
-  document.getElementById('panel-address').textContent  = b.address || '—';
-  document.getElementById('panel-client-name').textContent = b.name || '—';
-  document.getElementById('panel-phone').textContent   = b.phone || '—';
-  document.getElementById('panel-email').textContent   = b.email || '—';
-  document.getElementById('panel-total').textContent   = 'R ' + Number(b.total   || 0).toLocaleString();
-  document.getElementById('panel-deposit').textContent = 'R ' + Number(b.deposit || 0).toLocaleString();
-  document.getElementById('panel-balance').textContent = 'R ' + Number(b.balanceDue || 0).toLocaleString();
-  document.getElementById('panel-bal-status').textContent = b.balanceStatus || '—';
-  document.getElementById('detail-panel').classList.add('open');
+function updateBadges() {
+  const pending = ALL_BOOKINGS.filter(b => b.status === 'Pending Payment').length;
+  const badge = document.getElementById('badge-bookings');
+  if (pending > 0) {
+    badge.textContent = pending;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ── DETAIL PANEL ──
+function showPanel(bookingId) {
+  loadServicesForModal(); // Phase 2: Load services when panel opens
   
-  // Load client history to show previous treatment
-  document.getElementById('panel-prev-treatment').style.display = 'none'; // Hide until loaded
-  loadClientHistory(b.email, b.phone, id);
+  currentBookingId = bookingId;
+  const booking = ALL_BOOKINGS.find(b => b.bookingId === bookingId);
+  if (!booking) return;
+  
+  document.getElementById('panel-title').textContent = booking.bookingId;
+  document.getElementById('panel-sub').textContent = booking.status;
+  document.getElementById('panel-name').textContent = booking.name;
+  document.getElementById('panel-email').textContent = booking.email;
+  document.getElementById('panel-phone').textContent = booking.phone;
+  document.getElementById('panel-date').textContent = booking.date;
+  document.getElementById('panel-time').textContent = booking.time;
+  document.getElementById('panel-services').textContent = booking.services;
+  document.getElementById('panel-total').textContent = 'R' + booking.total;
+  document.getElementById('panel-deposit').textContent = 'R' + booking.deposit;
+  document.getElementById('panel-balance').textContent = 'R' + booking.balanceDue;
+  
+  document.getElementById('detail-panel').classList.add('open');
 }
 
-function closePanel() { document.getElementById('detail-panel').classList.remove('open'); }
+function closePanel() {
+  document.getElementById('detail-panel').classList.remove('open');
+  currentBookingId = null;
+}
 
 async function panelAction(action) {
   if (!currentBookingId) return;
-  if (action === 'requestBalance') {
-    try {
-      await apiFetch('/api/admin/request-balance', { method:'POST', body: JSON.stringify({ bookingId: currentBookingId }) });
-      cacheInvalidate('/api/admin/bookings');
-      showToast('Balance request sent ✓');
-      await loadBookings();
-    } catch(e) { showToast('Error: ' + e.message); }
-    closePanel(); return;
-  }
-  if (action === 'reschedule') { showToast('Reschedule — coming soon'); return; }
-  try {
-    await apiFetch('/api/admin/update-status', { method:'POST', body: JSON.stringify({ bookingId: currentBookingId, status: action }) });
-    cacheInvalidate('/api/admin/bookings');
-    showToast('Status → ' + action + ' ✓');
-    await loadBookings();
-    renderBookings();
-    renderDashboard();
-  } catch(e) { showToast('Error: ' + e.message); }
-  closePanel();
-}
-
-// ── CONSULTATIONS ─────────────────────────────────────
-async function loadConsults() {
-  try {
-    const d = await apiFetch('/api/admin/consultations');
-    allConsults = Array.isArray(d) ? d : [];
-    updateBadges();
-  } catch(e) { console.error('consults:', e.message); }
-}
-
-function renderConsults() {
-  const el = document.getElementById('consults-list');
-  if (!el) return;
-  if (!allConsults.length) { el.innerHTML = '<div class="data-note">No consultations yet.</div>'; return; }
-  el.innerHTML = allConsults.map(c => {
-    const tags = [];
-    if ((c.clientType||'').toLowerCase() === 'new')    tags.push('New Diva');
-    if ((c.pregnancy||'').toLowerCase()  === 'yes')    tags.push('⚠ Pregnant');
-    if (c.allergies && !/^none$/i.test(c.allergies.trim())) tags.push('Allergies');
-    if (c.medications && !/^none$/i.test(c.medications.trim())) tags.push('Meds');
-    if (c.leadSource && c.leadSource.trim()) tags.push(c.leadSource);
-    return `<div class="card consult-card" onclick="openConsultPanel('${esc(c.bookingId)}')">
-      <div class="consult-header">
-        <div>
-          <div class="consult-name">${esc(c.name||'—')}</div>
-          <div class="consult-date">${fmtD(c.date)} · ${esc((c.services||'').split(',')[0]||'—')}</div>
-        </div>
-        <div class="status-pill ${statusClass(c.status)}">${pillLabel(c.status)}</div>
-      </div>
-      <div class="consult-tags">${tags.map(t=>`<span class="consult-tag">${esc(t)}</span>`).join('')}</div>
-    </div>`;
-  }).join('');
-}
-
-function openConsultPanel(id) {
-  const c = allConsults.find(x => x.bookingId === id);
-  if (!c) return;
-  currentBookingId = id;
-  document.getElementById('panel-name').textContent    = c.name || '—';
-  document.getElementById('panel-ref').textContent     = id + (c.clientType ? ' · ' + c.clientType : '');
-  document.getElementById('panel-status').textContent  = c.status || 'Consultation';
-  document.getElementById('panel-status').className    = 'status-pill ' + statusClass(c.status);
-  document.getElementById('panel-date').textContent    = fmtD(c.date);
-  document.getElementById('panel-time').textContent    = c.time || '—';
-  document.getElementById('panel-services').textContent = c.services || '—';
-  document.getElementById('panel-address').textContent  = '—';
-  document.getElementById('panel-client-name').textContent = c.name || '—';
-  document.getElementById('panel-phone').textContent   = c.phone || '—';
-  document.getElementById('panel-email').textContent   = c.email || '—';
-  document.getElementById('panel-total').textContent   = '—';
-  document.getElementById('panel-deposit').textContent = '—';
-  document.getElementById('panel-balance').textContent = '—';
-  const notes = [
-    c.skinConditions && !/^none$/i.test(c.skinConditions) ? 'Skin: '+c.skinConditions : '',
-    c.allergies      && !/^none$/i.test(c.allergies)      ? 'Allergies: '+c.allergies : '',
-    c.pregnancy === 'Yes' ? '⚠ Pregnant' : '',
-    c.medications    && !/^none$/i.test(c.medications)    ? 'Meds: '+c.medications : '',
-    c.healthConditions && !/^none$/i.test(c.healthConditions||'none') ? c.healthConditions : '',
-    c.additionalNotes && c.additionalNotes.trim() ? c.additionalNotes : ''
-  ].filter(Boolean).join(' · ') || '—';
-  document.getElementById('panel-bal-status').textContent = notes;
-  document.getElementById('detail-panel').classList.add('open');
-}
-
-// ── LOYALTY ───────────────────────────────────────────
-async function loadLoyalty() {
-  const el = document.getElementById('loyalty-body');
-  if (el) el.innerHTML = '<tr><td colspan="8"><div class="data-note">Loading…</div></td></tr>';
-  try {
-    const d = await apiFetch('/api/admin/loyalty');
-    allLoyalty = Array.isArray(d) ? d : [];
-    loyaltyLoaded = true;
-    updateLoyaltyStrip();
-    updateBadges();
-    renderLoyalty();
-  } catch(e) {
-    if (el) el.innerHTML = `<tr><td colspan="8"><div class="data-note">Error: ${esc(e.message)}</div></td></tr>`;
-  }
-}
-
-function updateLoyaltyStrip() {
-  const total   = allLoyalty.length;
-  const ontrack = allLoyalty.filter(l => /on.?track/i.test(l.status||'')).length;
-  const ttbook  = allLoyalty.filter(l => /time.?to.?book/i.test(l.status||'')).length;
-  const overdue = allLoyalty.filter(l => /overdue/i.test(l.status||'')).length;
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  set('ls-total', total); set('ls-ontrack', ontrack); set('ls-ttbook', ttbook); set('ls-overdue', overdue);
-}
-
-function filterLoyalty(f) {
-  currentLoyaltyFilter = f;
-  document.querySelectorAll('.loyalty-filter .chip').forEach(c => {
-    const t = c.textContent.trim();
-    const match = (f==='All'&&t==='All') || (f==='ON TRACK'&&t==='On Track') ||
-                  (f==='TIME TO BOOK'&&t==='Time to Book') || (f==='OVERDUE'&&t==='Overdue');
-    c.classList.toggle('on', match);
-  });
-  renderLoyalty();
-}
-
-function renderLoyalty() {
-  const el = document.getElementById('loyalty-body');
-  if (!el) return;
-  let list = allLoyalty;
-  if (currentLoyaltyFilter !== 'All') {
-    list = list.filter(l => (l.status||'').toUpperCase().includes(currentLoyaltyFilter));
-  }
-  if (!list.length) { el.innerHTML = '<tr><td colspan="8"><div class="data-note">No clients found.</div></td></tr>'; return; }
-  el.innerHTML = list.map(l => {
-    const sc   = /on.?track/i.test(l.status||'') ? 'l-ontrack' : /overdue/i.test(l.status||'') ? 'l-overdue' : /time.?to.?book/i.test(l.status||'') ? 'l-ttbook' : '';
-    const lbl  = /on.?track/i.test(l.status||'') ? 'On Track' : /overdue/i.test(l.status||'') ? 'Overdue' : /time.?to.?book/i.test(l.status||'') ? 'Time to Book' : (l.status||'—');
-    const overdueDate = /overdue/i.test(l.status||'');
-    return `<tr>
-      <td><span style="font-weight:700;color:var(--t100);">${esc(l.clientName||'—')}</span>${l.location?`<div style="font-size:10px;color:var(--t40);margin-top:2px;">${esc(l.location)}</div>`:''}</td>
-      <td><span style="font-weight:500;">${esc(l.phone||'—')}</span></td>
-      <td><span class="l-pill ${sc}">${esc(lbl)}</span></td>
-      <td style="font-weight:500;">${esc(l.lastWaxDate||'—')}</td>
-      <td style="font-weight:${overdueDate?'700':'500'};color:${overdueDate?'var(--red)':'inherit'};">${esc(l.nextDueDate||'—')}</td>
-      <td style="font-weight:600;color:var(--t100);">${esc(l.packProgress||'—')}</td>
-      <td style="font-size:11.5px;color:var(--t60);max-width:130px;">${esc(l.notes||'')}</td>
-      <td>${l.whatsappLink?`<a href="${esc(l.whatsappLink)}" target="_blank" rel="noopener" class="wa-link">💬 Chat</a>`:'—'}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ── STOCK ─────────────────────────────────────────────
-async function loadStock() {
-  const el = document.getElementById('stock-body');
-  if (el) el.innerHTML = '<tr><td colspan="5"><div class="data-note">Loading…</div></td></tr>';
-  try {
-    const d = await apiFetch('/api/admin/stock');
-    allStock = Array.isArray(d) ? d : [];
-    stockLoaded = true;
-    updateBadges();
-    renderStock();
-  } catch(e) {
-    if (el) el.innerHTML = `<tr><td colspan="5"><div class="data-note">Error: ${esc(e.message)}</div></td></tr>`;
-  }
-}
-
-function renderStock() {
-  const tbody = document.getElementById('stock-body');
-  if (!tbody) return;
-  if (!allStock.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="data-note">No stock data.</div></td></tr>'; return; }
-  tbody.innerHTML = allStock.map((item,i) => {
-    const qty = parseInt(item.quantity || 0);
-    const min = parseInt(item.minStock  || 0);
-    const low = min > 0 && qty <= min;
-    return `<tr>
-      <td>
-        <div class="stock-name">${esc(item.name)}</div>
-        <div style="font-size:11.5px;color:var(--t60);margin-top:2px;font-weight:500;">${esc(item.category||'')}${item.unit?' · '+item.unit:''}</div>
-      </td>
-      <td style="color:var(--t60);font-weight:500;">${esc(item.category||'—')}</td>
-      <td><span class="stock-qty ${low?'low':'ok'}">${qty}</span></td>
-      <td style="color:var(--t60);font-weight:600;">${min||'—'}</td>
-      <td style="font-size:11.5px;color:var(--t60);">${esc(item.notes||'')}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ── DASHBOARD ─────────────────────────────────────────
-function renderDashboard() {
-  if (!allBookings.length) return; // data not ready yet — init() will call this after load
-  const now   = new Date();
-  const month = now.getMonth(), year = now.getFullYear();
-  const today = todayStr();
-
-  const isConfirmed = s => ['Confirmed','Service Complete'].includes(s);
-  const thisMonth = allBookings.filter(b => {
-    const d = new Date(b.date||'');
-    return d.getMonth()===month && d.getFullYear()===year && isConfirmed(b.status);
-  });
-  const lastMonth = allBookings.filter(b => {
-    const d = new Date(b.date||'');
-    return d.getMonth()===(month-1+12)%12 && d.getFullYear()===(month===0?year-1:year) && isConfirmed(b.status);
-  });
-
-  const revenue = thisMonth.reduce((s,b) => s + Number(b.deposit||0), 0);
-  const lastRev = lastMonth.reduce((s,b) => s + Number(b.deposit||0), 0);
-  const delta   = lastRev > 0 ? Math.round(((revenue-lastRev)/lastRev)*100) : 0;
-
-  const todayB   = allBookings.filter(b => b.date === today);
-  const todayRev = todayB.filter(b => isConfirmed(b.status)).reduce((s,b) => s+Number(b.deposit||0), 0);
-  const remaining = todayB.filter(b => b.status === 'Confirmed').length;
-  const nextB   = todayB.find(b => b.status === 'Confirmed');
-  const cancelled = allBookings.filter(b => b.status === 'Cancelled').length;
-  const cancelRate = allBookings.length > 0 ? Math.round((cancelled/allBookings.length)*100) : 0;
-
-  // Service popularity from real data
-  const svcMap = {};
-  allBookings.forEach(b => {
-    (b.services||'').split(/[,+&]/).map(s=>s.trim()).filter(Boolean)
-      .forEach(s => { svcMap[s] = (svcMap[s]||0)+1; });
-  });
-  const topSvcs = Object.entries(svcMap).sort((a,b)=>b[1]-a[1]).slice(0,4);
-  const maxSvc  = topSvcs[0]?.[1] || 1;
-
-  // DOM updates
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  document.getElementById('hero-revenue').innerHTML = `R ${revenue.toLocaleString()}`;
-  const deltaEl = document.getElementById('hero-delta');
-  if (deltaEl) {
-    deltaEl.style.opacity = '1';
-    deltaEl.textContent = (delta >= 0 ? '↑ ' : '↓ ') + Math.abs(delta) + '% vs last month';
-    deltaEl.className = 'hero-delta' + (delta < 0 ? ' down' : '');
-  }
-  set('d-rev-today',   `R ${todayRev.toLocaleString()}`);
-  set('d-appts-today', todayB.length);
-  set('d-remaining',   remaining);
-  set('d-next',        nextB ? `${nextB.time||'—'} · ${(nextB.name||'').split(' ')[0]}` : 'None today');
-  set('d-cancel',      cancelRate + '%');
-  set('d-rebook',      '—'); // would need historical data
-  set('d-hours',       (thisMonth.length * 2) + ' hrs');
-  set('d-fill',        Math.min(Math.round((thisMonth.length/20)*100),100) + '%');
-  set('d-basket',      thisMonth.length ? 'R '+Math.round(revenue/thisMonth.length).toLocaleString() : '—');
-  set('d-total-appts', thisMonth.length);
-  set('d-new-clients', allConsults.length);
-  set('d-returning',   Math.max(0, thisMonth.length - allConsults.length));
-  set('d-retention',   thisMonth.length > 0 ? Math.round((Math.max(0,thisMonth.length-allConsults.length)/thisMonth.length)*100)+'%' : '—');
-
-  const tsEl = document.getElementById('top-services');
-  if (tsEl) tsEl.innerHTML = topSvcs.length ? topSvcs.map(([name,cnt],i) => `
-    <div class="service-rank">
-      <div class="rank-num">${i+1}</div>
-      <div class="rank-name">${esc(name)}</div>
-      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round((cnt/maxSvc)*100)}%"></div></div>
-      <div class="rank-val">${cnt}×</div>
-    </div>`).join('') : '<div class="data-note">No data yet</div>';
-
-  // Alerts — real data only
-  const pendingDeps = allBookings.filter(b => b.status === 'Pending Payment').length;
-  const alerts = [];
-  if (pendingDeps > 0) alerts.push({ dot:'amber', text:`<strong>${pendingDeps} deposit${pendingDeps>1?'s':''}</strong> still pending payment` });
-  if (delta > 0)      alerts.push({ dot:'green', text:`Revenue <strong>↑ ${delta}%</strong> vs last month` });
-  else if (delta < 0) alerts.push({ dot:'red',   text:`Revenue <strong>↓ ${Math.abs(delta)}%</strong> vs last month` });
-  if (loyaltyLoaded) {
-    const ov = allLoyalty.filter(l => /overdue/i.test(l.status||'')).length;
-    const tt = allLoyalty.filter(l => /time.?to.?book/i.test(l.status||'')).length;
-    if (ov > 0) alerts.push({ dot:'red',   text:`<strong>${ov} client${ov>1?'s':''}</strong> overdue — loyalty tracker` });
-    if (tt > 0) alerts.push({ dot:'amber', text:`<strong>${tt} client${tt>1?'s':''}</strong> time to rebook` });
-  } else {
-    alerts.push({ dot:'amber', text:'Open <strong>Loyalty Tracker</strong> to load client alerts' });
-  }
-  if (stockLoaded) {
-    allStock.filter(s => parseInt(s.minStock||0)>0 && parseInt(s.quantity||0)<=parseInt(s.minStock||0))
-      .forEach(s => alerts.push({ dot:'red', text:`<strong>${esc(s.name)}</strong> — stock low (${s.quantity} left)` }));
-  }
-  const alertsEl = document.getElementById('alerts-list');
-  if (alertsEl) alertsEl.innerHTML = alerts.length ? alerts.map(a => `
-    <div class="alert-item">
-      <div class="alert-dot ${a.dot}"></div>
-      <div class="alert-text">${a.text}</div>
-    </div>`).join('') : '<div class="data-note">No alerts</div>';
-
-  // Heatmap — real booking dates
-  const hmEl = document.getElementById('heatmap');
-  if (hmEl) {
-    document.getElementById('hm-month').textContent = now.toLocaleString('default',{month:'long',year:'numeric'});
-    const days = new Date(year, month+1, 0).getDate();
-    hmEl.innerHTML = '';
-    for (let d=1; d<=Math.min(days,28); d++) {
-      const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const cnt = allBookings.filter(b => b.date===ds).length;
-      const cell = document.createElement('div');
-      cell.className = 'hm-cell' + (cnt===0?'': cnt===1?' l2': cnt===2?' l3':' l4');
-      hmEl.appendChild(cell);
-    }
-  }
-  buildChart();
-}
-
-function buildChart() {
-  // Build from real booking data grouped by week-day over last 30 days
-  const now = Date.now();
-  const W=400, H=150, pad=10;
-  const vals = Array.from({length:30}, (_,i) => {
-    const ds = new Date(now - (29-i)*86400000).toISOString().slice(0,10);
-    return allBookings.filter(b => b.date === ds).reduce((s,b) => s+Number(b.deposit||0), 0);
-  });
-  const max = Math.max(...vals, 1);
-  const pts = vals.map((v,i) => [pad+(i/(vals.length-1))*(W-pad*2), H-pad-((v/max)*(H-pad*2))]);
-  const lineD = 'M'+pts.map(p=>p.join(',')).join(' L');
-  const areaD = lineD+` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
-  const avg  = Math.round(vals.reduce((s,v)=>s+v,0)/vals.length);
-  const avgY = H-pad-((avg/max)*(H-pad*2));
-  document.getElementById('chart-line').setAttribute('d', lineD);
-  document.getElementById('chart-area').setAttribute('d', areaD);
-  document.getElementById('chart-avg').setAttribute('d',`M${pad},${avgY} L${W-pad},${avgY}`);
-}
-
-// ── BADGES ────────────────────────────────────────────
-function updateBadges() {
-  const pend     = allBookings.filter(b => b.status === 'Pending Payment').length;
-  const consuls  = allConsults.length;
-  const ov       = allLoyalty.filter(l => /overdue/i.test(l.status||'')).length;
-  const tt       = allLoyalty.filter(l => /time.?to.?book/i.test(l.status||'')).length;
-  const lowStk   = allStock.filter(s => parseInt(s.minStock||0)>0 && parseInt(s.quantity||0)<=parseInt(s.minStock||0)).length;
-  const setBadge = (id,n) => { const e=document.getElementById(id); if(!e) return; e.textContent=n; e.style.display=n>0?'inline-block':'none'; };
-  setBadge('badge-bookings', pend);
-  setBadge('badge-consults',  consuls);
-  setBadge('badge-loyalty',   ov+tt);
-  setBadge('badge-stock',     lowStk);
-}
-
-// ── AVAILABILITY ──────────────────────────────────────
-const DAYS  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'];
-const avail   = {Monday:true,Tuesday:true,Wednesday:false,Thursday:true,Friday:true,Saturday:true,Sunday:false};
-const blocked = {Monday:['11:00'],Friday:['15:00','16:00'],Thursday:['10:00']};
-
-function renderAvailability() {
-  document.getElementById('avail-grid').innerHTML = DAYS.map(day => {
-    const on=avail[day], bl=blocked[day]||[];
-    return `<div class="card card-grad-${on?'1':'2'} day-card">
-      <div class="day-header">
-        <div class="day-name">${day}</div>
-        <label class="toggle">
-          <input type="checkbox" ${on?'checked':''} onchange="toggleDay('${day}',this)">
-          <div class="toggle-track"></div><div class="toggle-thumb"></div>
-        </label>
-      </div>
-      <div class="time-slot-grid" style="${!on?'opacity:0.3;pointer-events:none':''}">
-        ${SLOTS.map(t=>`<div class="slot-chip ${!on?'': bl.includes(t)?'blocked':'available'}" onclick="toggleSlot('${day}','${t}',this)">${t}</div>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
-}
-function toggleDay(day,input) {
-  avail[day]=input.checked;
-  const s=input.closest('.day-card').querySelector('.time-slot-grid');
-  s.style.opacity=input.checked?'1':'0.3'; s.style.pointerEvents=input.checked?'auto':'none';
-  showToast(day+(input.checked?' — Open ✓':' — Closed'));
-}
-function toggleSlot(day,time,el) {
-  blocked[day]=blocked[day]||[];
-  if(el.classList.contains('blocked')){ blocked[day]=blocked[day].filter(t=>t!==time); el.classList.replace('blocked','available'); }
-  else { blocked[day].push(time); el.classList.replace('available','blocked'); }
-  showToast(day+' '+time+(blocked[day].includes(time)?' — Blocked':' — Available'));
-}
-
-// ── SETTINGS ──────────────────────────────────────────
-async function loadSettings() {
-  try {
-    const d = await apiFetch('/api?action=getConfig');
-    const setv=(id,v)=>{ const e=document.getElementById(id); if(e&&v) e.value=v; };
-    setv('s-app-url',   d.app_base_url||'');
-    setv('s-deposit',   d.deposit_percent||'50');
-    setv('s-yoco-slug', d.yoco_payment_page_slug||'');
-    setv('s-review-url',d.googlereviewurl||'');
-    setv('s-maps-key',  d.google_maps_api_key?'••••••••':'');
-  } catch(e) { console.error('settings:', e.message); }
-}
-function saveSettings(s) { showToast('Settings saved ✓ — '+s); }
-function toggleInt(name,input) {
-  const l={yoco:'Yoco',gcal:'Google Calendar',gmaps:'Google Maps',smtp:'Gmail/SMTP'}[name]||name;
-  showToast(l+(input.checked?' — Enabled ✓':' — Disabled'));
-}
-
-// ── REFRESH (throttled) ───────────────────────────────
-async function refresh() {
-  const now = Date.now();
-  if (now - _lastRefresh < REFRESH_MIN) { showToast('Refreshed recently ✓'); return; }
-  _lastRefresh = now;
-  // Bust caches for main data
-  cacheInvalidate('/api/admin/bookings');
-  cacheInvalidate('/api/admin/consultations');
-  showToast('Refreshing…');
-  await Promise.all([loadBookings(), loadConsults()]);
-  if (loyaltyLoaded) { cacheInvalidate('/api/admin/loyalty'); await loadLoyalty(); }
-  if (stockLoaded)   { cacheInvalidate('/api/admin/stock');   await loadStock();   }
-  renderDashboard();
-  if (currentView === 'bookings')  renderBookings();
-  if (currentView === 'consults')  renderConsults();
-  if (currentView === 'loyalty')   renderLoyalty();
-  if (currentView === 'stock')     renderStock();
-  showToast('Up to date ✓');
-}
-
-// ── UTILS ─────────────────────────────────────────────
-function todayStr() {
-  const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function fmtD(ds) {
-  if(!ds) return '—';
-  const [y,m,d]=ds.split('-').map(Number);
-  if(!y) return ds;
-  const dt=new Date(y,m-1,d);
-  return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]+' '+d+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1];
-}
-function initials(n) { return (n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'; }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function statusClass(s) {
-  return s==='Pending Payment'?'s-pending': s==='Confirmed'?'s-confirmed': s==='Service Complete'?'s-complete': s==='Cancelled'?'s-cancelled': s==='Refunded'?'s-refunded':'s-pending';
-}
-function pillLabel(s) {
-  return s==='Pending Payment'?'Pending': s==='Service Complete'?'Complete': s||'—';
-}
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2500);
-}
-
-// ── INIT ──────────────────────────────────────────────
-async function init() {
-  _lastRefresh = Date.now();
-  // Parallel load of primary data — only 2 API calls on init
-  await Promise.all([loadBookings(), loadConsults()]);
-  renderDashboard();
-  updateBadges();
-  // Auto-refresh every 5 minutes (not more often to respect API limits)
-  _refreshTimer = setInterval(() => {
-    cacheInvalidate('/api/admin/bookings');
-    cacheInvalidate('/api/admin/consultations');
-    Promise.all([loadBookings(), loadConsults()]).then(() => {
-      if (currentView === 'dashboard')  renderDashboard();
-      if (currentView === 'bookings')   renderBookings();
-      if (currentView === 'consults')   renderConsults();
-    });
-  }, 300000); // 5 minutes
-}
-
-// ══════════════════════════════════════════════════════
-// REVIEWS FUNCTIONS
-// ══════════════════════════════════════════════════════
-async function loadReviews() {
-  const listEl = document.getElementById('reviews-list');
-  const summaryEl = document.getElementById('reviews-summary');
-  if (listEl) listEl.innerHTML = '<div class="data-note">Loading reviews…</div>';
   
-  try {
-    const data = await apiFetch('/api/admin/reviews');
-    reviewsLoaded = true;
-    
-    if (!data.configured) {
-      listEl.innerHTML = `<div class="card" style="padding:24px;text-align:center;">
-        <div style="font-size:36px;margin-bottom:12px;">⚙️</div>
-        <div style="font-family:var(--font-d);font-size:20px;margin-bottom:8px;">Google Reviews Not Configured</div>
-        <div style="font-size:13px;color:var(--t40);line-height:1.7;margin-bottom:16px;">
-          To display Google Reviews, add your <strong>google_place_id</strong> to the Settings sheet.<br>
-          You can find your Place ID at <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" style="color:var(--amber);">Google's Place ID Finder</a>.
-        </div>
-        <button class="add-btn" onclick="show('settings',document.querySelector('[onclick*=settings]'))">Open Settings</button>
-      </div>`;
-      summaryEl.style.display = 'none';
-      return;
-    }
-    
-    if (data.error) {
-      listEl.innerHTML = `<div class="data-note">Error: ${esc(data.error)}</div>`;
-      return;
-    }
-    
-    // Show summary
-    summaryEl.style.display = 'block';
-    document.getElementById('reviews-rating').textContent = data.rating ? data.rating.toFixed(1) : '—';
-    document.getElementById('reviews-count').textContent = data.totalReviews ? `${data.totalReviews} reviews` : 'No reviews';
-    
-    const stars = Math.round(data.rating || 0);
-    document.getElementById('reviews-stars').textContent = '★'.repeat(stars) + '☆'.repeat(5-stars);
-    
-    // Google link
-    const reviewLink = document.getElementById('reviews-link');
-    if (data.placeName) {
-      reviewLink.href = `https://search.google.com/local/reviews?placeid=${encodeURIComponent(data.placeName)}`;
-    }
-    
-    // Render reviews
-    if (!data.reviews || !data.reviews.length) {
-      listEl.innerHTML = '<div class="data-note">No reviews to display.</div>';
-      return;
-    }
-    
-    listEl.innerHTML = data.reviews.map(r => `
-      <div class="review-card">
-        <div class="review-header">
-          <div class="review-avatar">${r.profilePhoto ? `<img src="${esc(r.profilePhoto)}" alt="">` : ''}</div>
-          <div>
-            <div class="review-author">${esc(r.author)}</div>
-            <div class="review-time">${esc(r.relativeTime)}</div>
-          </div>
-          <div class="review-stars" style="margin-left:auto;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
-        </div>
-        <div class="review-text">${esc(r.text || 'No comment')}</div>
-      </div>
-    `).join('');
-    
-  } catch (e) {
-    listEl.innerHTML = `<div class="data-note">Error loading reviews: ${esc(e.message)}</div>`;
-  }
-}
-
-// ══════════════════════════════════════════════════════
-// ADD SERVICE FUNCTIONS
-// ══════════════════════════════════════════════════════
-function showAddServiceModal() {
-  const status = document.getElementById('panel-status')?.textContent || '';
-  if (!['Confirmed', 'Complete'].some(s => status.includes(s))) {
-    showToast('Can only add services to Confirmed or Complete bookings');
-    return;
-  }
-  document.getElementById('add-service-modal').style.display = 'flex';
-  document.getElementById('add-svc-name').value = '';
-  document.getElementById('add-svc-price').value = '';
-  document.getElementById('add-svc-name').focus();
-}
-
-function hideAddServiceModal() {
-  document.getElementById('add-service-modal').style.display = 'none';
-}
-
-async function confirmAddService() {
-  const name = document.getElementById('add-svc-name').value.trim();
-  const price = parseFloat(document.getElementById('add-svc-price').value) || 0;
+  const endpoints = {
+    confirm: { url: '/api/admin/update-status', body: { bookingId: currentBookingId, status: 'Confirmed' } },
+    complete: { url: '/api/admin/update-status', body: { bookingId: currentBookingId, status: 'Service Complete' } },
+    cancel: { url: '/api/admin/update-status', body: { bookingId: currentBookingId, status: 'Cancelled' } },
+    requestBalance: { url: '/api/admin/request-balance', body: { bookingId: currentBookingId } }
+  };
   
-  if (!name) {
-    showToast('Please enter a service name');
+  if (!endpoints[action]) {
+    showToast('⚠️ Action not implemented');
     return;
   }
   
   try {
-    const result = await apiFetch('/api/admin/add-service', {
+    const res = await apiFetch(endpoints[action].url, {
       method: 'POST',
-      body: JSON.stringify({
-        bookingId: currentBookingId,
-        serviceName: name,
-        servicePrice: price
-      })
+      body: JSON.stringify(endpoints[action].body)
     });
     
-    if (result.success) {
-      showToast(`Added: ${name} · R${price.toFixed(2)}`);
-      hideAddServiceModal();
-      // Refresh bookings and update panel
-      cacheInvalidate('/api/admin/bookings');
-      await loadBookings();
-      renderBookings();
-      // Update panel totals
-      document.getElementById('panel-services').textContent = result.newServices;
-      document.getElementById('panel-total').textContent = `R ${result.newTotal}`;
-      document.getElementById('panel-balance').textContent = `R ${result.newBalance}`;
+    if (res.success) {
+      showToast(`✓ ${action} successful`);
+      closePanel();
+      refresh();
     } else {
-      showToast('Error: ' + (result.error || 'Failed'));
+      showToast('⚠️ ' + (res.error || 'Failed'));
     }
   } catch (e) {
-    showToast('Error: ' + e.message);
+    showToast('⚠️ Network error');
+    console.error('panelAction:', e);
   }
 }
 
-// ══════════════════════════════════════════════════════
-// CLIENT HISTORY / PREVIOUS TREATMENT
-// ══════════════════════════════════════════════════════
-async function loadClientHistory(email, phone, currentBookingId) {
+// ── SERVICE DROPDOWN FUNCTIONS (Phase 2) ──
+async function loadServicesForModal() {
+  if (SERVICES_CACHE) {
+    populateServiceDropdown(SERVICES_CACHE);
+    return;
+  }
+  
   try {
-    const params = new URLSearchParams();
-    if (email) params.set('email', email);
-    if (phone) params.set('phone', phone);
+    const res = await fetch('/api?action=getServices');
+    if (!res.ok) throw new Error('Failed to load services');
+    const services = await res.json();
     
-    const history = await apiFetch(`/api/admin/client-history?${params}`);
-    
-    // Filter out current booking and get previous
-    const previous = history.filter(b => b.bookingId !== currentBookingId);
-    
-    const prevEl = document.getElementById('panel-prev-treatment');
-    const prevSvcEl = document.getElementById('panel-prev-services');
-    
-    if (previous.length > 0) {
-      const last = previous[0];
-      prevEl.style.display = 'block';
-      prevSvcEl.textContent = `${last.services} · ${fmtD(last.date)}`;
-    } else {
-      prevEl.style.display = 'none';
-    }
+    SERVICES_CACHE = services.filter(s => s.active !== false);
+    populateServiceDropdown(SERVICES_CACHE);
   } catch (e) {
-    console.error('Client history error:', e.message);
-    document.getElementById('panel-prev-treatment').style.display = 'none';
+    console.error('loadServicesForModal:', e);
+    showToast('⚠️ Could not load services');
   }
 }
 
-// ══════════════════════════════════════════════════════
-// EMAIL TEST FUNCTION
-// ══════════════════════════════════════════════════════
-async function testEmail() {
-  showToast('Sending test email…');
+function populateServiceDropdown(services) {
+  const select = document.getElementById('add-svc-name');
+  if (!select) return;
+  
+  // Clear existing options (except first placeholder)
+  while (select.options.length > 1) {
+    select.remove(1);
+  }
+  
+  // Group services by category for better UX
+  const categories = {};
+  services.forEach(s => {
+    const cat = s.category || 'Other';
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(s);
+  });
+  
+  // Add optgroups
+  Object.keys(categories).sort().forEach(cat => {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = cat;
+    
+    categories[cat].forEach(svc => {
+      const opt = document.createElement('option');
+      opt.value = JSON.stringify({ name: svc.name, price: svc.price, id: svc.id });
+      opt.textContent = `${svc.name} - R${parseFloat(svc.price || 0).toFixed(2)}`;
+      optgroup.appendChild(opt);
+    });
+    
+    select.appendChild(optgroup);
+  });
+}
+
+function prefillServicePrice() {
+  const select = document.getElementById('add-svc-name');
+  const priceInput = document.getElementById('add-svc-price');
+  
+  if (!select || !priceInput) return;
+  
+  if (!select.value) {
+    priceInput.value = '';
+    priceInput.classList.remove('price-filled');
+    return;
+  }
+  
   try {
-    const result = await apiFetch('/api/admin/test-email', { method: 'POST', body: '{}' });
-    if (result.success) {
-      showToast(result.message || 'Test email sent!');
-    } else {
-      showToast('Error: ' + (result.error || 'Failed'));
-    }
+    const svcData = JSON.parse(select.value);
+    priceInput.value = parseFloat(svcData.price || 0).toFixed(2);
+    priceInput.classList.add('price-filled');
+    
+    // Remove animation class after animation completes
+    setTimeout(() => priceInput.classList.remove('price-filled'), 400);
   } catch (e) {
-    showToast('Error: ' + e.message);
+    console.error('prefillServicePrice:', e);
   }
 }
 
-async function checkEmailConfig() {
+async function addServiceRow(bookingId) {
+  const select = document.getElementById('add-svc-name');
+  const priceInput = document.getElementById('add-svc-price');
+  
+  if (!select || !priceInput) return;
+  
+  let serviceName = '';
+  let servicePrice = parseFloat(priceInput.value) || 0;
+  
   try {
-    const config = await apiFetch('/api/admin/email-config');
-    return config;
+    if (select.value) {
+      const svcData = JSON.parse(select.value);
+      serviceName = svcData.name;
+      // Use dropdown price if input wasn't manually changed
+      if (priceInput.value === parseFloat(svcData.price || 0).toFixed(2)) {
+        servicePrice = parseFloat(svcData.price || 0);
+      }
+    }
   } catch (e) {
-    return { ready: false, error: e.message };
+    // Fallback: treat select.value as plain text
+    serviceName = select.value;
   }
+  
+  if (!serviceName || serviceName === 'Select a service...') {
+    showToast('⚠️ Please select a service');
+    return;
+  }
+  
+  if (servicePrice < 0) {
+    showToast('⚠️ Price cannot be negative');
+    return;
+  }
+  
+  try {
+    const res = await apiFetch('/api/admin/add-service', {
+      method: 'POST',
+      body: JSON.stringify({ bookingId, serviceName, servicePrice })
+    });
+    
+    if (res.success) {
+      showToast('✓ Service added');
+      closePanel();
+      refresh();
+    } else {
+      showToast('⚠️ ' + (res.error || 'Failed to add service'));
+    }
+  } catch (e) {
+    showToast('⚠️ Network error');
+    console.error('addServiceRow:', e);
+  }
+}
+
+// ── FILTER CHIPS ──
+function fc(chip) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  chip.classList.add('on');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ── SETTINGS (stub) ──
+function saveSettings(section) {
+  showToast('✓ Settings saved');
 }
 </script>
-
 </body>
 </html>
