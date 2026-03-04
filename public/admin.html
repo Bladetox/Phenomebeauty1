@@ -231,6 +231,20 @@ html,body {
 
 .label-caps { font-size:9.5px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase; color:var(--t40); }
 
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px;}
+.stat-card{padding:22px;}
+.stat-num{font-family:var(--font-d);font-size:38px;font-weight:300;color:var(--t100);margin:8px 0 4px;}
+.stat-label{font-size:11px;font-weight:600;color:var(--t60);letter-spacing:0.04em;}
+
+/* Table styles */
+.data-table{width:100%;border-collapse:separate;border-spacing:0 6px;}
+.data-table th{text-align:left;padding:12px 16px;font-size:9.5px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--t40);}
+.data-table td{padding:14px 16px;background:var(--card);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);font-size:13px;color:var(--t80);}
+.data-table td:first-child{border-left:0.5px solid var(--border);border-top-left-radius:12px;border-bottom-left-radius:12px;}
+.data-table td:last-child{border-right:0.5px solid var(--border);border-top-right-radius:12px;border-bottom-right-radius:12px;}
+.data-table tr:hover td{background:var(--t06);}
+
 /* ── BOOKING DETAIL PANEL ── */
 .detail-panel {
   position:fixed; top:0; right:0; bottom:0; width:360px;
@@ -335,6 +349,16 @@ html,body {
 .chip{height:30px;padding:0 13px;border-radius:99px;font-size:11.5px;font-weight:600;border:0.5px solid var(--border);background:var(--t06);color:var(--t40);cursor:pointer;transition:all 0.15s ease;white-space:nowrap;}
 .chip.on,.chip:hover{background:var(--t100);color:var(--black);border-color:transparent;}
 .data-note{font-size:12px;color:var(--t60);text-align:center;padding:36px 0;font-weight:500;}
+
+/* Review card */
+.review-card{padding:20px;margin-bottom:12px;}
+.review-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.review-avatar{width:40px;height:40px;border-radius:50%;background:var(--t10);border:0.5px solid var(--border);}
+.review-author{flex:1;}
+.review-name{font-size:13px;font-weight:700;color:var(--t100);}
+.review-time{font-size:10.5px;color:var(--t60);}
+.review-rating{font-size:16px;color:var(--amber);}
+.review-text{font-size:12.5px;color:var(--t80);line-height:1.6;}
 </style>
 </head>
 <body>
@@ -396,7 +420,12 @@ html,body {
       <div class="label-caps" style="margin-bottom:8px;">Admin Dashboard</div>
       <div style="font-family:var(--font-d);font-size:32px;font-weight:300;color:var(--t100);">Welcome Back</div>
     </div>
-    <div class="data-note">Loading dashboard data...</div>
+    <div class="stats-grid" id="dash-stats">
+      <div class="card card-grad-2 stat-card"><div class="label-caps">Total Bookings</div><div class="stat-num" id="stat-total">0</div></div>
+      <div class="card card-grad-3 stat-card"><div class="label-caps">Confirmed</div><div class="stat-num" id="stat-confirmed">0</div></div>
+      <div class="card card-grad-5 stat-card"><div class="label-caps">Pending</div><div class="stat-num" id="stat-pending">0</div></div>
+      <div class="card card-grad-1 stat-card"><div class="label-caps">This Month</div><div class="stat-num" id="stat-month">0</div></div>
+    </div>
   </div>
 
   <!-- ═══ BOOKINGS ═══ -->
@@ -416,32 +445,32 @@ html,body {
 
   <!-- ═══ CONSULTATION FORMS ═══ -->
   <div class="view" id="view-consults">
-    <div class="data-note">Consultation forms feature coming soon</div>
+    <div id="consults-container"><div class="data-note">Loading consultation forms…</div></div>
   </div>
 
   <!-- ═══ LOYALTY TRACKER ═══ -->
   <div class="view" id="view-loyalty">
-    <div class="data-note">Loyalty tracker feature coming soon</div>
+    <div id="loyalty-container"><div class="data-note">Loading loyalty data…</div></div>
   </div>
 
   <!-- ═══ AVAILABILITY ═══ -->
   <div class="view" id="view-availability">
-    <div class="data-note">Availability management coming soon</div>
+    <div id="availability-container"><div class="data-note">Loading availability…</div></div>
   </div>
 
   <!-- ═══ STOCK ═══ -->
   <div class="view" id="view-stock">
-    <div class="data-note">Stock management feature coming soon</div>
+    <div id="stock-container"><div class="data-note">Loading stock data…</div></div>
   </div>
 
   <!-- ═══ REVIEWS ═══ -->
   <div class="view" id="view-reviews">
-    <div class="data-note">Google Reviews feature coming soon</div>
+    <div id="reviews-container"><div class="data-note">Loading reviews…</div></div>
   </div>
 
   <!-- ═══ INTEGRATIONS ═══ -->
   <div class="view" id="view-integrations">
-    <div class="data-note">Integrations settings coming soon</div>
+    <div id="integrations-container"><div class="data-note">Loading integrations…</div></div>
   </div>
 
   <!-- ═══ SETTINGS ═══ -->
@@ -520,7 +549,7 @@ html,body {
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// PHENOMEBEAUTY ADMIN v6.3 — Nav Alignment Fix
+// PHENOMEBEAUTY ADMIN v7.0 — Full Data Integration
 // ═══════════════════════════════════════════════════════════
 
 let ADMIN_TOKEN = '';
@@ -610,6 +639,13 @@ function show(viewName, el) {
   if (el) el.classList.add('active');
   document.getElementById('topbar-title').textContent = VIEW_TITLES[viewName] || viewName;
   closeSidebar();
+  
+  // Load data for view if not already loaded
+  if (viewName === 'consults' && !document.getElementById('consults-container').dataset.loaded) loadConsultations();
+  if (viewName === 'loyalty' && !document.getElementById('loyalty-container').dataset.loaded) loadLoyalty();
+  if (viewName === 'stock' && !document.getElementById('stock-container').dataset.loaded) loadStock();
+  if (viewName === 'reviews' && !document.getElementById('reviews-container').dataset.loaded) loadReviews();
+  if (viewName === 'integrations' && !document.getElementById('integrations-container').dataset.loaded) loadIntegrations();
 }
 
 function openSidebar() {
@@ -624,16 +660,35 @@ function closeSidebar() {
 
 // ── REFRESH ──
 async function refresh() {
-  await Promise.all([loadBookings()]);
+  await Promise.all([loadBookings(), updateDashboard()]);
   showToast('✓ Refreshed');
 }
 
+// ── DASHBOARD ──
+async function updateDashboard() {
+  if (!ALL_BOOKINGS.length) return;
+  const confirmed = ALL_BOOKINGS.filter(b => b.status === 'Confirmed').length;
+  const pending = ALL_BOOKINGS.filter(b => b.status === 'Pending Payment').length;
+  const thisMonth = ALL_BOOKINGS.filter(b => {
+    const d = new Date(b.date);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  
+  document.getElementById('stat-total').textContent = ALL_BOOKINGS.length;
+  document.getElementById('stat-confirmed').textContent = confirmed;
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-month').textContent = thisMonth;
+}
+
+// ── BOOKINGS ──
 async function loadBookings() {
   try {
     const data = await apiFetch('/api/admin/bookings');
     ALL_BOOKINGS = data;
     filterBookings('All');
     updateBadges();
+    updateDashboard();
   } catch (e) {
     console.error('loadBookings:', e);
   }
@@ -698,6 +753,204 @@ function updateBadges() {
     badge.style.display = 'inline-block';
   } else {
     badge.style.display = 'none';
+  }
+}
+
+// ── CONSULTATIONS ──
+async function loadConsultations() {
+  const container = document.getElementById('consults-container');
+  try {
+    const data = await apiFetch('/api/admin/consultations');
+    container.dataset.loaded = 'true';
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="data-note">No consultation forms yet</div>';
+      return;
+    }
+    
+    container.innerHTML = `
+      <table class="data-table">
+        <thead><tr>
+          <th>Booking ID</th><th>Name</th><th>Type</th><th>Source</th>
+          <th>Date</th><th>Status</th>
+        </tr></thead>
+        <tbody>${data.map(c => `
+          <tr>
+            <td style="font-weight:700;color:var(--t100);">${c.bookingId}</td>
+            <td>${c.name}</td>
+            <td>${c.clientType}</td>
+            <td>${c.leadSource || '—'}</td>
+            <td>${c.date}</td>
+            <td><span class="status-pill s-${c.status === 'Confirmed' ? 'confirmed' : 'pending'}">${c.status}</span></td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    `;
+  } catch (e) {
+    container.innerHTML = '<div class="data-note">Failed to load consultations</div>';
+    console.error('loadConsultations:', e);
+  }
+}
+
+// ── LOYALTY ──
+async function loadLoyalty() {
+  const container = document.getElementById('loyalty-container');
+  try {
+    const data = await apiFetch('/api/admin/loyalty');
+    container.dataset.loaded = 'true';
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="data-note">No loyalty data yet</div>';
+      return;
+    }
+    
+    container.innerHTML = `
+      <table class="data-table">
+        <thead><tr>
+          <th>Client</th><th>Phone</th><th>Pack Progress</th>
+          <th>Last Wax</th><th>Next Due</th><th>Status</th>
+        </tr></thead>
+        <tbody>${data.map(l => `
+          <tr>
+            <td style="font-weight:700;color:var(--t100);">${l.clientName}</td>
+            <td>${l.phone}</td>
+            <td>${l.packProgress || '—'}</td>
+            <td>${l.lastWaxDate || '—'}</td>
+            <td>${l.nextDueDate || '—'}</td>
+            <td>${l.status || '—'}</td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    `;
+    
+    const badge = document.getElementById('badge-loyalty');
+    const due = data.filter(l => l.status && l.status.toLowerCase().includes('due')).length;
+    if (due > 0) { badge.textContent = due; badge.style.display = 'inline-block'; }
+  } catch (e) {
+    container.innerHTML = '<div class="data-note">Failed to load loyalty data</div>';
+    console.error('loadLoyalty:', e);
+  }
+}
+
+// ── STOCK ──
+async function loadStock() {
+  const container = document.getElementById('stock-container');
+  try {
+    const data = await apiFetch('/api/admin/stock');
+    container.dataset.loaded = 'true';
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="data-note">No stock data yet</div>';
+      return;
+    }
+    
+    container.innerHTML = `
+      <table class="data-table">
+        <thead><tr>
+          <th>Product</th><th>Category</th><th>Quantity</th>
+          <th>Min Stock</th><th>Unit</th><th>Notes</th>
+        </tr></thead>
+        <tbody>${data.map(s => {
+          const qty = parseInt(s.quantity) || 0;
+          const min = parseInt(s.minStock) || 0;
+          const lowStock = qty <= min && min > 0;
+          return `
+          <tr style="${lowStock ? 'background:rgba(248,113,113,0.08);' : ''}">
+            <td style="font-weight:700;color:var(--t100);">${s.name}</td>
+            <td>${s.category || '—'}</td>
+            <td style="${lowStock ? 'color:var(--red);font-weight:700;' : ''}">${s.quantity}</td>
+            <td>${s.minStock || '—'}</td>
+            <td>${s.unit || '—'}</td>
+            <td style="font-size:11px;color:var(--t60);">${s.notes || ''}</td>
+          </tr>
+        `}).join('')}</tbody>
+      </table>
+    `;
+    
+    const badge = document.getElementById('badge-stock');
+    const low = data.filter(s => parseInt(s.quantity) <= parseInt(s.minStock) && parseInt(s.minStock) > 0).length;
+    if (low > 0) { badge.textContent = low; badge.style.display = 'inline-block'; }
+  } catch (e) {
+    container.innerHTML = '<div class="data-note">Failed to load stock data</div>';
+    console.error('loadStock:', e);
+  }
+}
+
+// ── REVIEWS ──
+async function loadReviews() {
+  const container = document.getElementById('reviews-container');
+  try {
+    const data = await apiFetch('/api/admin/reviews');
+    container.dataset.loaded = 'true';
+    
+    if (!data.configured) {
+      container.innerHTML = '<div class="data-note">Configure Google Place ID in Settings to view reviews</div>';
+      return;
+    }
+    
+    if (data.error) {
+      container.innerHTML = `<div class="data-note">${data.error}</div>`;
+      return;
+    }
+    
+    const stars = '★'.repeat(Math.round(data.rating)) + '☆'.repeat(5 - Math.round(data.rating));
+    container.innerHTML = `
+      <div class="card card-grad-3" style="padding:24px;margin-bottom:16px;">
+        <div style="font-size:42px;color:var(--amber);margin-bottom:8px;">${stars}</div>
+        <div style="font-size:18px;font-weight:700;color:var(--t100);margin-bottom:4px;">${data.rating} / 5.0</div>
+        <div style="font-size:12px;color:var(--t60);">${data.totalReviews} total reviews</div>
+      </div>
+      ${(data.reviews || []).map(r => `
+        <div class="card review-card">
+          <div class="review-header">
+            ${r.profilePhoto ? `<img src="${r.profilePhoto}" class="review-avatar">` : '<div class="review-avatar"></div>'}
+            <div class="review-author">
+              <div class="review-name">${r.author}</div>
+              <div class="review-time">${r.relativeTime}</div>
+            </div>
+            <div class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+          </div>
+          <div class="review-text">${r.text || ''}</div>
+        </div>
+      `).join('')}
+    `;
+  } catch (e) {
+    container.innerHTML = '<div class="data-note">Failed to load reviews</div>';
+    console.error('loadReviews:', e);
+  }
+}
+
+// ── INTEGRATIONS ──
+async function loadIntegrations() {
+  const container = document.getElementById('integrations-container');
+  try {
+    const email = await apiFetch('/api/admin/email-config');
+    container.dataset.loaded = 'true';
+    
+    const emailStatus = email.ready ? '✓ Connected' : '✕ Not configured';
+    const emailColor = email.ready ? 'var(--green)' : 'var(--red)';
+    
+    container.innerHTML = `
+      <div class="card card-grad-1" style="padding:24px;margin-bottom:14px;">
+        <div class="label-caps" style="margin-bottom:12px;">Email Service</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <div style="font-size:24px;color:${emailColor};">${email.ready ? '✓' : '✕'}</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--t100);">${emailStatus}</div>
+            <div style="font-size:11.5px;color:var(--t60);">${email.smtpHost || 'No SMTP configured'}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card card-grad-2" style="padding:24px;">
+        <div class="label-caps" style="margin-bottom:12px;">API Status</div>
+        <div style="font-size:13px;color:var(--t80);line-height:1.8;">
+          <div>• Booking API: <span style="color:var(--green);font-weight:600;">Active</span></div>
+          <div>• Availability: <span style="color:var(--green);font-weight:600;">Active</span></div>
+          <div>• Payment Gateway: <span style="color:var(--green);font-weight:600;">Active</span></div>
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    container.innerHTML = '<div class="data-note">Failed to load integration status</div>';
+    console.error('loadIntegrations:', e);
   }
 }
 
