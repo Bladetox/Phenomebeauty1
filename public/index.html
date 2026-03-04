@@ -6,609 +6,13 @@
     <title>PhenomeBeauty — Mobile Beauty Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Abril Fatface for main branding + Cormorant Garamond + Jost -->
     <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-      /* ═══════════════════════════════════════════════════════════
-         PHENOMEBEAUTY — OBSIDIAN ATELIER
-         Splash Screen + Booking Flow
-         ═══════════════════════════════════════════════════════════ */
-
-      :root {
-        --obsidian:   #04040a;
-        --void:       #020205;
-        --onyx:       #050508;
-        --glass-1:    rgba(255,255,255,0.09);
-        --glass-2:    rgba(255,255,255,0.06);
-        --text-pri:   rgba(255,255,255,0.96);
-        --text-sec:   rgba(255,255,255,0.65);
-        --text-ter:   rgba(255,255,255,0.38);
-        --border-hi:  rgba(255,255,255,0.18);
-        --border-mid: rgba(255,255,255,0.10);
-        --r-xl: 28px;
-        --r-lg: 22px;
-        --r-md: 16px;
-        --r-sm: 12px;
-        --r-pill: 999px;
-      }
-
-      *, *::before, *::after {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      html, body {
-        margin: 0; padding: 0;
-        font-family: 'Jost', system-ui, sans-serif;
-        color: var(--text-pri);
-        min-height: 100vh;
-        background:
-          radial-gradient(ellipse at 15% 5%,  rgba(100, 60,220,0.80) 0%, transparent 36%),
-          radial-gradient(ellipse at 85% 4%,  rgba(65,  35,165,0.70) 0%, transparent 34%),
-          radial-gradient(ellipse at 50% 52%, rgba(50,  25,130,0.60) 0%, transparent 42%),
-          radial-gradient(ellipse at 8%  94%, rgba(80,  45,175,0.65) 0%, transparent 34%),
-          radial-gradient(ellipse at 92% 92%, rgba(58,  28,130,0.60) 0%, transparent 34%),
-          radial-gradient(ellipse at 50% 50%, rgba(18,  10, 55,0.92) 0%, transparent 66%),
-          var(--obsidian);
-        background-attachment: fixed;
-      }
-
-      /* ══════════════════════════════════════════════════════════════
-         WELCOME SPLASH SCREEN — Premium landing page
-         ══════════════════════════════════════════════════════════════ */
-      #welcome-splash {
-        position: fixed;
-        inset: 0;
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: inherit;
-        opacity: 1;
-        transition: opacity 0.6s ease, visibility 0.6s ease;
-      }
-      
-      #welcome-splash.hidden {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-      }
-      
-      .splash-content {
-        text-align: center;
-        padding: 40px 24px;
-        max-width: 540px;
-        animation: fadeSlideIn 0.8s ease-out;
-      }
-      
-      .splash-logo-wrap {
-        width: 140px;
-        height: 140px;
-        margin: 0 auto 28px;
-        border-radius: 38px;
-        padding: 3.5px;
-        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.18) inset,
-          0 1px 0 rgba(255,255,255,0.10) inset,
-          0 16px 56px rgba(0,0,0,0.80),
-          0 4px 14px rgba(0,0,0,0.60),
-          0 0 80px rgba(120,90,220,0.20);
-        position: relative;
-      }
-      
-      .splash-logo-wrap::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, transparent 60%);
-        pointer-events: none;
-      }
-      
-      .splash-logo-wrap img {
-        width: 100%;
-        height: 100%;
-        border-radius: 33px;
-        object-fit: cover;
-        display: block;
-      }
-      
-      .splash-brand-tag {
-        font-family: 'Jost', sans-serif;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.36em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.60);
-        margin-bottom: 14px;
-        text-shadow: 0 0 24px rgba(180,160,255,0.40);
-      }
-      
-      .splash-title {
-        font-family: 'Abril Fatface', Georgia, serif;
-        font-size: 56px;
-        font-weight: 400;
-        letter-spacing: 0.02em;
-        color: rgba(255,255,255,0.98);
-        margin: 0 0 16px;
-        line-height: 1.1;
-        text-shadow: 0 4px 28px rgba(200,180,255,0.35);
-      }
-      
-      .splash-subtitle {
-        font-family: 'Cormorant Garamond', Georgia, serif;
-        font-size: 18px;
-        font-weight: 300;
-        font-style: italic;
-        line-height: 1.7;
-        color: rgba(255,255,255,0.55);
-        max-width: 420px;
-        margin: 0 auto 42px;
-      }
-      
-      .splash-cta {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 16px 36px;
-        border-radius: 18px;
-        font-family: 'Jost', sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        background: rgba(255,255,255,0.96);
-        color: var(--obsidian);
-        border: none;
-        cursor: pointer;
-        outline: none;
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.30) inset,
-          0 1px 0 rgba(255,255,255,0.50) inset,
-          0 14px 42px rgba(255,255,255,0.12),
-          0 4px 12px rgba(0,0,0,0.35);
-        transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      
-      .splash-cta:hover {
-        transform: translateY(-2px);
-        background: rgba(255,255,255,1);
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.40) inset,
-          0 18px 52px rgba(255,255,255,0.16),
-          0 6px 16px rgba(0,0,0,0.40);
-      }
-      
-      .splash-cta:active {
-        transform: translateY(0);
-      }
-      
-      @keyframes fadeSlideIn {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Responsive splash */
-      @media (max-width: 640px) {
-        .splash-title {
-          font-size: 42px;
-        }
-        .splash-subtitle {
-          font-size: 16px;
-        }
-      }
-
-      /* ══════════════════════════════════════════════════════════════
-         BOOKING APP — Initially hidden
-         ══════════════════════════════════════════════════════════════ */
-      #booking-app {
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.5s ease 0.1s, visibility 0.5s ease 0.1s;
-      }
-      
-      #booking-app.visible {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .app-frame {
-        width: 100%;
-        min-height: 100vh;
-        padding: 14px 10px 20px;
-        display: flex;
-        align-items: stretch;
-        justify-content: center;
-      }
-
-      .shell {
-        width: 100%;
-        max-width: 520px;
-        min-height: calc(100vh - 32px);
-        border-radius: var(--r-xl);
-        padding: 20px 16px;
-        background: rgba(255,255,255,0.10);
-        backdrop-filter: blur(72px) saturate(200%);
-        -webkit-backdrop-filter: blur(72px) saturate(200%);
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.20) inset,
-          0 1px 0 rgba(255,255,255,0.14) inset,
-          0 0 0 0.5px rgba(255,255,255,0.06),
-          0 28px 80px rgba(0,0,0,0.70),
-          0 4px 16px rgba(0,0,0,0.50);
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .shell::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 8%;
-        right: 8%;
-        height: 1px;
-        background: linear-gradient(90deg,
-          transparent,
-          rgba(255,255,255,0.45) 30%,
-          rgba(255,255,255,0.80) 50%,
-          rgba(255,255,255,0.45) 70%,
-          transparent);
-        border-radius: var(--r-pill);
-      }
-
-      @media(min-width:768px) {
-        .app-frame { padding: 32px 16px; }
-        .shell { border-radius: 32px; padding: 28px 24px; }
-      }
-
-      header {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 18px;
-      }
-
-      .logo-wrap {
-        width: 82px;
-        height: 82px;
-        border-radius: 27px;
-        padding: 2.5px;
-        background: linear-gradient(145deg, #252535 0%, #0a0a15 100%);
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.18) inset,
-          0 1px 0 rgba(255,255,255,0.10) inset,
-          0 12px 44px rgba(0,0,0,0.75),
-          0 2px 10px rgba(0,0,0,0.50),
-          0 0 40px rgba(120,90,220,0.10);
-        position: relative;
-      }
-
-      .logo-wrap::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
-        pointer-events: none;
-      }
-
-      .logo {
-        width: 100%;
-        height: 100%;
-        border-radius: 23px;
-        object-fit: cover;
-        border: none;
-        display: block;
-      }
-
-      .brand-tag {
-        margin-top: 14px;
-        font-family: 'Jost', sans-serif;
-        font-size: 10px;
-        letter-spacing: 0.36em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.70);
-        font-weight: 800;
-      }
-
-      h1 {
-        margin: 6px 0 2px;
-        font-family: 'Cormorant Garamond', Georgia, serif;
-        font-size: 30px;
-        font-weight: 400;
-        letter-spacing: 0.03em;
-        line-height: 1.1;
-        color: rgba(255,255,255,0.97);
-      }
-
-      .sub-heading {
-        font-family: 'Jost', sans-serif;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.24em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.38);
-        margin-bottom: 16px;
-      }
-
-      /* Step Progress Indicator */
-      .step-indicator {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .step-track-row {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        width: 100%;
-        padding: 0 2px;
-      }
-
-      .step-pill {
-        flex: 1;
-        height: 3px;
-        border-radius: var(--r-pill);
-        background: rgba(255,255,255,0.10);
-        overflow: visible;
-        position: relative;
-      }
-
-      .step-pill-inner {
-        width: 0;
-        height: 100%;
-        border-radius: inherit;
-        background: linear-gradient(90deg,
-          rgba(200,180,255,0.70) 0%,
-          rgba(255,255,255,0.98) 100%);
-        box-shadow: 0 0 10px rgba(200,180,255,0.50), 0 0 3px rgba(255,255,255,0.60);
-        transition: width 0.60s cubic-bezier(0.4,0,0.2,1);
-        position: relative;
-      }
-
-      .step-pill-inner.pb-active::after {
-        content: '';
-        position: absolute;
-        top: -2px;
-        right: -20px;
-        width: 28px;
-        height: calc(100% + 4px);
-        background: linear-gradient(90deg, transparent, rgba(220,200,255,0.90));
-        border-radius: var(--r-pill);
-        filter: blur(3px);
-        animation: pbShimmer 1.8s ease-in-out infinite;
-      }
-
-      @keyframes pbShimmer {
-        0%, 100% { opacity: 0; transform: translateX(-12px); }
-        50%       { opacity: 1; transform: translateX(0); }
-      }
-
-      .step-dots-row {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        padding: 0 2px;
-      }
-
-      .step-dot {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-        flex: 1;
-        transition: opacity 0.3s ease;
-      }
-
-      .step-dot-num {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Jost', sans-serif;
-        font-size: 8px;
-        font-weight: 800;
-        transition: all 0.35s ease;
-        border: 0.5px solid rgba(255,255,255,0.12);
-        background: rgba(255,255,255,0.06);
-        color: rgba(255,255,255,0.30);
-      }
-
-      .step-dot.sd-done .step-dot-num {
-        background: rgba(255,255,255,0.97);
-        color: var(--obsidian);
-        border-color: transparent;
-        box-shadow: 0 0 12px rgba(200,180,255,0.35), 0 2px 8px rgba(255,255,255,0.20);
-      }
-
-      .step-dot.sd-active .step-dot-num {
-        background: rgba(255,255,255,0.18);
-        color: rgba(255,255,255,0.96);
-        border-color: rgba(255,255,255,0.35);
-        box-shadow: 0 0 14px rgba(200,180,255,0.30), 0 0 0 1px rgba(255,255,255,0.10);
-      }
-
-      .step-dot-lbl {
-        font-family: 'Jost', sans-serif;
-        font-size: 7.5px;
-        font-weight: 700;
-        letter-spacing: 0.10em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.22);
-        text-align: center;
-        white-space: nowrap;
-        transition: color 0.3s ease;
-      }
-
-      .step-dot.sd-active .step-dot-lbl { color: rgba(255,255,255,0.65); }
-      .step-dot.sd-done .step-dot-lbl { color: rgba(255,255,255,0.35); }
-
-      .surface {
-        flex: 1;
-        margin-top: 12px;
-        padding: 15px;
-        border-radius: var(--r-lg);
-        background: rgba(255,255,255,0.06);
-        backdrop-filter: blur(36px) saturate(180%);
-        -webkit-backdrop-filter: blur(36px) saturate(180%);
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.12) inset,
-          0 1px 0 rgba(255,255,255,0.07) inset,
-          0 0 0 0.5px rgba(255,255,255,0.04);
-        border: none;
-        display: flex;
-        flex-direction: column;
-        overflow: visible;
-      }
-
-      .surface-inner {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        min-height: 0;
-      }
-
-      .view {
-        display: none;
-        height: 100%;
-      }
-
-      .view.active {
-        display: flex;
-        flex-direction: column;
-        animation: fadeSlide 0.28s ease-out;
-      }
-
-      @keyframes fadeSlide {
-        from { opacity: 0; transform: translateY(7px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-
-      .section-label {
-        font-family: 'Jost', sans-serif;
-        font-size: 9px;
-        letter-spacing: 0.30em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.50);
-        margin-bottom: 14px;
-        flex-shrink: 0;
-        font-weight: 800;
-      }
-
-      .scroll-area {
-        overflow-y: auto;
-        overflow-x: visible;
-        padding-right: 2px;
-        flex: 1;
-        min-height: 0;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255,255,255,0.08) transparent;
-      }
-
-      .actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 14px;
-        flex-shrink: 0;
-      }
-
-      button {
-        flex: 1;
-        border-radius: 16px;
-        padding: 13px 0;
-        font-family: 'Jost', sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        outline: none;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
-      }
-
-      .btn-outline {
-        background: rgba(255,255,255,0.07);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        color: rgba(255,255,255,0.50);
-        border: 0.5px solid rgba(255,255,255,0.12);
-      }
-
-      .btn-outline:hover {
-        transform: translateY(-1px);
-        background: rgba(255,255,255,0.12);
-        border-color: rgba(255,255,255,0.20);
-        color: rgba(255,255,255,0.75);
-      }
-
-      .btn-primary {
-        background: rgba(255,255,255,0.95);
-        color: var(--obsidian);
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.30) inset,
-          0 1px 0 rgba(255,255,255,0.50) inset,
-          0 10px 30px rgba(255,255,255,0.08),
-          0 3px 8px rgba(0,0,0,0.30);
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        transform: translateY(-1.5px);
-        background: rgba(255,255,255,1);
-        box-shadow:
-          0 0 0 0.5px rgba(255,255,255,0.40) inset,
-          0 14px 36px rgba(255,255,255,0.12),
-          0 4px 10px rgba(0,0,0,0.35);
-      }
-
-      .btn-primary:active:not(:disabled) {
-        transform: translateY(0px);
-      }
-
-      .btn-primary:disabled {
-        background: rgba(255,255,255,0.07);
-        color: rgba(255,255,255,0.20);
-        box-shadow: none;
-        border: 0.5px solid rgba(255,255,255,0.06);
-        cursor: not-allowed;
-      }
-
-      /* NOTE: Add all remaining CSS for booking flow components here:
-         - Category chips
-         - Service cards
-         - Calendar
-         - Time slots
-         - Forms
-         - Summary
-         - Toast
-         - etc.
-         
-         (Keeping file concise - include full CSS from modular version)
-      */
-    </style>
+    <link rel="stylesheet" href="/css/styles.css">
   </head>
   <body>
-    <!-- ═══════════════════════════════════════════════════════════════
-         WELCOME SPLASH — Shown first, hides when user clicks CTA
-         ═══════════════════════════════════════════════════════════════ -->
+    <!-- ═════════════════════════════════════════════════════════
+         WELCOME SPLASH — Premium entry experience
+         ═════════════════════════════════════════════════════════ -->
     <div id="welcome-splash">
       <div class="splash-content">
         <div class="splash-logo-wrap">
@@ -620,12 +24,12 @@
         <h1 class="splash-title">Phenomebeauty</h1>
         
         <p class="splash-subtitle">
-          Elegant and premium beauty treatments,<br>
-          delivered to the comfort of your home
+          Where luxury meets convenience.<br>
+          Your journey to radiance begins here.
         </p>
         
-        <button class="splash-cta" onclick="enterBooking()">
-          Select Your Services
+        <button class="splash-cta" id="enter-booking-btn">
+          Begin Your Booking
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
@@ -633,9 +37,9 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         BOOKING APP — Initially hidden, revealed when CTA is clicked
-         ═══════════════════════════════════════════════════════════════ -->
+    <!-- ═════════════════════════════════════════════════════════
+         BOOKING APP — Full booking flow
+         ═════════════════════════════════════════════════════════ -->
     <div id="booking-app">
       <div class="app-frame">
         <div class="shell">
@@ -668,12 +72,68 @@
               <div id="step-services" class="view active">
                 <div class="section-label">Select your treatments</div>
                 <div class="scroll-area" id="services-scroll">
-                  <div id="services-list">Loading services...</div>
+                  <div class="chip-row" id="category-chips"></div>
+                  <div id="services-list">
+                    <!-- Services will load here via JavaScript -->
+                  </div>
+                </div>
+                <div class="cart-bar" id="cart-bar">
+                  <div class="cart-bar-top">
+                    <span class="cart-title">Your Selection</span>
+                    <span class="cart-total" id="cart-total-price">R0</span>
+                  </div>
+                  <div class="cart-items" id="cart-items-list"></div>
+                  <div class="cart-duration" id="cart-duration"></div>
                 </div>
               </div>
               
-              <!-- Add all other booking steps here: datetime, details, summary, success -->
-              <!-- (Keeping minimal for file size - include full HTML from modular version) -->
+              <div id="step-datetime" class="view">
+                <div class="section-label">Choose date &amp; time</div>
+                <div class="scroll-area">
+                  <div class="cal-wrap">
+                    <div class="cal-header">
+                      <div class="cal-nav" id="cal-prev">&#8249;</div>
+                      <div class="cal-month-label" id="cal-month-label">—</div>
+                      <div class="cal-nav" id="cal-next">&#8250;</div>
+                    </div>
+                    <div class="cal-weekdays">
+                      <div class="cal-wd">Su</div><div class="cal-wd">Mo</div>
+                      <div class="cal-wd">Tu</div><div class="cal-wd">We</div>
+                      <div class="cal-wd">Th</div><div class="cal-wd">Fr</div>
+                      <div class="cal-wd">Sa</div>
+                    </div>
+                    <div id="cal-days" class="cal-days"></div>
+                  </div>
+                  <div id="time-section" style="display:none;">
+                    <div class="time-section-label" id="time-section-label">Available times</div>
+                    <div class="time-grid" id="time-grid"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="step-details" class="view">
+                <div class="section-label">Your details</div>
+                <div class="scroll-area">
+                  <!-- Client details form will be here -->
+                </div>
+              </div>
+
+              <div id="step-summary" class="view">
+                <div class="section-label">Review booking</div>
+                <div class="scroll-area">
+                  <div class="summary-card" id="summary-block"></div>
+                </div>
+              </div>
+
+              <div class="success-view" id="success-view">
+                <div class="success-icon" id="success-icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <div class="success-title" id="success-title">You're booked!</div>
+                <div class="success-totals" id="success-totals"></div>
+              </div>
             </div>
           </div>
 
@@ -685,33 +145,9 @@
       </div>
     </div>
 
-    <script>
-      // ═══════════════════════════════════════════════════════════════
-      // SPLASH SCREEN CONTROL
-      // ═══════════════════════════════════════════════════════════════
-      function enterBooking() {
-        const splash = document.getElementById('welcome-splash');
-        const app = document.getElementById('booking-app');
-        
-        splash.classList.add('hidden');
-        
-        setTimeout(() => {
-          app.classList.add('visible');
-          // Initialize booking flow here
-          loadServices();
-        }, 300);
-      }
+    <div id="toast" class="toast"></div>
 
-      // ═══════════════════════════════════════════════════════════════
-      // BOOKING FLOW LOGIC
-      // ═══════════════════════════════════════════════════════════════
-      function loadServices() {
-        // Your existing service loading logic
-        document.getElementById('services-list').innerHTML = '<p>Services will load here...</p>';
-      }
-
-      // Include all your existing booking flow JavaScript here from main.js
-      // (State management, step navigation, calendar, forms, payment, etc.)
-    </script>
+    <!-- Load JavaScript modules -->
+    <script type="module" src="/js/main.js"></script>
   </body>
 </html>
