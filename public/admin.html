@@ -360,22 +360,153 @@ html,body {
 .review-rating{font-size:16px;color:var(--amber);}
 .review-text{font-size:12.5px;color:var(--t80);line-height:1.6;}
 
-/* Stock Settings Button - Responsive */
+
+/* ===== RESPONSIVE DESIGN - MOBILE & DESKTOP ===== */
+
+/* Base container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
 @media (max-width: 768px) {
-  .icon-btn {
-    padding: 6px 10px !important;
-    font-size: 14px !important;
+  .container {
+    padding: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start !important;
+  }
+  
+  .header h1 {
+    font-size: 20px !important;
   }
 }
 
-.icon-btn:hover {
-  background: var(--hover) !important;
-  border-color: var(--t20) !important;
+/* Section headers - flex layout */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.icon-btn:active {
-  transform: scale(0.98);
+.section-header h2 {
+  margin: 0;
+  flex-shrink: 0;
 }
+
+.section-header .badge {
+  flex-shrink: 0;
+}
+
+.section-header .icon-btn {
+  margin-left: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.section-header .icon-btn:hover {
+  background: var(--hover);
+  border-color: var(--t20);
+}
+
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .section-header .icon-btn {
+    padding: 5px 8px;
+    font-size: 16px;
+  }
+}
+
+/* Tables - responsive */
+.data-table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .data-table {
+    font-size: 12px;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 8px 4px !important;
+    white-space: nowrap;
+  }
+}
+
+/* Modals - responsive */
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  margin: 20px;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 10px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Buttons - consistent sizing */
+button, .btn, .primary-btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+@media (max-width: 768px) {
+  button, .btn, .primary-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Stats cards - responsive grid */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* Ensure all sections scale properly */
+.section {
+  margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+  .section {
+    margin-bottom: 20px;
+  }
+}
+
 
 </style>
 </head>
