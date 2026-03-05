@@ -529,6 +529,30 @@ html,body {
   color: var(--t100);
 }
 
+/* Stock row status indicators - use background tint on TD, not TR */
+.stock-table tr.stock-low td {
+  background: linear-gradient(135deg, rgba(248,113,113,0.08) 0%, rgba(255,255,255,0.055) 100%) !important;
+}
+
+.stock-table tr.stock-good td {
+  background: linear-gradient(135deg, rgba(74,222,128,0.06) 0%, rgba(255,255,255,0.055) 100%) !important;
+}
+
+.stock-table .stock-low-text {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.stock-table .stock-good-text {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.stock-table .stock-notes {
+  font-size: 11px;
+  color: var(--t60);
+}
+
 </style>
 </head>
 <body>
@@ -1079,13 +1103,16 @@ async function loadStock() {
           const threshold = parseInt(localStorage.getItem('stockThreshold') || '5');
           const lowStock = stockQty <= threshold;
           const goodStock = stockQty > threshold;
+          // Use CSS classes instead of inline styles for proper glassmorphic effect
+          const rowClass = lowStock ? 'stock-low' : (goodStock ? 'stock-good' : '');
+          const stockClass = lowStock ? 'stock-low-text' : (goodStock ? 'stock-good-text' : '');
           return `
-          <tr data-row="${idx}" style="${lowStock ? 'background:rgba(248,113,113,0.08);' : goodStock ? 'background:rgba(74,222,128,0.08);' : ''}">
+          <tr data-row="${idx}" class="${rowClass}">
             <td contenteditable="true" data-field="item" class="editable">${s.item || ''}</td>
             <td contenteditable="true" data-field="cost" class="editable">R ${(parseFloat(s.cost) || 0).toFixed(2)}</td>
-            <td contenteditable="true" data-field="stockOnHand" class="editable" style="${lowStock ? 'color:#ef4444;font-weight:700;' : goodStock ? 'color:#16a34a;font-weight:700;' : ''}">${s.stockOnHand || '0'}</td>
+            <td contenteditable="true" data-field="stockOnHand" class="editable ${stockClass}">${s.stockOnHand || '0'}</td>
             <td class="calculated">R ${(parseFloat(s.totalCost) || 0).toFixed(2)}</td>
-            <td contenteditable="true" data-field="notes" class="editable" style="font-size:11px;">${s.notes || ''}</td>
+            <td contenteditable="true" data-field="notes" class="editable stock-notes">${s.notes || ''}</td>
             <td><button class="action-btn save-row" onclick="saveStockRow(${idx})" title="Save changes">Save</button></td>
           </tr>
         `}).join('')}</tbody>
