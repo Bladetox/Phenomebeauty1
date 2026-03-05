@@ -238,7 +238,7 @@ html,body {
 .stat-label{font-size:11px;font-weight:600;color:var(--t60);letter-spacing:0.04em;}
 
 /* Table styles */
-.data-table{width:100%;border-collapse:separate;border-spacing:0 6px;}
+.data-table{width:100%;border-collapse:separate;border-spacing:0 6px;min-width:800px;}
 .data-table th{text-align:left;padding:12px 16px;font-size:9.5px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--t40);}
 .data-table td{padding:14px 16px;background:var(--card);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);font-size:13px;color:var(--t80);}
 .data-table td:first-child{border-left:0.5px solid var(--border);border-top-left-radius:12px;border-bottom-left-radius:12px;}
@@ -360,26 +360,37 @@ html,body {
 .review-rating{font-size:16px;color:var(--amber);}
 .review-text{font-size:12.5px;color:var(--t80);line-height:1.6;}
 
-
-
-
-/* ── STOCK TABLE ENHANCEMENTS ── */
-.stock-table .editable {
-  cursor: text;
-  min-width: 60px;
-  position: relative;
-  transition: all 0.15s ease;
-}
-
-.stock-table .editable:hover {
-  background: rgba(255,255,255,0.08) !important;
-  box-shadow: inset 0 0 0 0.5px var(--border-hi);
-}
-
-.stock-table .editable:focus {
+/* ── STOCK TABLE INPUT FIELDS (NO LAYOUT SHIFT) ── */
+.stock-table .stock-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--t80);
+  font-family: var(--font-b);
+  font-size: 13px;
+  padding: 4px 8px;
   outline: none;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.30);
-  background: rgba(255,255,255,0.10) !important;
+  transition: background 0.15s ease;
+  border-radius: 6px;
+}
+
+.stock-table .stock-input:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.stock-table .stock-input:focus {
+  background: rgba(255,255,255,0.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+}
+
+.stock-table input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.stock-table input[type="number"]::-webkit-inner-spin-button,
+.stock-table input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .stock-table .calculated {
@@ -742,7 +753,7 @@ html,body {
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// PHENOMEBEAUTY ADMIN v7.1 — Real Availability Data
+// PHENOMEBEAUTY ADMIN v7.2 — Fixed Stock Table
 // ═══════════════════════════════════════════════════════════
 
 let ADMIN_TOKEN = '';
@@ -1036,16 +1047,6 @@ async function loadAvailability() {
       return;
     }
     
-    // Group by weekday for better display
-    const byDay = {};
-    data.forEach(slot => {
-      const day = slot.weekday.trim();
-      if (!byDay[day]) byDay[day] = [];
-      byDay[day].push(slot);
-    });
-    
-    const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    
     container.innerHTML = `
       <div class="card card-grad-1" style="padding:24px;margin-bottom:16px;">
         <div class="label-caps" style="margin-bottom:12px;">Weekly Schedule</div>
@@ -1092,43 +1093,46 @@ async function loadStock() {
     }
     
     container.innerHTML = `
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="data-table stock-table">
         <thead><tr>
           <th>Item</th><th>Cost (R)</th><th>Stock On Hand</th>
           <th>Total Cost (R)</th><th>Notes</th><th>Actions</th>
         </tr></thead>
         <tbody>${data.map((s, idx) => {
+          const cost = parseFloat(s.cost) || 0;
           const stockQty = parseInt(s.stockOnHand) || 0;
+          const totalCost = cost * stockQty;
           const threshold = parseInt(localStorage.getItem('stockThreshold') || '5');
           const lowStock = stockQty <= threshold;
           const goodStock = stockQty > threshold;
-          // Use CSS classes instead of inline styles for proper glassmorphic effect
           const rowClass = lowStock ? 'stock-low' : (goodStock ? 'stock-good' : '');
           const stockClass = lowStock ? 'stock-low-text' : (goodStock ? 'stock-good-text' : '');
           return `
           <tr data-row="${idx}" class="${rowClass}">
-            <td contenteditable="true" data-field="item" class="editable">${s.item || ''}</td>
-            <td contenteditable="true" data-field="cost" class="editable">R ${(parseFloat(s.cost) || 0).toFixed(2)}</td>
-            <td contenteditable="true" data-field="stockOnHand" class="editable ${stockClass}">${s.stockOnHand || '0'}</td>
-            <td class="calculated">R ${(parseFloat(s.totalCost) || 0).toFixed(2)}</td>
-            <td contenteditable="true" data-field="notes" class="editable stock-notes">${s.notes || ''}</td>
+            <td><input type="text" class="stock-input" data-field="item" value="${(s.item || '').replace(/"/g, '&quot;')}" /></td>
+            <td><input type="number" step="0.01" class="stock-input" data-field="cost" value="${cost.toFixed(2)}" /></td>
+            <td><input type="number" class="stock-input ${stockClass}" data-field="stockOnHand" value="${stockQty}" /></td>
+            <td class="calculated">R ${totalCost.toFixed(2)}</td>
+            <td><input type="text" class="stock-input stock-notes" data-field="notes" value="${(s.notes || '').replace(/"/g, '&quot;')}" /></td>
             <td><button class="action-btn save-row" onclick="saveStockRow(${idx})" title="Save changes">Save</button></td>
           </tr>
         `}).join('')}</tbody>
       </table>
+      </div>
     `;
     
-    // Add blur event listeners for auto-calculation
-    document.querySelectorAll('.stock-table [contenteditable="true"]').forEach(cell => {
-      cell.addEventListener('blur', () => {
-        const row = cell.closest('tr');
-        const costCell = row.querySelector('[data-field="cost"]');
-        const stockCell = row.querySelector('[data-field="stockOnHand"]');
+    // Add input event listeners for auto-calculation
+    document.querySelectorAll('.stock-table input[data-field="cost"], .stock-table input[data-field="stockOnHand"]').forEach(input => {
+      input.addEventListener('input', () => {
+        const row = input.closest('tr');
+        const costInput = row.querySelector('[data-field="cost"]');
+        const stockInput = row.querySelector('[data-field="stockOnHand"]');
         const totalCell = row.querySelector('.calculated');
         
-        if (costCell && stockCell && totalCell) {
-          const cost = parseFloat(costCell.textContent.replace('R', '').trim()) || 0;
-          const stock = parseFloat(stockCell.textContent.trim()) || 0;
+        if (costInput && stockInput && totalCell) {
+          const cost = parseFloat(costInput.value) || 0;
+          const stock = parseFloat(stockInput.value) || 0;
           totalCell.textContent = 'R ' + (cost * stock).toFixed(2);
         }
       });
@@ -1251,7 +1255,6 @@ function showPanel(bookingId) {
 function closePanel() {
   document.getElementById('detail-panel').classList.remove('open');
   currentBookingId = null;
-  // Reset form
   document.getElementById('add-svc-dropdown').value = '';
   document.getElementById('add-svc-name').value = '';
   document.getElementById('add-svc-price').value = '';
@@ -1314,12 +1317,10 @@ function populateServiceDropdown(services) {
   const select = document.getElementById('add-svc-dropdown');
   if (!select) return;
   
-  // Clear existing options (except first placeholder)
   while (select.options.length > 1) {
     select.remove(1);
   }
   
-  // Group services by category
   const categories = {};
   services.forEach(s => {
     const cat = s.category || 'Other';
@@ -1327,7 +1328,6 @@ function populateServiceDropdown(services) {
     categories[cat].push(s);
   });
   
-  // Add optgroups
   Object.keys(categories).sort().forEach(cat => {
     const optgroup = document.createElement('optgroup');
     optgroup.label = cat;
@@ -1461,11 +1461,10 @@ function saveStockSettings() {
   const threshold = document.getElementById('stockThresholdInput').value;
   localStorage.setItem('stockThreshold', threshold);
   closeStockSettings();
-  loadStock(); // Reload stock to apply new threshold
+  loadStock();
   showToast('Stock threshold updated to ' + threshold);
 }
 </script>
-
 
 <script>
 async function saveStockRow(rowIdx) {
@@ -1476,15 +1475,15 @@ async function saveStockRow(rowIdx) {
   btn.textContent = 'Saving...';
   const data = {
     rowIndex: rowIdx,
-    item: row.querySelector('[data-field="item"]').textContent.trim(),
-    cost: parseFloat(row.querySelector('[data-field="cost"]').textContent.replace('R', '').trim()) || 0,
-    stockOnHand: parseFloat(row.querySelector('[data-field="stockOnHand"]').textContent.trim()) || 0,
-    notes: row.querySelector('[data-field="notes"]').textContent.trim()
+    item: row.querySelector('[data-field="item"]').value.trim(),
+    cost: parseFloat(row.querySelector('[data-field="cost"]').value) || 0,
+    stockOnHand: parseFloat(row.querySelector('[data-field="stockOnHand"]').value) || 0,
+    notes: row.querySelector('[data-field="notes"]').value.trim()
   };
   data.totalCost = Math.round(data.cost * data.stockOnHand * 100) / 100;
   try {
-    const result = await apiFetch('/api/admin/stock', {
-      method: 'PUT',
+    const result = await apiFetch('/api/stock/update', {
+      method: 'POST',
       body: JSON.stringify(data)
     });
     if (result.success) {
