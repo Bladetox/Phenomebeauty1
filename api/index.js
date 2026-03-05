@@ -1109,6 +1109,35 @@ app.put('/api/admin/stock', adminOnly, async (req, res) => {
 });
 
 // =============================================================================
+// POST /api/stock/update — Alternative endpoint used by admin.html saveStockRow
+// =============================================================================
+app.post('/api/stock/update', adminOnly, async (req, res) => {
+    try {
+        const { rowIndex, item, cost, stockOnHand, notes } = req.body;
+        if (rowIndex === undefined || rowIndex === null)
+            return res.status(400).json({ error: 'rowIndex is required' });
+        const sheet = req.doc.sheetsByTitle['Stock'];
+        if (!sheet) return res.status(404).json({ error: 'Stock sheet not found' });
+        const rows = await sheet.getRows();
+        const row  = rows[rowIndex];
+        if (!row) return res.status(404).json({ error: `Row ${rowIndex} not found` });
+        const cleanCost  = parseFloat(cost)       || 0;
+        const cleanStock = parseFloat(stockOnHand) || 0;
+        const cleanTotal = Math.round(cleanCost * cleanStock * 100) / 100;
+        row.set('ITEM',          sanitize(item  || '', 200));
+        row.set('COST',          cleanCost.toFixed(2));
+        row.set('STOCK ON HAND', cleanStock.toString());
+        row.set('TOTAL COST',    cleanTotal.toFixed(2));
+        row.set('NOTES',         sanitize(notes || '', 500));
+        await row.save();
+        return res.json({ success: true, message: 'Stock updated successfully' });
+    } catch (e) {
+        console.error('POST /api/stock/update:', e.message);
+        return res.status(500).json({ error: 'Failed to update stock: ' + e.message });
+    }
+});
+
+// =============================================================================
 // GET /api/admin/reviews  — fetches live reviews from Google Places API (New)
 // Requires: google_maps_api_key + google_place_id in Settings sheet
 // Falls back gracefully if not configured.
