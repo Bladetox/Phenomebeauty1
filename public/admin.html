@@ -363,196 +363,55 @@ html,body {
 
 
 
-/* ===== COMPREHENSIVE ADMIN PANEL THEME ===== */
-
-:root {
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --success: #10b981;
-  --success-hover: #059669;
-  --danger: #ef4444;
-  --danger-hover: #dc2626;
-  --secondary: #6b7280;
-  --secondary-hover: #4b5563;
+/* ── STOCK TABLE ENHANCEMENTS ── */
+.stock-table .editable {
+  cursor: text;
+  min-width: 60px;
+  position: relative;
+  transition: all 0.15s ease;
 }
 
-/* Container - Responsive */
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
+.stock-table .editable:hover {
+  background: rgba(255,255,255,0.08) !important;
+  outline: 0.5px solid var(--border-hi);
+  outline-offset: -1px;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 12px;
-  }
+.stock-table .editable:focus {
+  outline: 1px solid rgba(255,255,255,0.30);
+  outline-offset: -1px;
+  background: rgba(255,255,255,0.10) !important;
 }
 
-/* Section Headers - Consistent Layout */
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
+.stock-table .calculated {
+  color: var(--t60);
+  font-style: italic;
+  pointer-events: none;
 }
 
-.section-header h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--t100);
-}
-
-.section-header .badge {
-  background: var(--danger);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-@media (max-width: 768px) {
-  .section-header h2 {
-    font-size: 20px;
-  }
-}
-
-/* Unified Button System */
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  border-radius: 8px;
+.stock-table .action-btn.save-row {
+  background: var(--green);
+  color: var(--black);
   border: none;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: var(--primary);
-  color: white;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  transition: all 0.15s ease;
 }
 
-.action-btn:hover {
-  background: var(--primary-hover);
+.stock-table .action-btn.save-row:hover {
+  opacity: 0.88;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.action-btn:active {
-  transform: translateY(0);
-}
-
-.action-btn:disabled {
-  opacity: 0.6;
+.stock-table .action-btn.save-row:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
-.action-btn.secondary {
-  background: var(--card);
-  color: var(--t100);
-  border: 1px solid var(--border);
-}
-
-.action-btn.secondary:hover {
-  background: var(--hover);
-  border-color: var(--t20);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.action-btn.save-row {
-  background: var(--success);
-  padding: 6px 12px;
-  font-size: 13px;
-}
-
-.action-btn.save-row:hover {
-  background: var(--success-hover);
-}
-
-@media (max-width: 768px) {
-  .action-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-  
-  .action-btn.save-row {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-  
-  .btn-text {
-    display: none; /* Hide text on mobile, show icon only */
-  }
-  
-  .btn-icon {
-    font-size: 16px;
-  }
-}
-
-/* Tables - Fully Responsive */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--card);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.data-table thead {
-  background: var(--hover);
-}
-
-.data-table th {
-  padding: 12px;
-  text-align: left;
-  font-weight: 600;
-  color: var(--t100);
-  font-size: 14px;
-  border-bottom: 2px solid var(--border);
-}
-
-.data-table td {
-  padding: 12px;
-  color: var(--t80);
-  border-bottom: 1px solid var(--border);
-}
-
-.data-table tbody tr:hover {
-  background: var(--hover);
-}
-
-/* Editable Cells */
-.editable {
-  cursor: text;
-  min-width: 60px;
-  position: relative;
-  padding: 10px 12px !important;
-}
-
-.editable:hover {
-  background: rgba(59, 130, 246, 0.05);
-  outline: 1px solid rgba(59, 130, 246, 0.2);
-  outline-offset: -1px;
-}
-
-.editable:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: -2px;
-  background: rgba(59, 130, 246, 0.08);
-  border-radius: 4px;
-}
-
-.calculated {
-  color: var(--t60);
-  font-style: italic;
-}
-
-/* Modal - Responsive */
+/* Modal styling for stock settings */
 .modal {
   display: none;
   position: fixed;
@@ -560,111 +419,114 @@ html,body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(5,5,8,0.85);
+  backdrop-filter: blur(8px);
   z-index: 1000;
   align-items: center;
   justify-content: center;
 }
 
 .modal-content {
-  background: var(--card);
-  padding: 24px;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 60%);
+  border: 0.5px solid var(--border-hi);
+  border-radius: 20px;
+  padding: 28px;
   width: 90%;
-  max-width: 500px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 420px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.70);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-content::before {
+  content:'';
+  position:absolute;
+  top:0;
+  left:10%;
+  right:10%;
+  height:0.5px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.30) 50%,transparent);
 }
 
 .modal-content h3 {
-  margin: 0 0 20px 0;
-  font-size: 20px;
+  margin: 0 0 22px 0;
+  font-family: var(--font-d);
+  font-size: 22px;
+  font-weight: 500;
   color: var(--t100);
 }
 
 .modal-content label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 500;
-  color: var(--t100);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--t60);
 }
 
 .modal-content input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-  background: var(--bg);
+  height: 44px;
+  padding: 0 14px;
+  border: 0.5px solid var(--border);
+  border-radius: 11px;
+  font-size: 16px;
+  background: var(--t06);
   color: var(--t100);
-  margin-bottom: 8px;
+  font-family: var(--font-b);
+  font-weight: 500;
+  margin-bottom: 6px;
+  outline: none;
+  transition: border-color 0.15s;
 }
 
 .modal-content input:focus {
-  outline: 2px solid var(--primary);
-  border-color: var(--primary);
+  border-color: var(--t40);
 }
 
 .modal-content small {
   display: block;
   color: var(--t60);
-  font-size: 12px;
-  margin-bottom: 16px;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-bottom: 18px;
 }
 
-/* Modal Buttons */
 .modal-content button {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 11px;
+  font-family: var(--font-b);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
   margin-right: 8px;
+  border: none;
 }
 
-/* Mobile Table Optimization */
-@media (max-width: 768px) {
-  .data-table {
-    font-size: 12px;
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .data-table th,
-  .data-table td {
-    padding: 8px 6px;
-    white-space: nowrap;
-  }
-  
-  .modal-content {
-    width: 95%;
-    padding: 20px;
-    margin: 12px;
-  }
+.modal-content button.primary-btn {
+  background: var(--t100);
+  color: var(--black);
 }
 
-/* Sections */
-.section {
-  background: var(--card);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  border: 1px solid var(--border);
+.modal-content button.primary-btn:hover {
+  opacity: 0.88;
 }
 
-@media (max-width: 768px) {
-  .section {
-    padding: 16px;
-    margin-bottom: 16px;
-  }
+.modal-content button:not(.primary-btn) {
+  background: var(--t06);
+  border: 0.5px solid var(--border);
+  color: var(--t80);
 }
 
-/* Remove old styles that conflict */
-.icon-btn {
-  display: none !important;
-}
-
-.settings-btn {
-  display: none !important;
-}
-
-.save-btn {
-  display: none !important;
+.modal-content button:not(.primary-btn):hover {
+  background: var(--t10);
+  color: var(--t100);
 }
 
 </style>
