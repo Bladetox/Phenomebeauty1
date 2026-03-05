@@ -1583,48 +1583,34 @@ function saveStockSettings() {
 async function saveStockRow(rowIdx) {
   const row = document.querySelector(`[data-row="${rowIdx}"]`);
   if (!row) return;
-  
   const btn = row.querySelector('.save-row');
   btn.disabled = true;
   btn.textContent = 'Saving...';
-  
   const data = {
+    rowIndex: rowIdx,
     item: row.querySelector('[data-field="item"]').textContent.trim(),
     cost: parseFloat(row.querySelector('[data-field="cost"]').textContent.replace('R', '').trim()) || 0,
     stockOnHand: parseFloat(row.querySelector('[data-field="stockOnHand"]').textContent.trim()) || 0,
     notes: row.querySelector('[data-field="notes"]').textContent.trim()
   };
-  
-  data.totalCost = data.cost * data.stockOnHand;
-  
+  data.totalCost = Math.round(data.cost * data.stockOnHand * 100) / 100;
   try {
-    const res = await fetch('/api/stock', {
+    const result = await apiFetch('/api/admin/stock', {
       method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + (localStorage.getItem('adminToken') || 'ADMIN123')
-      },
-      body: JSON.stringify({ rowIndex: rowIdx, ...data })
+      body: JSON.stringify(data)
     });
-    
-    const result = await res.json();
-    
-    if (res.ok) {
+    if (result.success) {
       showToast('✅ Stock updated successfully');
       btn.textContent = 'Saved!';
-      setTimeout(() => {
-        btn.textContent = 'Save';
-        btn.disabled = false;
-        loadStock(); // Reload to show updated colors
-      }, 1500);
+      setTimeout(() => { btn.textContent = 'Save'; btn.disabled = false; loadStock(); }, 1500);
     } else {
       showToast('❌ ' + (result.error || 'Failed to update stock'));
       btn.textContent = 'Save';
       btn.disabled = false;
     }
   } catch (err) {
-    console.error('Save error:', err);
-    showToast('❌ Network error - check console');
+    console.error('saveStockRow error:', err);
+    showToast('❌ Network error');
     btn.textContent = 'Save';
     btn.disabled = false;
   }
