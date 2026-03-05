@@ -135,7 +135,7 @@ async function calCreate(s, b) {
     try {
         const r = await cal.events.insert({ calendarId: calId, requestBody: {
             summary:     `${b.name} — ${b.services}`,
-            description: `ID: ${b.bookingId}\nPhone: ${b.phone}\nEmail: ${b.email}\nAddress: ${b.address}\nTotal: R${b.totalAmount}\nDeposit: R${b.deposit}\nBalance: R${b.balance}`,
+            description: `ID: ${b.bookingId}\\nPhone: ${b.phone}\\nEmail: ${b.email}\\nAddress: ${b.address}\\nTotal: R${b.totalAmount}\\nDeposit: R${b.deposit}\\nBalance: R${b.balance}`,
             location:    b.address,
             start: { dateTime: toISO(b.date, startT),           timeZone: 'Africa/Johannesburg' },
             end:   { dateTime: toISO(b.date, endT || '01:00'),   timeZone: 'Africa/Johannesburg' },
@@ -1069,13 +1069,17 @@ app.get('/api/admin/stock', adminOnly, async (req, res) => {
         const sheet = req.doc.sheetsByTitle['Stock'];
         if (!sheet) return res.json([]);
         const rows = await sheet.getRows();
-        res.json(rows.filter(r=>(r.get('ITEM')||'').trim()).map(r=>({
-            item: r.get('ITEM') || '',
-            cost: r.get('COST') || '0',
-            stockOnHand: r.get('STOCK ON HAND') || '0',
-            totalCost: r.get('TOTAL COST') || '0',
-            notes: r.get('NOTES') || ''
-        })));
+        res.json(rows.filter(r=>(r.get('ITEM')||'').trim()).map(r=>{
+            const rawCost = (r.get('COST') || '0').toString().trim();
+            const cleanCost = rawCost.replace(/^R\s*/i, '');
+            return {
+                item: r.get('ITEM') || '',
+                cost: cleanCost,
+                stockOnHand: r.get('STOCK ON HAND') || '0',
+                totalCost: r.get('TOTAL COST') || '0',
+                notes: r.get('NOTES') || ''
+            };
+        }));
     } catch(e){res.status(500).json({error:e.message});}
 });
 
