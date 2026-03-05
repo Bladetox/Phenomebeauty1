@@ -563,6 +563,24 @@ html,body {
   color: var(--t60);
 }
 
+/* Mobile scroll wrapper for tables */
+.mobile-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--t10) transparent;
+}
+.mobile-scroll-wrapper::-webkit-scrollbar { height: 6px; }
+.mobile-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: var(--t10);
+  border-radius: 99px;
+}
+@media(max-width:640px) {
+  .mobile-scroll-wrapper {
+    margin: 0 -20px;
+    padding: 0 20px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1093,7 +1111,7 @@ async function loadStock() {
     }
     
     container.innerHTML = `
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <div class="mobile-scroll-wrapper">
       <table class="data-table stock-table">
         <thead><tr>
           <th>Item</th><th>Cost (R)</th><th>Stock On Hand</th>
